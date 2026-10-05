@@ -29,17 +29,23 @@ const NOTICE_KINDS = [
 /** The person's choices, or the table's defaults when they never saved any. */
 function find_prefs(PDO $pdo, int $memberId): array
 {
-    $st = $pdo->prepare('SELECT email_enabled, text_enabled, kinds, text_kinds FROM notification_prefs WHERE member_id = :m');
+    $st = $pdo->prepare('SELECT email_enabled, text_enabled, kinds, text_kinds, digest, away_minutes FROM notification_prefs WHERE member_id = :m');
     $st->execute(['m' => $memberId]);
     $r = $st->fetch();
     if ($r === false) {
         $d = $pdo->query("SELECT column_name, column_default FROM information_schema.columns WHERE table_name = 'notification_prefs' AND column_name IN ('kinds', 'text_kinds')")->fetchAll(PDO::FETCH_KEY_PAIR);
         $lit = static fn (string $def): string => preg_match("/'(\{[^']*\})'/", $def, $m) ? $m[1] : '{}';
         return ['email_enabled' => true, 'text_enabled' => false, 'kinds' => pg_text_array($lit((string) ($d['kinds'] ?? ''))),
-                'text_kinds' => pg_text_array($lit((string) ($d['text_kinds'] ?? ''))), 'saved' => false];
+                'text_kinds' => pg_text_array($lit((string) ($d['text_kinds'] ?? ''))), 'digest' => false, 'away_minutes' => null, 'saved' => false];
     }
     return ['email_enabled' => (bool) $r['email_enabled'], 'text_enabled' => (bool) $r['text_enabled'], 'kinds' => pg_text_array((string) $r['kinds']),
-            'text_kinds' => pg_text_array((string) $r['text_kinds']), 'saved' => true];
+            'text_kinds' => pg_text_array((string) $r['text_kinds']), 'digest' => (bool) $r['digest'], 'away_minutes' => $r['away_minutes'] === null ? null : (int) $r['away_minutes'], 'saved' => true];
+}
+
+/** The same, by the spec's name. */
+function my_prefs(PDO $pdo, int $memberId): array
+{
+    return find_prefs($pdo, $memberId);
 }
 
 /** Save the choices ($prefs keys present are changed; absent are kept). Answers ['before' => …, 'after' => …] of the changed keys. */
@@ -49,10 +55,11 @@ function save_prefs(PDO $pdo, int $memberId, array $prefs): array
     unset($before['saved']);
     $after = array_intersect_key($prefs, $before) + $before;
     $lit = static fn (array $a): string => '{' . implode(',', array_map(static fn (string $k): string => preg_replace('/[^a-z_]/', '', $k), $a)) . '}';
-    $pdo->prepare('INSERT INTO notification_prefs (member_id, email_enabled, text_enabled, kinds, text_kinds) VALUES (:m, :e, :t, CAST(:k AS text[]), CAST(:tk AS text[]))
+    $pdo->prepare('INSERT INTO notification_prefs (member_id, email_enabled, text_enabled, kinds, text_kinds, digest, away_minutes) VALUES (:m, :e, :t, CAST(:k AS text[]), CAST(:tk AS text[]), :d, :a)
                    ON CONFLICT (member_id) DO UPDATE SET email_enabled = EXCLUDED.email_enabled, text_enabled = EXCLUDED.text_enabled, kinds = EXCLUDED.kinds,
-                                                        text_kinds = EXCLUDED.text_kinds, updated_at = now()')
-        ->execute(['m' => $memberId, 'e' => $after['email_enabled'] ? 't' : 'f', 't' => $after['text_enabled'] ? 't' : 'f', 'k' => $lit($after['kinds']), 'tk' => $lit($after['text_kinds'])]);
+                                                        text_kinds = EXCLUDED.text_kinds, digest = EXCLUDED.digest, away_minutes = EXCLUDED.away_minutes, updated_at = now()')
+        ->execute(['m' => $memberId, 'e' => $after['email_enabled'] ? 't' : 'f', 't' => $after['text_enabled'] ? 't' : 'f', 'k' => $lit($after['kinds']), 'tk' => $lit($after['text_kinds']),
+                   'd' => $after['digest'] ? 't' : 'f', 'a' => $after['away_minutes']]);
     $changed = array_keys(array_filter($after, static fn ($v, string $k): bool => $v !== $before[$k], ARRAY_FILTER_USE_BOTH));
     return ['before' => array_intersect_key($before, array_flip($changed)), 'after' => array_intersect_key($after, array_flip($changed)), 'prefs' => $after];
 }
@@ -77,11 +84,29 @@ function last_text_refusal(PDO $pdo, int $memberId): ?string
     return null;
 }
 
+// ---- my status line (members.status_text / status_emoji / status_until — written here, never by the directory) ---------
+/** Set (or clear, when both text and emoji are empty) the member's own status. Returns before/after of the three fields. */
+function set_status(PDO $pdo, int $memberId, ?string $text, ?string $emoji, ?string $until): array
+{
+    $st = $pdo->prepare('SELECT status_text, status_emoji, status_until FROM members WHERE id = :id');
+    $st->execute(['id' => $memberId]);
+    $before = $st->fetch() ?: ['status_text' => null, 'status_emoji' => null, 'status_until' => null];
+    $text = $text !== null && trim($text) !== '' ? trim($text) : null;
+    $emoji = $emoji !== null && trim($emoji) !== '' ? trim($emoji) : null;
+    if ($text === null && $emoji === null) {
+        $until = null;
+    }
+    $pdo->prepare('UPDATE members SET status_text = :t, status_emoji = :e, status_until = :u WHERE id = :id')
+        ->execute(['t' => $text, 'e' => $emoji, 'u' => $until, 'id' => $memberId]);
+    $after = ['status_text' => $text, 'status_emoji' => $emoji, 'status_until' => $until];
+    return sp_diff(array_map(static fn ($v) => $v === null ? null : (string) $v, $before), $after);
+}
+
 // ---- notifications (the bell) ----------------------------------------------------------------------------------------
-function find_my_notifications(PDO $pdo, int $memberId, bool $unreadOnly = false, int $limit = 50): array
+function find_my_notifications(PDO $pdo, int $memberId, bool $unreadOnly = false, int $limit = 50, int $page = 1): array
 {
     $st = $pdo->prepare('SELECT notification_id, kind, record_type, record_id, record_uuid, channel_id, message_id, title, body, read_at, created_at FROM mcp_notifications'
-        . ($unreadOnly ? ' WHERE read_at IS NULL' : '') . ' ORDER BY (read_at IS NULL) DESC, created_at DESC LIMIT ' . max(1, min(200, $limit)));
+        . ($unreadOnly ? ' WHERE read_at IS NULL' : '') . ' ORDER BY (read_at IS NULL) DESC, created_at DESC LIMIT ' . max(1, min(200, $limit)) . ' OFFSET ' . (max(1, $page) - 1) * max(1, min(200, $limit)));
     $st->execute();
     return $st->fetchAll();
 }

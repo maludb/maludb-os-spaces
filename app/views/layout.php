@@ -1,11 +1,12 @@
 <?php
 /**
- * The app shell (design-system nxl skeleton), PHONE FIRST. Wraps a screen's page HTML.
+ * The app shell (design-system nxl skeleton), PHONE FIRST — sso-shell.md "The shell". Wraps a screen's page HTML.
  * Data: title, content, activeNav?, screen?, entity?, recordId?
  * Load-bearing: nxl-* classes, #mobile-collapse, #menu-mini-button, asset order, theme-customizer-init.min.js last.
- * #page-content is the HTMX swap target. At 375 px: the header carries the name and role badge, the bell and the avatar; a
- * bottom tab bar carries Home, Channels, Pages, Search and More (= the sidebar); the command bar sits above it.
- * From 992 px: the sidebar. The menu is app/features/shell/nav.php — an item shows only for a right held.
+ * Three panes at 1280 px: the sidebar (the menu, then the tree from sp_sidebar(): favorites, spaces → sections → pages,
+ * channels, Shared, Private, DMs), the main pane #page-content (the HTMX target), the right pane #right-pane (empty until a
+ * slice fills it). One pane at 375 px: the header's menu button opens the sidebar as an offcanvas; the bottom tab bar
+ * carries Home · Channels · Pages · Search · Me; the command bar sits above it; the right pane is a full page.
  */
 $title     = $title     ?? app_name();
 $content   = $content   ?? '';
@@ -13,14 +14,18 @@ $activeNav = $activeNav ?? '';
 $screen    = $screen    ?? '';
 $entity    = $entity    ?? '';
 $recordId  = $recordId  ?? '';
+$pdo       = db();
 $m         = current_member();
+$me        = (int) ($m['id'] ?? 0);
 $initials  = strtoupper(mb_substr((string) ($m['display_name'] ?? '?'), 0, 1));
 $roleBadge = role_badge();
-$unread    = 0;                                   // slice 8 fills the bell: count of unread notifications
-if ($m !== null) {
-    $st = db()->query('SELECT count(*) FROM mcp_notifications WHERE read_at IS NULL');
-    $unread = (int) $st->fetchColumn();
-}
+$badgeKind = match ($roleBadge) { 'Spaces admin', 'Super-admin' => 'danger', 'Space owner' => 'primary', 'Guest' => 'warning', default => 'secondary' };
+$unread    = $m !== null ? bell_count($pdo, $me) : 0;
+$status    = $m !== null ? my_status($pdo, $me) : null;
+$sb        = $m !== null ? sidebar($pdo) : [];
+$counts    = $m !== null ? unread_counts($pdo) : [];
+$guest     = $m !== null && is_guest();
+$here      = current_path();
 $navlink = function (string $id, string $url, string $icon, string $label) use ($activeNav): string {
     $active = $activeNav === $id ? ' active' : '';
     return '<li class="nxl-item" id="nav-' . e($id) . '">'
@@ -31,6 +36,7 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
         . '<span class="nxl-mtext">' . e($label) . '</span>'
         . '</a></li>';
 };
+$groups = nav_groups();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +60,7 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
     <link rel="stylesheet" type="text/css" href="/assets/css/app-overrides.css" />
 </head>
 <body>
-    <!--! [Start] Navigation (the sidebar on a desktop; "More" on a phone) !-->
+    <!--! [Start] Navigation (the sidebar on a desktop; the offcanvas from the menu button on a phone) !-->
     <nav class="nxl-navigation" id="left-sidenav">
         <div class="navbar-wrapper">
             <div class="m-header">
@@ -64,16 +70,20 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
                 </a>
             </div>
             <div class="navbar-content">
-                <ul class="nxl-navbar">
-                    <?php foreach (nav_groups() as $groupLabel => $items): ?>
+                <ul class="nxl-navbar" id="shell-menu">
+                    <?php $top = array_filter($groups['Spaces'] ?? [], static fn (array $i): bool => in_array($i[0], ['home', 'activity', 'saved', 'search'], true) && nav_has_right($i[4])); ?>
+                    <?php foreach ($top as $item) { echo $navlink($item[0], $item[1], $item[2], $item[3]); } ?>
+                </ul>
+                <?php if ($m !== null): ?>
+                    <?= view('shared/sidebar.php', ['sb' => $sb, 'unread' => $counts, 'here' => $here, 'guest' => $guest, 'mayWrite' => has_right('pages.write')]) ?>
+                <?php endif; ?>
+                <ul class="nxl-navbar" id="shell-menu-groups">
+                    <?php foreach ($groups as $groupLabel => $items): ?>
+                        <?php if ($groupLabel === 'Spaces') { $items = array_filter($items, static fn (array $i): bool => !in_array($i[0], ['home', 'activity', 'saved', 'search'], true)); } ?>
                         <?php $shown = array_filter($items, static fn (array $i): bool => nav_has_right($i[4])); if ($shown === []) { continue; } ?>
-                        <li class="nxl-item nxl-caption"><label><?= e($groupLabel) ?></label></li>
+                        <li class="nxl-item nxl-caption"><label><?= e($groupLabel === 'Spaces' ? 'Browse' : $groupLabel) ?></label></li>
                         <?php foreach ($shown as $item) { echo $navlink($item[0], $item[1], $item[2], $item[3]); } ?>
                     <?php endforeach; ?>
-                    <li class="nxl-item nxl-caption"><label>Me</label></li>
-                    <?= $navlink('notifications', '/notifications', 'feather-bell', 'Notifications') ?>
-                    <?= $navlink('tokens', '/settings/tokens/', 'feather-key', 'Tokens') ?>
-                    <?= $navlink('activity', '/activity', 'feather-activity', 'Activity') ?>
                 </ul>
             </div>
         </div>
@@ -84,7 +94,7 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
     <header class="nxl-header" id="top-header">
         <div class="header-wrapper">
             <div class="header-left d-flex align-items-center gap-3">
-                <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse">
+                <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse" aria-label="Menu">
                     <div class="hamburger hamburger--arrowturn">
                         <div class="hamburger-box"><div class="hamburger-inner"></div></div>
                     </div>
@@ -94,12 +104,17 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
                     <a href="javascript:void(0);" id="menu-expend-button" style="display: none"><i class="feather-arrow-right"></i></a>
                 </div>
                 <div class="header-role d-flex align-items-center" id="header-person">
-                    <span class="fw-semibold text-dark text-truncate" id="header-person-name"><?= e($m['display_name'] ?? '') ?></span>
-                    <?php if ($roleBadge !== ''): ?><span class="badge bg-soft-primary text-primary ms-2 text-nowrap" id="header-role-badge"><?= e($roleBadge) ?></span><?php endif; ?>
+                    <span class="fw-semibold text-dark text-truncate" id="header-business"><?= e(business_name($pdo)) ?></span>
+                    <?php if ($roleBadge !== ''): ?><span class="badge bg-soft-<?= e($badgeKind) ?> text-<?= e($badgeKind) ?> ms-2 text-nowrap" id="header-role-badge"><?= e($roleBadge) ?></span><?php endif; ?>
                 </div>
             </div>
             <div class="header-right ms-auto">
                 <div class="d-flex align-items-center">
+                    <?php if ($status !== null): ?>
+                    <div class="nxl-h-item d-none d-md-flex me-2">
+                        <a href="/settings/#status" class="fs-12 text-muted text-truncate" id="header-status" title="Your status"><?= e(trim(($status['emoji'] ?? '') . ' ' . ($status['text'] ?? ''))) ?></a>
+                    </div>
+                    <?php endif; ?>
                     <div class="nxl-h-item">
                         <a href="/notifications" class="nxl-head-link me-0 position-relative" id="header-bell" aria-label="Notifications" hx-get="/notifications" hx-target="#page-content" hx-push-url="/notifications">
                             <i class="feather-bell"></i>
@@ -123,15 +138,18 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
                             <div class="dropdown-header">
                                 <div class="d-flex align-items-center">
                                     <span class="avatar-text avatar-md user-avtar"><?= e($initials) ?></span>
-                                    <div>
+                                    <div class="min-w-0">
                                         <h6 class="text-dark mb-0" id="header-user-name"><?= e($m['display_name'] ?? 'Member') ?></h6>
-                                        <span class="fs-12 fw-medium text-muted"><?= e($m['email'] ?? '') ?></span>
+                                        <span class="fs-12 fw-medium text-muted" id="header-user-status"><?= $status !== null ? e(trim(($status['emoji'] ?? '') . ' ' . ($status['text'] ?? ''))) : e($m['email'] ?? '') ?></span>
                                     </div>
                                 </div>
                             </div>
                             <div class="dropdown-divider"></div>
                             <a href="/settings/" class="dropdown-item" hx-get="/settings/" hx-target="#page-content" hx-push-url="/settings/" id="header-settings-link">
                                 <i class="feather-settings"></i><span>My settings</span>
+                            </a>
+                            <a href="/settings/#status" class="dropdown-item" id="header-status-link">
+                                <i class="feather-smile"></i><span>Set a status</span>
                             </a>
                             <a href="/settings/tokens/" class="dropdown-item" hx-get="/settings/tokens/" hx-target="#page-content" hx-push-url="/settings/tokens/" id="header-tokens-link">
                                 <i class="feather-key"></i><span>Tokens</span>
@@ -157,16 +175,19 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
     <!--! [Start] Main Content !-->
     <main class="nxl-container app-has-assistant-bar app-has-tabbar">
         <div id="flash"></div>
-        <div class="nxl-content" id="page-content"
-             data-screen="<?= e($screen) ?>" data-entity="<?= e($entity) ?>" data-record-id="<?= e($recordId) ?>">
-            <?= $content ?>
+        <div class="app-panes" id="app-panes">
+            <div class="nxl-content" id="page-content"
+                 data-screen="<?= e($screen) ?>" data-entity="<?= e($entity) ?>" data-record-id="<?= e($recordId) ?>">
+                <?= $content ?>
+            </div>
+            <?= view('shared/right-pane.php') ?>
         </div>
         <footer class="footer" id="page-footer">
             <p class="fs-11 text-muted fw-medium text-uppercase mb-0 copyright">
                 <span>© <?= date('Y') ?> <?= e(app_name()) ?> · an application for the Business OS</span>
             </p>
             <div class="d-flex align-items-center gap-4">
-                <a href="/activity" class="fs-11 fw-semibold text-uppercase" hx-get="/activity" hx-target="#page-content" hx-push-url="/activity">Activity</a>
+                <a href="/trail" class="fs-11 fw-semibold text-uppercase" hx-get="/trail" hx-target="#page-content" hx-push-url="/trail">My trail</a>
                 <a href="<?= e(launcher_url()) ?>" class="fs-11 fw-semibold text-uppercase">Applications</a>
             </div>
         </footer>
@@ -189,13 +210,41 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
                 if (meta) { e.detail.headers['X-CSRF-Token'] = meta.content; }
             }
         });
-        // "More" is the sidebar: the same toggle the hamburger uses.
-        var more = document.getElementById('tab-more');
-        if (more) { more.addEventListener('click', function () { var t = document.getElementById('mobile-collapse'); if (t) { t.click(); } }); }
-        // A swapped screen: title, sidebar and tab highlight, theme widgets that bind on ready.
+        // The right pane: a slice fills it (a thread, comments) and opens it; closed by its button or Escape.
+        window.SP = window.SP || {};
+        SP.rightPane = {
+            el: function () { return document.getElementById('right-pane'); },
+            open: function (html, title) {
+                var p = SP.rightPane.el(); if (!p) return;
+                if (html !== undefined && html !== null) { document.getElementById('right-pane-body').innerHTML = html; if (window.htmx) { htmx.process(document.getElementById('right-pane-body')); } }
+                document.getElementById('right-pane-title').textContent = title || '';
+                p.removeAttribute('hidden'); p.dataset.open = '1';
+                document.dispatchEvent(new CustomEvent('sp:rightpane', { detail: { open: true } }));
+            },
+            close: function () {
+                var p = SP.rightPane.el(); if (!p) return;
+                p.setAttribute('hidden', ''); delete p.dataset.open; document.getElementById('right-pane-body').innerHTML = ''; document.getElementById('right-pane-title').textContent = '';
+                document.dispatchEvent(new CustomEvent('sp:rightpane', { detail: { open: false } }));
+            },
+            isOpen: function () { var p = SP.rightPane.el(); return !!(p && !p.hasAttribute('hidden')); }
+        };
+        document.getElementById('right-pane-close').addEventListener('click', function () { SP.rightPane.close(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && SP.rightPane.isOpen()) { SP.rightPane.close(); } });
+        // The sidebar's tree: a toggle opens its children (loaded once by HTMX); the hamburger is the offcanvas on a phone.
+        document.body.addEventListener('click', function (e) {
+            var t = e.target.closest('.sp-tree-toggle'); if (!t || t.classList.contains('leaf')) return;
+            var open = t.getAttribute('aria-expanded') === 'true';
+            t.setAttribute('aria-expanded', open ? 'false' : 'true');
+            var c = document.getElementById(t.getAttribute('aria-controls')); if (c) { if (open) { c.setAttribute('hidden', ''); } else { c.removeAttribute('hidden'); } }
+        });
+        // The command bar shows Send only while in use.
+        (function () { var f = document.getElementById('assistant-form'), i = document.getElementById('assistant-input'); if (!f || !i) return;
+            i.addEventListener('input', function () { f.classList.toggle('in-use', i.value.trim() !== ''); }); })();
+        // A swapped screen: title, sidebar and tab highlight, context stamps, theme widgets that bind on ready.
         document.body.addEventListener('htmx:afterSwap', function (e) {
             var pc = document.getElementById('page-content');
             if (!pc) return;
+            if (e.detail && e.detail.target && e.detail.target.id === 'right-pane-body') { SP.rightPane.open(undefined, (e.detail.xhr && e.detail.xhr.getResponseHeader('X-Pane-Title')) || document.getElementById('right-pane-title').textContent); return; }
             var xt = e.detail && e.detail.xhr ? e.detail.xhr.getResponseHeader('HX-Title') : null;
             if (xt) { document.title = decodeURIComponent(xt); }
             if (e.detail && e.detail.target && e.detail.target.id === 'flash') { window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -205,13 +254,16 @@ $navlink = function (string $id, string $url, string $icon, string $label) use (
                 pc.dataset.entity = xhr.getResponseHeader('X-Entity') || '';
                 pc.dataset.recordId = xhr.getResponseHeader('X-Record-Id') || '';
             }
+            if (!e.detail || !e.detail.target || e.detail.target.id !== 'page-content') return;
             var screen = pc.dataset.screen || '';
-            var navId = screen === 'dashboard' ? 'home' : screen;
-            document.querySelectorAll('.nxl-navbar .nxl-link, #app-tabbar .app-tab').forEach(function (a) { a.classList.remove('active'); });
+            var navId = { 'dashboard': 'home', 'settings': 'my-settings', 'trail': 'trail', 'tokens': 'tokens', 'notifications': 'notifications' }[screen] || screen;
+            document.querySelectorAll('.nxl-navbar .nxl-link, #app-tabbar .app-tab, .sp-tree-row > a').forEach(function (a) { a.classList.remove('active'); });
             var link = document.querySelector('#nav-' + navId + ' .nxl-link');
             if (link) { link.classList.add('active'); }
             var tab = document.getElementById('tab-' + navId);
             if (tab) { tab.classList.add('active'); }
+            var path = window.location.pathname;
+            document.querySelectorAll('.sp-tree-row > a').forEach(function (a) { if (a.getAttribute('href') === path) { a.classList.add('active'); } });
             if (window.jQuery) {
                 if (jQuery.fn.tooltip) { jQuery('[data-bs-toggle="tooltip"]').tooltip(); }
                 if (jQuery.fn.select2) { jQuery('#page-content select[data-select2-selector]').each(function () { if (!jQuery(this).hasClass('select2-hidden-accessible')) { jQuery(this).select2({ width: '100%' }); } }); }

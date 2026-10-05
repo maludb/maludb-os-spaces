@@ -1,4 +1,4 @@
-<?php /** The phone's tab bar (hidden from 992 px, where the sidebar is): Home, Channels, Pages, Search, More. Data: activeNav */ ?>
+<?php /** The phone's tab bar (hidden from 992 px, where the sidebar is): Home, Channels, Pages, Search, Me. Data: activeNav */ ?>
 <nav class="app-tabbar d-lg-none" id="app-tabbar" aria-label="Main">
     <?php foreach (nav_tabs() as [$tid, $turl, $ticon, $tlabel, $tright]): ?>
         <?php if ($tright !== null && !nav_has_right($tright)) { continue; } ?>
@@ -7,5 +7,4 @@
             <i class="<?= e($ticon) ?>"></i><span><?= e($tlabel) ?></span>
         </a>
     <?php endforeach; ?>
-    <a href="javascript:void(0);" id="tab-more" class="app-tab" role="button" aria-label="More"><i class="feather-menu"></i><span>More</span></a>
 </nav>

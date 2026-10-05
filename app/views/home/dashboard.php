@@ -1,4 +1,4 @@
-<?php /** Home (screen `home`). Data: s (home_summary), tz. Each region is an empty state naming its slice until it ships; the sidebar's spaces and channels are real from Phase 0. */
+<?php /** Home (screen `home`, sso-shell.md). Data: s (home_summary), tz. Each region is an empty state naming its slice until it ships; the spaces card is real (sp_sidebar()). */
 $may = $s['may'];
 $sb = $s['sidebar'] ?? [];
 $coming = static fn (string $id, string $icon, string $title, string $text, string $slice): string =>
@@ -33,5 +33,4 @@ $coming = static fn (string $id, string $icon, string $title, string $text, stri
             <?php if ($may['admin']): ?><?= $s['admin'] === null ? $coming('home-admin', 'feather-shield', 'For the admin', 'Pending dispatches, published pages and the trash appear here.', 'slice 9') : '' ?><?php endif; ?>
         </div>
     </div>
-    <div class="alert alert-light border fs-12 mt-2" id="home-phase-note">The shell — three panes, the sidebar of spaces, pages and channels, the command bar — is Phase 2's. This page proves sign-on lands on something real.</div>
 </div>

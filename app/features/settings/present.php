@@ -6,7 +6,13 @@ declare(strict_types=1);
 function present_prefs(array $p): array
 {
     return ['email_enabled' => (bool) $p['email_enabled'], 'text_enabled' => (bool) $p['text_enabled'], 'kinds' => array_values($p['kinds']),
-            'text_kinds' => array_values($p['text_kinds']), 'saved' => (bool) ($p['saved'] ?? true)];
+            'text_kinds' => array_values($p['text_kinds']), 'digest' => (bool) ($p['digest'] ?? false), 'away_minutes' => $p['away_minutes'] ?? null, 'saved' => (bool) ($p['saved'] ?? true)];
+}
+
+/** My status line as JSON (null when none). */
+function present_status(?array $s): ?array
+{
+    return $s === null ? null : ['text' => $s['text'], 'emoji' => $s['emoji'], 'until' => json_ts($s['until'] ?? null)];
 }
 
 function present_token(array $t): array

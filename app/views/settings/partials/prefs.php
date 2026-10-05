@@ -28,5 +28,12 @@
             <label class="d-flex align-items-center gap-2 border rounded px-3 mb-2 btn-touch" for="prefs-field-text-kind-<?= e($k) ?>"><input type="checkbox" class="form-check-input mt-0" name="text_kinds[]" value="<?= e($k) ?>" id="prefs-field-text-kind-<?= e($k) ?>" <?= in_array($k, $prefs['text_kinds'], true) ? 'checked' : '' ?>><?= e($label) ?></label>
         <?php endforeach; ?>
     </div></div>
+    <div class="card mb-3"><div class="card-header"><h5 class="card-title mb-0">How often</h5></div><div class="card-body">
+        <input type="hidden" name="digest" value="no">
+        <label class="d-flex align-items-center gap-2 border rounded px-3 mb-2 btn-touch" for="prefs-field-digest"><input type="checkbox" class="form-check-input mt-0" name="digest" value="yes" id="prefs-field-digest" <?= !empty($prefs['digest']) ? 'checked' : '' ?>><i class="feather-sunrise"></i> One morning digest instead of an email per event</label>
+        <label class="form-label fs-12 text-muted mt-2" for="prefs-field-away">Text me only when I have been away this many minutes</label>
+        <input type="number" name="away_minutes" id="prefs-field-away" class="form-control btn-touch" min="1" max="1440" inputmode="numeric" placeholder="the workspace's" value="<?= e((string) ($prefs['away_minutes'] ?? '')) ?>">
+        <div class="fs-12 text-muted mt-1">Empty means the workspace's setting. While you are active in Spaces you are never texted.</div>
+    </div></div>
     <button type="submit" class="btn btn-primary btn-touch w-100" id="prefs-save-btn">Save</button>
 </form>

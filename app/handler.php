@@ -150,13 +150,19 @@ function return_path(string $default): string
     return safe_local_path($_POST['return_to'] ?? null) ?? $default;
 }
 
-/** A landing URL with a notice key (and an anchor). */
+/** A landing URL with a notice key (and an anchor). A fragment already on the path is kept unless $anchor replaces it. */
 function sp_land(string $path, ?string $notice = null, ?string $anchor = null): string
 {
+    $fragment = null;
+    if (($hash = strpos($path, '#')) !== false) {
+        $fragment = substr($path, $hash + 1);
+        $path = substr($path, 0, $hash);
+    }
     if ($notice !== null) {
         $path .= (str_contains($path, '?') ? '&' : '?') . 'notice=' . rawurlencode($notice);
     }
-    return $anchor === null ? $path : $path . '#' . $anchor;
+    $anchor ??= $fragment;
+    return $anchor === null || $anchor === '' ? $path : $path . '#' . $anchor;
 }
 
 /** The notice banner for a key: [kind, sentence] or null. */

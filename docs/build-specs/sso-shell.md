@@ -147,3 +147,36 @@ vhost when `SP_APP=apache`, headless Chromium at 375 × 740 and 1280 × 800; the
   a token minted and shown once, then revoked; the manifest.webmanifest installable; every control ≥ 44 px; `scrollWidth` = viewport; no console errors.
 
 ## Open questions
+
+## Built and proven (2026-10-05)
+**Phase 1 approved by the owner 2026-10-05** ("Continue with your original build process"). Phase 2 built the same day on the Phase 0 kit:
+`app/views/layout.php` (three panes: the sidebar — Home · Activity · Saved · Search, then `shared/sidebar.php` from one `sp_sidebar()` call
+and one `sp_unread()` call — favorites, each space with its sections, root pages (lazy children by `html/pages/children.php` →
+`sp_page_children()`, the list partial `shared/sidebar-pages.php`) and channels with unread/mention badges, Shared with me, Private, Direct
+messages, More spaces (joinable), then the Browse, Me and Admin menu groups —, the main pane `#page-content`, the right pane
+`shared/right-pane.php` (`SP.rightPane.open(html, title)` / `.close()`, 380 px beside the main pane from 1280 px, a full page below, Escape
+closes; an HTMX swap into `#right-pane-body` opens it); the header with the business name (`sp_settings.business_name`), the role badge
+(Super-admin / Spaces admin `danger`, Space owner `primary`, Member `secondary`, Guest `warning`), my status line, the bell with its count,
+the avatar menu; the tab bar Home · Channels · Pages · Search · Me at 375 (the sidebar is the offcanvas from the menu button); the command
+bar with Send shown only while in use. `app/features/shell/queries.php`: `sidebar()`, `unread_counts()`, `bell_count()`, `my_status()`,
+`business_name()`, each one query per render. The page header partial is `shared/header.php` (the kit's name; the spec said `page-header`).
+**Presence**: `presence_touch()` in the bootstrap (one UPDATE a minute per session), `html/presence.php` the heartbeat (POST + CSRF, 204).
+**My settings** (`settings/index.php`): prefs with `digest` and `away_minutes` (`prefs_save`), the status line (`status_set`,
+`html/settings/status.php`: text ≤ 100, emoji ≤ 16, `until` in my time zone and in the future, `clear=1`; `set_status()` in
+`app/features/settings/queries.php`), the time zone shown read-only (the directory's; changed in the operating system — the mirror would
+overwrite a local value). **The trail** is `html/trail.php` (screen `trail`; `/activity` is slice 6's placeholder). **The command bar**:
+`app/features/assistant/queries.php` `ask_assistant()` + `assistant_refresh_events()`, `html/assistant/ask.php` (a `navigate` answer that is a
+local path is followed by HX-Location; the kernel's refusal in its words; the kernel down said in words). `html/login.php`, `html/files.php`
+(the gated attachment door: 401 anonymous, `sp_can_see_attachment()`, streams from `storage/`), the assets (the design system verbatim +
+`app-overrides.css` rewritten for Spaces: the three panes, the tree, the tab bar), the brand images, `manifest.webmanifest`. Sixteen
+placeholders (`render_nav_stub()`, `NAV_SLICES` in `nav.php`): saved, search, spaces, pages, channels, dm, activity, admin/{settings, spaces,
+published, retention, trash, agents, connections}, exports, proposals — the registry reads them as unbuilt (5 screens, 5 actions built).
+`tests/dev_router.php` mirrors the Spaces vhost (the public door, the attachment door, UUID records). Decision taken: `sp_land()` keeps or
+replaces a fragment on the landing path (a form's `return_to` never carries one).
+**Proof** `tests/phase2/run.sh` — **312 checks green** (sso 56, gates 110, sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63) plus
+the registry and approvals checks, under `php -S` and under a real Apache serving the rendered vhost (`SP_APP=apache`): every box of the
+"Proof" list above, including the Watcher refused and logged, an agent kept off the person-only screens (home, tokens, the command bar,
+notifications) while saving its own prefs and status, the sidebar per role (a guest: Shared with me and Direct messages only), a department
+delivered seeding its space, a new member admitted landing in General and their department's space, presence once a minute, the three panes
+at 1280 and the full-page right pane at 375, every control ≥ 44 px, no console errors, the home whole with JavaScript off, installable.
+Screenshots: `/tmp/sp-shots/`. Phase 0's 18 checks still green.

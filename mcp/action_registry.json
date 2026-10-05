@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T15:50:21+00:00",
+    "generated_at": "2026-10-05T16:36:08+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -20,8 +20,8 @@
                 "since",
                 "kind"
             ],
-            "built": true,
-            "stub": false
+            "built": false,
+            "stub": true
         },
         "saved": {
             "screen": "saved",
@@ -30,7 +30,7 @@
             "when": "the messages I saved (Later) and my reminders",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "notifications": {
             "screen": "notifications",
@@ -52,7 +52,7 @@
                 "message",
                 "page"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "settings": {
@@ -83,7 +83,7 @@
                 "q"
             ],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "space-add": {
             "screen": "space-add",
@@ -160,7 +160,7 @@
                 "changed"
             ],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "page-add": {
             "screen": "page-add",
@@ -279,7 +279,7 @@
                 "archived"
             ],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "channel-add": {
             "screen": "channel-add",
@@ -346,7 +346,7 @@
             "when": "my direct and group messages with their last lines and unread counts",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "dm-new": {
             "screen": "dm-new",
@@ -459,7 +459,7 @@
                 "space"
             ],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "wiki-report": {
             "screen": "wiki-report",
@@ -477,7 +477,7 @@
             "when": "the agents that are members here, their spaces and channels, their last reply, their pending and failed dispatches — read-only; hiring and grants link to the kernel",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "dispatch-list": {
             "screen": "dispatch-list",
@@ -501,7 +501,7 @@
                 "kind"
             ],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "connection-list": {
             "screen": "connection-list",
@@ -510,7 +510,7 @@
             "when": "which sibling applications read what of ours (the two shares) and when — the kernel's facts, read-only",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "import": {
             "screen": "import",
@@ -532,7 +532,7 @@
             "when": "my exports (the admin's: everyone's): make one, download one before it expires",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "admin-settings": {
             "screen": "admin-settings",
@@ -541,7 +541,7 @@
             "when": "the workspace's settings: business name, default space kind and levels, snapshot interval, version and trash retention, stale days, unanswered hours, verification default, the attachment limit, embed hosts, public pages noindex, digest hour, week start, time zone, group DM size, away minutes, the admin channel",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "admin-spaces": {
             "screen": "admin-spaces",
@@ -550,7 +550,7 @@
             "when": "every space, the private ones marked (opening one is logged `space.admin_view`); archive, restore, delete",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "admin-published": {
             "screen": "admin-published",
@@ -559,7 +559,7 @@
             "when": "every published page, its views and last opened; rotate or unpublish",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "admin-retention": {
             "screen": "admin-retention",
@@ -568,7 +568,7 @@
             "when": "every channel's retention and the version and trash retentions",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         },
         "admin-trash": {
             "screen": "admin-trash",
@@ -577,7 +577,7 @@
             "when": "everyone's trash: restore, purge, purge all",
             "params": [],
             "built": false,
-            "stub": false
+            "stub": true
         }
     },
     "actions": {
@@ -659,7 +659,7 @@
             "approval": null,
             "log_event": "status.set",
             "who": "own",
-            "built": false
+            "built": true
         },
         "notification_read": {
             "action": "notification_read",

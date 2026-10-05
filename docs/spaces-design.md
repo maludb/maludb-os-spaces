@@ -664,7 +664,14 @@ THE FIRST EXEMPLAR)**, **`channels` (4, THE SECOND EXEMPLAR)**, `databases` (5),
 claimed by exactly one slice). Every "Open questions" section is empty. Decisions taken in the specs rather than asked: Phase 2's own-trail page is
 `/trail` and `/activity` is the feed (the manifest says so); a member added to a space and a wiki page's new owner are told with the `share` kind
 (db/012 has no kind of their own); the editor's presence is a file-backed cache, never a table; the dispatch loop (the worker calling the kernel's
-chat endpoint) is slice 7's step, slice 4 proves its two halves through the SQL functions. **The owner approves Phase 1 as a whole before any PHP.**
+chat endpoint) is slice 7's step, slice 4 proves its two halves through the SQL functions. **PHASE 1 APPROVED by the owner 2026-10-05** ("Continue with your original build process").
+**PHASE 2 — BUILT and proven 2026-10-05** (`docs/build-specs/sso-shell.md`, "Built and proven"): the shell — three panes at 1280 (the
+sidebar from one `sp_sidebar()` call with lazy page children, the main pane, the right pane `SP.rightPane` empty until slices 3 and 4), one
+pane and the tab bar Home · Channels · Pages · Search · Me at 375, the header with the business name, the badge, my status and the bell,
+the command bar through the kernel's chat endpoint (a `navigate` followed), presence once a minute plus the heartbeat, My settings with the
+digest, away minutes, the status line (`status_set`) and the read-only time zone, the trail at `/trail`, the attachment door, the assets
+and the brand, sixteen placeholders naming their slices; **312 checks green** under `php -S` and under a real Apache (sso 56, gates 110,
+sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63), the registry and approvals in step, Phase 0's 18 still green. Next: slice 1.
 
 **Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 

@@ -83,6 +83,7 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/directory.php';
 require_once __DIR__ . '/mail.php';
 require_once __DIR__ . '/features/shell/nav.php';
+require_once __DIR__ . '/features/shell/queries.php';
 
 // A JSON caller (the kernel's actions server, an approval replay) never receives PHP's own
 // error output — a 500 it can parse instead of an HTML fragment.
@@ -181,5 +182,24 @@ if (PHP_SAPI !== 'cli') {
             redirect(launcher_url('app=' . rawurlencode(app_key())));
         }
         session_touch(db(), session_id());
+        presence_touch(db());
     }
+}
+
+/**
+ * Presence (sso-shell.md): a signed-in request sets members.last_seen_at at most once a minute (one UPDATE, guarded by a
+ * session timestamp); html/presence.php is the explicit heartbeat the editor and a channel page POST while visible.
+ * "Active in the last 5 minutes" is what mcp_members.is_active_now says.
+ */
+function presence_touch(PDO $pdo, bool $force = false): void
+{
+    if (!is_logged_in() || is_action_authed()) {
+        return;
+    }
+    $last = (int) ($_SESSION['presence_at'] ?? 0);
+    if (!$force && $last > time() - 60) {
+        return;
+    }
+    $_SESSION['presence_at'] = time();
+    $pdo->prepare('UPDATE members SET last_seen_at = now() WHERE id = :id')->execute(['id' => (int) $_SESSION['member_id']]);
 }

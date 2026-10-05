@@ -22,31 +22,34 @@ function nav_groups(): array
             ['dms',       '/dm/',        'feather-message-circle','Direct messages', 'dm.write|spaces.guest'],
         ],
         'Me' => [
-            ['my-settings', '/settings/',        'feather-settings', 'My settings', 'spaces.join|spaces.guest'],
-            ['tokens',      '/settings/tokens/', 'feather-key',      'Tokens',      'spaces.join|spaces.guest'],
+            ['my-settings',   '/settings/',        'feather-settings', 'My settings',   'spaces.join|spaces.guest'],
+            ['notifications', '/notifications',    'feather-bell',     'Notifications', 'spaces.join|spaces.guest'],
+            ['tokens',        '/settings/tokens/', 'feather-key',      'Tokens',        'spaces.join|spaces.guest'],
+            ['trail',         '/trail',            'feather-list',     'My trail',      'spaces.join|spaces.guest'],
         ],
         'Admin' => [
             ['admin-settings',    '/admin/settings',    'feather-sliders',        'Settings',            'settings.manage'],
             ['admin-spaces',      '/admin/spaces',      'feather-layers',         'All spaces',          'settings.manage'],
             ['admin-published',   '/admin/published',   'feather-globe',          'Published pages',     'settings.manage'],
             ['admin-retention',   '/admin/retention',   'feather-clock',          'Retention',           'retention.manage'],
-            ['admin-exports',     '/admin/exports',     'feather-download-cloud', 'Exports',             'export.all'],
+            ['admin-exports',     '/exports/',          'feather-download-cloud', 'Exports',             'export.all'],
             ['admin-trash',       '/admin/trash',       'feather-trash-2',        'Trash',               'trash.purge'],
             ['admin-agents',      '/admin/agents',      'feather-cpu',            'Agents',              'agents.settings'],
             ['admin-connections', '/admin/connections', 'feather-share-2',        'Connections',         'settings.manage'],
-            ['admin-proposals',   '/admin/proposals',   'feather-inbox',          'Librarian proposals', 'agents.settings'],
+            ['admin-proposals',   '/proposals/',        'feather-inbox',          'Librarian proposals', 'agents.settings'],
         ],
     ];
 }
 
-/** The phone's tabs (design §9): Home, Channels, Pages, Search — and More (the sidebar) which the layout adds. */
+/** The phone's tabs (design §9, sso-shell.md): Home · Channels · Pages · Search · Me. The sidebar opens from the header's menu button. */
 function nav_tabs(): array
 {
     return [
-        ['home',     '/',          'feather-home',      'Home',     'spaces.join|spaces.guest'],
-        ['channels', '/channels/', 'feather-hash',      'Channels', 'spaces.join|spaces.guest'],
-        ['pages',    '/pages/',    'feather-file-text', 'Pages',    'spaces.join|spaces.guest'],
-        ['search',   '/search',    'feather-search',    'Search',   'spaces.join|spaces.guest'],
+        ['home',        '/',          'feather-home',      'Home',     'spaces.join|spaces.guest'],
+        ['channels',    '/channels/', 'feather-hash',      'Channels', 'spaces.join|spaces.guest'],
+        ['pages',       '/pages/',    'feather-file-text', 'Pages',    'spaces.join|spaces.guest'],
+        ['search',      '/search',    'feather-search',    'Search',   'spaces.join|spaces.guest'],
+        ['my-settings', '/settings/', 'feather-user',      'Me',       'spaces.join|spaces.guest'],
     ];
 }
 
@@ -137,7 +140,7 @@ function back_link(): ?array
         return null;
     }
     $path = parse_url($back, PHP_URL_PATH) ?: '/';
-    $labels = ['/' => 'Home', '/notifications' => 'Notifications', '/activity' => 'Activity', '/settings/' => 'My settings', '/settings/tokens/' => 'Tokens',
+    $labels = ['/' => 'Home', '/notifications' => 'Notifications', '/activity' => 'Activity', '/trail' => 'My trail', '/settings/' => 'My settings', '/settings/tokens/' => 'Tokens',
                '/saved' => 'Saved', '/search' => 'Search', '/spaces/' => 'Spaces', '/pages/' => 'Pages', '/channels/' => 'Channels', '/dm/' => 'Direct messages', '/trash' => 'Trash'];
     foreach ($labels as $p => $label) {
         if ($path === $p) {
@@ -174,6 +177,11 @@ function with_back(string $url, string $here): string
 {
     return $url . (str_contains($url, '?') ? '&' : '?') . 'back=' . rawurlencode($here);
 }
+
+/** The slice that builds each not-yet-built menu item, in words — the placeholders and the registry read it. */
+const NAV_SLICES = ['saved' => 'slice 4', 'search' => 'slice 6', 'spaces' => 'slice 1', 'pages' => 'slice 2', 'channels' => 'slice 4', 'dms' => 'slice 4', 'activity' => 'slice 6',
+    'admin-settings' => 'slice 9', 'admin-spaces' => 'slice 9', 'admin-published' => 'slice 9', 'admin-retention' => 'slice 9', 'admin-exports' => 'slice 8', 'admin-trash' => 'slice 9',
+    'admin-agents' => 'slice 7', 'admin-connections' => 'slice 7', 'admin-proposals' => 'slice 7'];
 
 /**
  * A screen of the manifest that its slice has not built yet (Phase 2): the shell, the page header, one card saying which
