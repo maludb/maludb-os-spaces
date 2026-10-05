@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T21:10:14+00:00",
+    "generated_at": "2026-10-05T22:31:35+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -20,8 +20,8 @@
                 "since",
                 "kind"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "saved": {
             "screen": "saved",
@@ -458,8 +458,8 @@
                 "is",
                 "space"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "wiki-report": {
             "screen": "wiki-report",
@@ -467,7 +467,7 @@
             "section": "Notifications, search and the wiki's reports (slice 6)",
             "when": "the wiki's reports for a space: expired, unverified, stale, orphans, broken links, duplicates; nudge an owner",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "agent-list": {
@@ -3742,7 +3742,7 @@
             "approval": null,
             "log_event": "page.nudge",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "proposal_make": {
             "action": "proposal_make",

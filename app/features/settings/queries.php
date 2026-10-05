@@ -42,7 +42,12 @@ function find_prefs(PDO $pdo, int $memberId): array
             'text_kinds' => pg_text_array((string) $r['text_kinds']), 'digest' => (bool) $r['digest'], 'away_minutes' => $r['away_minutes'] === null ? null : (int) $r['away_minutes'], 'saved' => true];
 }
 
-/** The same, by the spec's name. */
+/** The same, by the spec's name (a default row when the person never saved any). */
+function find_my_prefs(PDO $pdo, int $memberId): array
+{
+    return find_prefs($pdo, $memberId);
+}
+
 function my_prefs(PDO $pdo, int $memberId): array
 {
     return find_prefs($pdo, $memberId);
@@ -100,28 +105,6 @@ function set_status(PDO $pdo, int $memberId, ?string $text, ?string $emoji, ?str
         ->execute(['t' => $text, 'e' => $emoji, 'u' => $until, 'id' => $memberId]);
     $after = ['status_text' => $text, 'status_emoji' => $emoji, 'status_until' => $until];
     return sp_diff(array_map(static fn ($v) => $v === null ? null : (string) $v, $before), $after);
-}
-
-// ---- notifications (the bell) ----------------------------------------------------------------------------------------
-function find_my_notifications(PDO $pdo, int $memberId, bool $unreadOnly = false, int $limit = 50, int $page = 1): array
-{
-    $st = $pdo->prepare('SELECT notification_id, kind, record_type, record_id, record_uuid, channel_id, message_id, title, body, read_at, created_at FROM mcp_notifications'
-        . ($unreadOnly ? ' WHERE read_at IS NULL' : '') . ' ORDER BY (read_at IS NULL) DESC, created_at DESC LIMIT ' . max(1, min(200, $limit)) . ' OFFSET ' . (max(1, $page) - 1) * max(1, min(200, $limit)));
-    $st->execute();
-    return $st->fetchAll();
-}
-
-/** Mark one of the member's own notifications read, or every unread one (null). Returns how many changed. */
-function mark_notifications_read(PDO $pdo, int $memberId, ?int $id): int
-{
-    if ($id === null) {
-        $st = $pdo->prepare('UPDATE notifications SET read_at = now() WHERE member_id = :m AND read_at IS NULL');
-        $st->execute(['m' => $memberId]);
-    } else {
-        $st = $pdo->prepare('UPDATE notifications SET read_at = now() WHERE member_id = :m AND id = :id AND read_at IS NULL');
-        $st->execute(['m' => $memberId, 'id' => $id]);
-    }
-    return $st->rowCount();
 }
 
 // ---- tokens -----------------------------------------------------------------------------------------------------------

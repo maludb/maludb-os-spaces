@@ -104,4 +104,27 @@ The world (`tests/phase3/slice6/lib.php` `wiki_world()`): Product (closed, a wik
 - [ ] **The report**: the seven lists with the right pages; a page Priya may not see absent from hers; Nudge queues one `verification` notice with the page in `record_uuid` and logs `page.nudge`; a second nudge this week queues nothing and says so; a non-owner → 403; the settings' numbers shown.
 - [ ] **375 × 740 and 1280 × 800**: the bell list, the feed and the search results stack on the phone (the groups as sections, the chips wrap); the report's lists as cards; every control ≥ 44 px, `scrollWidth` = viewport, no console errors; JavaScript off searches and nudges.
 
+## Built and proven (2026-10-05)
+Built as the Files list says, much of it on Phase 2's and slice 4's ground: the bell (`/notifications`), `/settings/`, `prefs.php`, `status.php` and `read.php` existed; this slice made them whole and added `app/features/notify/{queries,present}.php`
+(the bell's reader with its channel kind and actor, `unread_notification_count()`, `activity_feed()`, `find_saved()` / `find_my_reminders()` over slice 4's readers, `notification_record_url()` — a reminder → `/reminders/`, a join request →
+`/spaces/{id}/requests`, a proposal → `/proposals/`, a message → `/channels/` or `/dm/` with `?message=`, a page → `/pages/{uuid}`), `app/features/search/{parse,queries,present}.php` (`parse_search_query()` is pure and case-blind and keeps a
+word that only looks like a modifier; `resolve_search_filters()` names a channel, a person — a name or any word of one, `@me` — and a space through the views and says so in words when nobody matches; `search()` is `sp_search()` for 25;
+the presenter escapes everything but the `<mark>` pair), `app/features/wiki/{queries,present}.php` (`wiki_report()` the seven lists narrowed to the space, `nudge_owner()`), `html/activity.php`, `html/saved.php` (tabs), `html/search.php`,
+`html/spaces/wiki/{report,nudge}.php`, the views listed, and **a vhost, dev-router and registry-builder rewrite for `/spaces/{id}/wiki/report`**. 3 screens made real (`activity`, `search`, `wiki-report`; `notifications`, `saved`, `settings`,
+`wiki-view` finished), 1 new action (`wiki_nudge_send`), 4 actions reworked onto the prelude.
+**`db/020_notify_dedupe_search_links.sql` — two schema defects the proof found.** (1) `sp_notify()` looked for its dedupe key in the outbox under a name the outbox never held (`key:email`), and a member who is not away has no outbox row at all, so a
+second call with the same key wrote a second bell row and, for an away member, raised 23505. The key now lives on the bell row (`notifications.dedupe_key`, unique per member); outbox keys carry the member; the text body starts "Spaces: " as
+this spec says. (2) `sp_index_*` tested `has_link` with `LIKE '%"link":"http%'`, but jsonb text is `"link": {…}`, so `has:link` never matched; redefined and every row re-indexed. Consequence for earlier slices: `space_added:`,
+`page_owner:` keys now dedupe for good (the same person added to the same space twice is told once).
+**Decisions taken in the build:**
+- The bell keeps Phase 2's ids (`header-bell-count`, `header-bell-count-wrap`); `#bell-count` is the number on the notifications page. The bell polls on its own every 20 s (`?count=1&known=N` answers 204 when unchanged), not with the channel
+  poll; the list and the feed poll the same way (`?list=1&h=hash`, 204).
+- `notification_read` of a notice that is not the caller's is a 404 (the view hides it), not a silent no-op; Phase 2's check was updated. `text_kinds` must be within `kinds` (422 naming the extras); Phase 2's check was updated.
+- An agent is refused the bell, the feed, Saved and Settings (`require_human`: agents are dispatched, not notified) but may search and read the wiki report; the report is open to anyone who sees the space, Nudge to its owners.
+- A nudge to oneself, to an agent, or to someone who cannot see the page is refused in words; `reason` (expired | never | stale) is optional and read from the page; only a queued nudge is logged `page.nudge`.
+- Search: a param (`in`, `from`, …) beats the same modifier typed in `q`; `from:@name` matches a name or any word of it; the selects are in a `<details>` ("Narrow it down"); `space:` takes an id, a name or a slug.
+- The report's Stale and Orphans lists are the functions' (an orphan must have a parent page: a root page is not one). Activity's `since` is `today` (midnight in the person's zone), `7` or `30`.
+- A DM's status line is the other person's (a 1:1 DM only); the people picker shows it too; a lapsed `until` shows nothing and clears nothing.
+**Proven by `tests/phase3/slice6/run.sh` — BELL, PREFS, STATUS, ACTIVITY, SAVED, SEARCH, REPORT, JSON, BROWSER (294 checks green (bell 29, prefs 22, status 17, activity 22, saved 17, search 53, report 42, json 37, browser 55); Phase 2 and slices 1–5 re-run green).** Every box of the checklist has at least one `ok()` line.
+
 ## Open questions

@@ -40,8 +40,8 @@ ok(str_contains($r['body'], 'You may not change the workspace settings.'), 'a re
 ok(str_contains(page($jGuest, '/spaces/')['body'], 'You may not join spaces.'), 'a guest on Spaces: "You may not join spaces."');
 $stubs = trim((string) shell_exec('grep -rl "render_nav_stub(" ' . escapeshellarg(dirname(__DIR__, 2) . '/html') . ' 2>/dev/null | wc -l'));
 ok((int) $stubs >= 1, "the placeholders stand until their slices ship: $stubs controllers name their slice");
-ok(str_contains(page($jMember, '/search')['body'], 'slice 6 builds this screen') && str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/proposals/')['body'], 'slice 7 builds this screen'), 'each placeholder names its slice (search 6, trash 9, proposals 7)');
-ok(req('POST', '/search', ['jar' => $jMember, 'form' => ['csrf_token' => page_csrf($jMember)]])['code'] === 501, 'a POST to a placeholder: 501');
+ok(str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/proposals/')['body'], 'slice 7 builds this screen'), 'each placeholder names its slice (trash 9, proposals 7; search and activity are real since slice 6)');
+ok(req('POST', '/admin/trash', ['jar' => $jAdmin, 'form' => ['csrf_token' => page_csrf($jAdmin)]])['code'] === 501, 'a POST to a placeholder: 501');
 $menu = fn (string $j): array => (preg_match_all('/id="nav-([a-z-]+)"/', page($j, '/')['body'], $m) ? $m[1] : []);
 $groups = fn (string $j): array => (preg_match_all('/nxl-caption"><label>([^<]+)</', page($j, '/')['body'], $m) ? $m[1] : []);
 ok($groups($jMember) === ['Browse', 'Me'] && in_array('spaces', $menu($jMember), true) && in_array('dms', $menu($jMember), true) && in_array('trail', $menu($jMember), true) && !in_array('admin-settings', $menu($jMember), true), 'a Member sees Browse (Spaces, Pages, Channels, DMs) and Me: ' . implode(', ', $groups($jMember)));
@@ -65,13 +65,13 @@ $t = csrf_of(page($jMember, '/')['body']);
 $d = json_decode(page($jMember, '/settings/', $json)['body'], true)['data'];
 ok($d['notify']['email_enabled'] === true && $d['notify']['text_enabled'] === false && $d['notify']['digest'] === false && $d['notify']['away_minutes'] === null && $d['notify']['saved'] === false && in_array('mention', $d['notify']['kinds'], true) && $d['notify']['text_kinds'] === ['dm', 'mention'], 'the defaults before any save: email on, text off, no digest, the default kinds, texts for dm and mention');
 ok($d['status'] === null && $d['timezone'] === 'UTC', 'no status yet; the time zone is the directory\'s (UTC)');
-$r = req('POST', '/settings/prefs.php', ['jar' => $jMember, 'form' => ['email_enabled' => 'yes', 'text_enabled' => 'yes', 'kinds' => ['mention', 'reply'], 'text_kinds' => ['dm']]]);
+$r = req('POST', '/settings/prefs.php', ['jar' => $jMember, 'form' => ['email_enabled' => 'yes', 'text_enabled' => 'yes', 'kinds' => ['mention', 'reply'], 'text_kinds' => ['mention']]]);
 ok($r['code'] === 403, 'saving without the CSRF token: 403');
 $since = last_activity_id();
-$r = req('POST', '/settings/prefs.php', ['jar' => $jMember, 'form' => ['email_enabled' => 'yes', 'text_enabled' => 'yes', 'digest' => 'yes', 'away_minutes' => '30', 'kinds' => ['mention', 'reply'], 'text_kinds' => ['dm'], 'csrf_token' => $t, 'return_to' => '/settings/?tab=notify']]);
+$r = req('POST', '/settings/prefs.php', ['jar' => $jMember, 'form' => ['email_enabled' => 'yes', 'text_enabled' => 'yes', 'digest' => 'yes', 'away_minutes' => '30', 'kinds' => ['mention', 'reply'], 'text_kinds' => ['mention'], 'csrf_token' => $t, 'return_to' => '/settings/?tab=notify']]);
 ok($r['code'] === 302 && str_starts_with($r['location'], '/settings/?tab=notify') && str_contains($r['location'], 'notice=prefs_saved'), 'with it: 302 back to the settings with the notice');
 $row = q('SELECT email_enabled, text_enabled, kinds, text_kinds, digest, away_minutes FROM notification_prefs WHERE member_id = 26')[0] ?? null;
-ok($row && $row['text_enabled'] && $row['digest'] && (int) $row['away_minutes'] === 30 && $row['kinds'] === '{mention,reply}' && $row['text_kinds'] === '{dm}', 'the row holds the choices (text on, digest, 30 away minutes, two kinds, one text kind)');
+ok($row && $row['text_enabled'] && $row['digest'] && (int) $row['away_minutes'] === 30 && $row['kinds'] === '{mention,reply}' && $row['text_kinds'] === '{mention}', 'the row holds the choices (text on, digest, 30 away minutes, two kinds, one text kind)');
 $log = activity('prefs.save', $since);
 ok(count($log) === 1 && str_contains((string) $log[0]['after'], 'digest') && str_contains((string) $log[0]['before'], 'text_enabled'), 'prefs.save logs before and after of the changed keys');
 $r = req('POST', '/settings/prefs.php', ['jar' => $jMember, 'form' => ['kinds' => ['mention', 'nonsense'], 'csrf_token' => $t]]);
@@ -160,9 +160,9 @@ $r = req('POST', '/settings/notifications/read.php', ['jar' => $jMember, 'form' 
 ok($r['code'] === 302 && one('SELECT read_at FROM notifications WHERE id = :i', ['i' => $nid]) !== null && preg_match('/id="header-bell-count">1</', page($jMember, '/')['body']) === 1, 'marking one read: 302, read_at set, the bell shows 1');
 $mid = (int) one("SELECT id FROM notifications WHERE member_id = 27");
 $r = req('POST', '/settings/notifications/read.php', ['jar' => $jMember, 'form' => ['notification' => $mid, 'csrf_token' => $t]]);
-ok($r['code'] === 302 && one('SELECT read_at FROM notifications WHERE id = :i', ['i' => $mid]) === null, 'marking Marco\'s: nothing changes (own rows only)');
+ok($r['code'] === 404 && one('SELECT read_at FROM notifications WHERE id = :i', ['i' => $mid]) === null, 'marking Marco\'s: 404, nothing changes (own rows only; the view hides it)');
 $r = req('POST', '/settings/notifications/read.php', ['jar' => $jMember, 'form' => ['csrf_token' => $t]]);
-ok($r['code'] === 302 && (int) one('SELECT count(*) FROM notifications WHERE member_id = 26 AND read_at IS NULL') === 0 && count(activity('notification.read', $since)) === 3, 'no id marks all of hers read; notification.read logged each time');
+ok($r['code'] === 302 && (int) one('SELECT count(*) FROM notifications WHERE member_id = 26 AND read_at IS NULL') === 0 && count(activity('notification.read', $since)) === 2, 'no id marks all of hers read; notification.read logged each time one was changed (Marco\'s attempt is a 404, not a row)');
 ok(count(json_decode(page($jMember, '/notifications?unread=1', $json)['body'], true)['data']['notifications']) === 0, '?unread=1 now lists none');
 $r = page($jMember, '/notifications?count=1', ['headers' => ['HX-Request: true']]);
 ok($r['code'] === 200 && str_starts_with(trim($r['body']), '<span id="header-bell-count-wrap"') && !str_contains($r['body'], '<html'), 'the bell re-fetches its count alone (Pattern A)');
@@ -181,7 +181,7 @@ pdo()->exec("INSERT INTO activity_log (actor_member_id, source, action, entity_t
 $rows = json_decode(page($jOwner, '/trail?space=' . $general, $json)['body'], true)['data']['rows'] ?? [];
 ok($rows !== [] && $rows[0]['space_id'] === $general && $rows[0]['action'] === 'space.update', '?space= answers that space\'s rows (by the key)');
 ok((json_decode(page($jGuest, '/trail?space=' . $general, $json)['body'], true)['data']['rows'] ?? []) === [], 'and nothing for a guest the view does not admit to it');
-ok(page($jMember, '/activity')['code'] === 200 && str_contains(page($jMember, '/activity')['body'], 'slice 6 builds this screen'), '/activity (the feed) is slice 6\'s placeholder');
+ok(page($jMember, '/activity')['code'] === 200 && str_contains(page($jMember, '/activity')['body'], 'id="activity-header"') && !str_contains(page($jMember, '/activity')['body'], 'builds this screen'), '/activity (the feed) is real since slice 6');
 
 echo "6. The command bar goes through the kernel's chat endpoint\n";
 $r = req('POST', '/assistant/ask.php', ['jar' => $jMember, 'headers' => ['HX-Request: true'], 'form' => ['utterance' => 'What changed in General today?', 'screen' => 'home', 'csrf_token' => $t]]);

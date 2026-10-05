@@ -13,7 +13,7 @@
             <?= view('settings/partials/status.php', ['status' => $status, 'tz' => $tz]) ?>
             <div class="card mb-3" id="settings-timezone"><div class="card-header"><h5 class="card-title mb-0">Your time zone</h5></div><div class="card-body">
                 <div class="fw-semibold" id="settings-timezone-value"><?= e($tz) ?></div>
-                <div class="fs-12 text-muted">Times are shown in it. It comes from your profile in the operating system: <a href="<?= e($osProfile) ?>" id="settings-timezone-link">change it there</a> and it follows within a minute.</div>
+                <div class="fs-12 text-muted">Times are shown in it. HR keeps it, in your profile in the operating system: <a href="<?= e($osProfile) ?>" id="settings-timezone-link">change it there</a> and it follows within a minute.</div>
             </div></div>
         </div>
     </div>

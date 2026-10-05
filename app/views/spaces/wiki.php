@@ -19,5 +19,5 @@
         <?php endforeach; ?>
         </tbody>
     </table></div></div>
-    <div class="fs-12 text-muted mt-2">Stale, orphaned, duplicated and broken pages are the reports of slice 6.</div>
+    <div class="mt-3"><?= hx_link('/spaces/' . $id . '/wiki/report', '<i class="feather-bar-chart-2 me-1"></i>The reports: expired, stale, orphans, broken links, duplicates, unanswered questions', 'btn btn-light btn-touch', 'id="wiki-report-link"') ?></div>
 </div>

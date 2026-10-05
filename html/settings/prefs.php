@@ -58,6 +58,11 @@ if (($kinds = $list('kinds')) !== null) {
 if (($textKinds = $list('text_kinds')) !== null) {
     $f['text_kinds'] = $textKinds;
 }
+$current = find_my_prefs($pdo, $me);                                                           // a text may only be for an event the person is told about at all
+$notIn = array_values(array_diff($f['text_kinds'] ?? $current['text_kinds'], $f['kinds'] ?? $current['kinds']));
+if ($notIn !== []) {
+    refuse(422, 'You can only be texted about events you are told about: add ' . implode(', ', array_map(static fn (string $x): string => mb_substr($x, 0, 30), $notIn)) . ' to "Tell me when" first.');
+}
 $pdo->beginTransaction();
 $r = save_prefs($pdo, $me, $f);
 log_activity($pdo, 'prefs.save', 'notification_prefs', $me, ['before' => $r['before'], 'after' => $r['after']]);

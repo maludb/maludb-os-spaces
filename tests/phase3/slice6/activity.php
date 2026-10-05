@@ -1,0 +1,67 @@
+<?php
+/** Proof — Activity (spec "Proof", 4): the four kinds for Priya, newest first, with their links; the since and kind filters; an agent chipped; Marco's feed empty of her events; the poll. */
+require __DIR__ . '/lib.php';
+$w = wiki_world();
+$marco = as_member(27); $priya = as_member(26); $dana = as_member(30);
+$launch = $w['launch']; $mine = $w['priya_msg'];
+$pp = page_by_title('SMOKE Pricing 2027');
+
+echo "1. The four kinds, newest first\n";
+[$c, $d] = screen($priya, '/activity');
+$rows = $d['activity'] ?? [];
+$kinds = array_values(array_unique(array_column($rows, 'kind')));
+sort($kinds);
+ok($c === 200 && $kinds === ['comment', 'mention', 'reaction', 'reply'], 'all four kinds: ' . implode(', ', $kinds));
+$at = array_column($rows, 'occurred_at'); $sorted = $at; rsort($sorted);
+ok($at === $sorted, 'newest first');
+$of = static function (string $kind) use ($rows): array { return array_values(array_filter($rows, static fn (array $r): bool => $r['kind'] === $kind))[0] ?? []; };
+ok(($of('mention')['who']['display_name'] ?? '') === 'SMOKE Marco' && str_contains($of('mention')['excerpt'] ?? '', 'rate limit ships Friday') && str_starts_with($of('mention')['url'] ?? '', '/channels/' . $launch . '?message='), 'a mention: who, the excerpt, the message');
+ok(($of('reply')['url'] ?? '') === '/channels/' . $launch . '/threads/' . $mine, 'a reply leads to its thread');
+ok(($of('reaction')['who']['display_name'] ?? '') === 'SMOKE Dana' && str_contains($of('reaction')['excerpt'] ?? '', '👍'), 'a reaction: who and the emoji');
+ok(($of('comment')['url'] ?? '') === '/pages/' . $pp && str_contains($of('comment')['excerpt'] ?? '', 'rate limit page'), 'a comment on her page leads to the page');
+$r = page($priya, '/activity');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="activity-list"') && str_contains($r['body'], 'id="activity-row-1"') && str_contains($r['body'], 'id="activity-row-4"'), 'the page: activity-list and a row per event');
+ok(str_contains($r['body'], 'mentioned you in #smoke-launch') && str_contains($r['body'], 'commented on'), 'the rows say what happened');
+
+echo "2. The filters\n";
+[$c, $dk] = screen($priya, '/activity?kind=reaction');
+ok($c === 200 && $dk['kind'] === 'reaction' && count($dk['activity']) >= 1 && array_unique(array_column($dk['activity'], 'kind')) === ['reaction'], 'kind=reaction: only reactions');
+[$c, $dk] = screen($priya, '/activity?kind=nonsense');
+ok($c === 200 && $dk['kind'] === null && count($dk['activity']) === count($rows), 'an unknown kind is dropped, not an error');
+as_viewer(27);
+[, $b] = post($marco, $launch, 'SMOKE old news for @SMOKE Priya');
+$old = (int) $b['record_id'];
+pdo()->exec("UPDATE messages SET sent_at = now() - interval '10 days' WHERE id = $old");
+[$c, $d7] = screen($priya, '/activity?since=7');
+[$c, $d30] = screen($priya, '/activity?since=30');
+$has = static fn (array $d): bool => count(array_filter($d['activity'], static fn (array $r): bool => $r['message_id'] === $old)) === 1;
+ok(!$has($d7) && $has($d30), 'since=7 leaves out a ten-day-old mention, since=30 keeps it');
+[$c, $dt] = screen($priya, '/activity?since=today');
+ok($c === 200 && $dt['since'] === 'today' && !$has($dt) && count($dt['activity']) >= 4, 'since=today: today\'s four, not the old one');
+$html = page($priya, '/activity?since=30&kind=mention')['body'];
+ok(str_contains($html, 'id="activity-since-30"') && str_contains($html, 'id="activity-kind-mention"') && str_contains($html, 'btn btn-touch btn-primary" id="activity-since-30"') , 'the filter buttons mark the chosen ones');
+
+echo "3. An agent, the poll, who sees what\n";
+pdo()->exec("INSERT INTO message_reactions (message_id, member_id, emoji) VALUES ($mine, 40, '🎉') ON CONFLICT DO NOTHING");
+$html = page($priya, '/activity')['body'];
+ok(str_contains($html, 'SMOKE Seamus') && preg_match('/SMOKE Seamus<\/span> <span class="badge bg-soft-secondary text-secondary">agent<\/span>/', $html) === 1, 'an agent\'s reaction is chipped "agent"');
+preg_match('/hx-get="\/activity\?list=1[^"]*&amp;h=([a-f0-9]+)"/', $html, $h);
+ok(page($priya, '/activity?list=1&h=' . $h[1])['code'] === 204, 'the poll: 204 when nothing changed');
+$r = page($priya, '/activity?list=1&h=old');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="activity-list"') && !str_contains($r['body'], '<html'), 'and the list alone when it did');
+[$c, $dm] = screen($marco, '/activity?since=30');
+$text = json_encode($dm['activity']);
+ok($c === 200 && !str_contains($text, 'rate limit ships Friday') && !str_contains($text, 'SMOKE Per key, yes') && !str_contains($text, 'SMOKE Marco on the rate limit page') && !str_contains($text, '👍'), 'Marco\'s feed holds none of her events');
+$none = array_filter($dm['activity'], static fn (array $r): bool => $r['kind'] === 'comment' || $r['kind'] === 'reaction');
+ok($none === [], 'no comment on a page of hers, no reaction to a message of hers');
+$ann = as_member(29);
+[$c, $da] = screen($ann, '/activity');
+ok($c === 200 && is_array($da['activity']), 'a guest\'s feed answers (their own events only)');
+$r = page($dana, '/activity?since=today');
+ok($r['code'] === 200, 'Dana\'s feed answers');
+$since = last_activity_id();
+page($priya, '/activity');
+ok(count(activity('screen.view', $since)) === 1, 'the screen is logged (screen.view); the poll is not');
+$t = req('GET', '/activity?since=today', ['jar' => '']);
+ok(in_array($t['code'], [302, 401, 403], true), 'signed out: sent to sign in (' . $t['code'] . ')');
+finish();

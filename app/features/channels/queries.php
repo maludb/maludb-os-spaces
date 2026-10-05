@@ -104,7 +104,9 @@ function spaces_for_channel_create(PDO $pdo): array
 function my_dms(PDO $pdo): array
 {
     $rows = $pdo->query('SELECT d.channel_id, d.kind, d.member_ids, d.names, d.last_message_at, d.last_line, d.unread_count,
-                                EXISTS (SELECT 1 FROM channel_members cm JOIN members m ON m.id = cm.member_id AND m.member_kind = \'agent\' WHERE cm.channel_id = d.channel_id) AS has_agent
+                                EXISTS (SELECT 1 FROM channel_members cm JOIN members m ON m.id = cm.member_id AND m.member_kind = \'agent\' WHERE cm.channel_id = d.channel_id) AS has_agent,
+                                CASE WHEN d.kind = \'dm\' THEN (SELECT NULLIF(trim(COALESCE(x.status_emoji, \'\') || \' \' || COALESCE(x.status_text, \'\')), \'\') FROM mcp_members x
+                                                                WHERE x.member_id = ANY (d.member_ids) AND x.member_id <> app_current_member_id() AND (x.status_until IS NULL OR x.status_until > now()) LIMIT 1) END AS status_line
                            FROM sp_my_dms() d')->fetchAll();
     return array_map(static function (array $d): array { $d['channel_id'] = (int) $d['channel_id']; $d['unread_count'] = (int) $d['unread_count']; $d['has_agent'] = (bool) $d['has_agent']; $d['member_ids'] = array_map('intval', pg_text_array((string) $d['member_ids'])); return $d; }, $rows);
 }
@@ -112,7 +114,7 @@ function my_dms(PDO $pdo): array
 /** The people a DM may go to: everyone the caller may see but themselves (a guest: only those around them). */
 function dm_candidates(PDO $pdo, int $me): array
 {
-    $st = $pdo->prepare('SELECT member_id, display_name, is_agent, is_guest, is_active_now FROM mcp_members WHERE member_id <> :me AND status = \'active\' AND capability IS NOT NULL AND member_id IN (SELECT sp_visible_member_ids()) ORDER BY is_agent, lower(display_name)');
+    $st = $pdo->prepare('SELECT member_id, display_name, is_agent, is_guest, is_active_now, CASE WHEN status_until IS NULL OR status_until > now() THEN trim(COALESCE(status_emoji, \'\') || \' \' || COALESCE(status_text, \'\')) END AS status_line FROM mcp_members WHERE member_id <> :me AND status = \'active\' AND capability IS NOT NULL AND member_id IN (SELECT sp_visible_member_ids()) ORDER BY is_agent, lower(display_name)');
     $st->execute(['me' => $me]);
     return array_map(static function (array $m): array { $m['member_id'] = (int) $m['member_id']; $m['is_agent'] = (bool) $m['is_agent']; $m['is_guest'] = (bool) $m['is_guest']; return $m; }, $st->fetchAll());
 }

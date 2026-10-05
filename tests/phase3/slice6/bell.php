@@ -1,0 +1,78 @@
+<?php
+/** Proof — the bell (spec "Proof", 1): Priya's notices in order with their links, the unread count, one read and all read, another member's notice absent, the JSON the same, the poll answers 204 when nothing changed, the dedupe key (db/020). */
+require __DIR__ . '/lib.php';
+$w = wiki_world();
+$marco = as_member(27); $priya = as_member(26); $dana = as_member(30); $ann = as_member(29);
+$launch = $w['launch'];
+
+echo "1. The list, in order, with its links\n";
+[$c, $d] = screen($priya, '/notifications');
+$rows = $d['notifications'] ?? [];
+ok($c === 200 && count($rows) >= 4, 'the screen answers JSON: ' . count($rows) . ' notices');
+$by = static function (string $kind) use ($rows): array { return array_values(array_filter($rows, static fn (array $n): bool => $n['kind'] === $kind)); };
+$mention = $by('mention')[0] ?? null; $reply = $by('reply')[0] ?? null; $comment = $by('comment')[0] ?? null;
+$share = array_values(array_filter($by('share'), static fn (array $n): bool => str_contains($n['title'], 'SMOKE Shared with Priya')))[0] ?? null;
+ok($mention !== null && str_contains($mention['title'], 'SMOKE Marco mentioned you in #smoke-launch') && $mention['url'] === '/channels/' . $launch . '?message=' . $mention['message_id'], 'a mention links to its channel with ?message= (' . ($mention['url'] ?? '-') . ')');
+ok($reply !== null && $reply['url'] === '/channels/' . $launch . '?message=' . $reply['message_id'], 'a reply links to the message');
+ok($comment !== null && $comment['url'] === '/pages/' . page_by_title('SMOKE Pricing 2027'), 'a comment links to the page');
+ok($share !== null && $share['url'] === '/pages/' . $w['shared'], 'a share links to the page');
+$times = array_map(static fn (array $n): string => $n['created_at'], $rows);
+$sorted = $times; rsort($sorted);
+ok($times === $sorted, 'newest first');
+ok($mention !== null && $mention['icon'] === 'feather-at-sign' && ($mention['who']['display_name'] ?? '') === 'SMOKE Marco', 'each notice carries its icon and who');
+$r = page($priya, '/notifications');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="notification-list"') && str_contains($r['body'], 'id="notification-row-' . $mention['notification_id'] . '"') && str_contains($r['body'], 'id="notification-row-' . $mention['notification_id'] . '-chip">unread<'), 'the page: notification-list, notification-row-{id}, the unread chip');
+ok(str_contains($r['body'], 'href="/channels/' . $launch . '?message=' . $mention['message_id'] . '&amp;back=%2Fnotifications"'), 'the row links with the way back');
+
+echo "2. The count and the poll\n";
+$unread = (int) $d['unread'];
+ok($unread === count(array_filter($rows, static fn (array $n): bool => !$n['read'])) && $unread >= 4, "unread: $unread");
+preg_match('/id="header-bell-count">(\d+|99\+)</', page($priya, '/')['body'], $m);
+ok(($m[1] ?? '') === (string) $unread, 'the bell in the header shows ' . $unread);
+$r = page($priya, '/notifications?count=1&known=' . $unread);
+ok($r['code'] === 204, 'the bell poll: 204 when the count is what the page already shows');
+$r = page($priya, '/notifications?count=1&known=0');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="header-bell-count">' . $unread . '<'), 'and the new count when it is not');
+preg_match('/hx-get="\/notifications\?list=1[^"]*&amp;h=([a-f0-9]+)"/', page($priya, '/notifications')['body'], $h);
+$r = page($priya, '/notifications?list=1&h=' . ($h[1] ?? 'x'));
+ok($r['code'] === 204, 'the list poll: 204 when nothing changed');
+$r = page($priya, '/notifications?list=1&h=stale');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="notification-list"') && !str_contains($r['body'], '<html'), 'and the list alone when it did');
+
+echo "3. One read, all read\n";
+$one = $mention['notification_id'];
+$since = last_activity_id();
+[$c, $b] = act($priya, '/settings/notifications/read.php', ['notification' => $one]);
+ok($c === 200 && $b['ok'] && $b['count'] === 1 && $b['record_id'] === $one && $b['refresh'] === 'notificationChanged', 'one read: the contract {ok, did, record_id, location, refresh} and count 1');
+ok(one('SELECT read_at FROM notifications WHERE id = :i', ['i' => $one]) !== null && (int) one('SELECT count(*) FROM notifications WHERE member_id = 26 AND read_at IS NULL') === $unread - 1, 'read_at set; the others untouched');
+$l = activity('notification.read', $since);
+ok(count($l) === 1 && json_decode((string) $l[0]['after'], true)['count'] === 1, 'logged notification.read with the count');
+[$c, $b] = act($priya, '/settings/notifications/read.php', ['notification' => $one]);
+ok($c === 200 && $b['count'] === 0, 'again: nothing changes, said so');
+[$c, $b] = act($dana, '/settings/notifications/read.php', ['notification' => $share['notification_id']]);
+ok($c === 404 && (int) one('SELECT count(*) FROM notifications WHERE id = :i AND read_at IS NULL', ['i' => $share['notification_id']]) === 1, 'another member\'s notice: 404, untouched');
+$dn = q('SELECT id FROM notifications WHERE member_id = 30 ORDER BY id LIMIT 1');
+ok($dn !== [] && !in_array((int) $dn[0]['id'], array_column($rows, 'notification_id'), true), 'another member\'s notice is not in Priya\'s list (the view)');
+[$c, $d2] = screen($priya, '/notifications?unread=1');
+ok(count($d2['notifications']) === $unread - 1 && !in_array($one, array_column($d2['notifications'], 'notification_id'), true), 'the Unread filter drops it');
+[$c, $b] = act($priya, '/settings/notifications/read.php', []);
+ok($c === 200 && $b['count'] === $unread - 1, 'all read: ' . $b['count'] . ' marked');
+ok((int) one('SELECT count(*) FROM notifications WHERE member_id = 26 AND read_at IS NULL') === 0 && !str_contains(page($priya, '/')['body'], 'id="header-bell-count"'), 'none unread; the bell shows no count');
+$r = req('POST', '/settings/notifications/read.php', ['jar' => $priya, 'form' => ['csrf_token' => page_csrf($priya)]]);
+ok($r['code'] === 302 && str_contains($r['location'], '/notifications'), 'a plain form post redirects back to the list');
+$r = req('POST', '/settings/notifications/read.php', ['jar' => $priya, 'form' => []]);
+ok($r['code'] === 403 || $r['code'] === 419 || $r['code'] === 422, 'no CSRF token: refused (' . $r['code'] . ')');
+
+echo "4. A guest has a bell too, and the dedupe key holds (db/020)\n";
+[$c, $da] = screen($ann, '/notifications');
+ok($c === 200 && is_array($da['notifications']), 'a guest\'s list answers');
+as_viewer(27);
+$n0 = last_note_id();
+$key = 'smoke_dedupe:' . bin2hex(random_bytes(4));
+pdo()->exec("UPDATE members SET last_seen_at = now() - interval '3 hours' WHERE id = 26");
+$a1 = one("SELECT sp_notify(26, 'verification', 'SMOKE once', 'body', NULL, NULL, NULL, NULL, NULL, '$key')");
+$a2 = one("SELECT sp_notify(26, 'verification', 'SMOKE once', 'body', NULL, NULL, NULL, NULL, NULL, '$key')");
+ok($a1 !== null && $a1 !== false && ($a2 === null || $a2 === false), 'the same key twice: the second is a no-op, not a second bell row and not an error');
+ok((int) one('SELECT count(*) FROM notifications WHERE dedupe_key = :k', ['k' => $key]) === 1 && (int) one("SELECT count(*) FROM notification_outbox WHERE dedupe_key LIKE :k", ['k' => $key . '%']) === 1, 'one bell row, one outbox row (away, email on)');
+pdo()->exec("UPDATE members SET last_seen_at = now() WHERE id = 26");
+finish();

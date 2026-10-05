@@ -145,3 +145,6 @@ html.app-skin-dark .sp-tree-row > a:hover, html.app-skin-dark .sp-tree-row > a.a
 .sp-menu { position: relative; } .sp-menu > summary { list-style: none; cursor: pointer; } .sp-menu > summary::-webkit-details-marker { display: none; }
 .sp-menu-popover { position: absolute; right: 0; top: 100%; z-index: 1040; min-width: 15rem; max-width: 90vw; } .sp-menu-popover .list-group-item { min-height: 44px; display: flex; align-items: center; }
 .public-body { background: var(--bs-light, #f5f6fa); } .public-main { max-width: 820px; margin: 0 auto; padding: 1rem 16px 2rem; } .public-main .card { border-radius: .75rem; }
+/* slice 6: a search chip's remove link is a 44 px target; the match in a result; the report's cards */
+.sp-chip-x { min-width: 44px; min-height: 44px; margin: -.6rem -1rem -.6rem 0; }
+.search-excerpt mark { padding: 0 .15em; background: rgba(255, 193, 7, .35); color: inherit; border-radius: 2px; }
