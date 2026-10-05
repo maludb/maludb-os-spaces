@@ -16,8 +16,9 @@ ok(page($j, '/spaces/')['code'] === 200 && page($j, '/spaces')['code'] === 200, 
 ok(page($j, '/channels/')['code'] === 200 && page($j, '/dm/')['code'] === 200 && page($j, '/pages/')['code'] === 200, '/channels/, /dm/ and /pages/ reach their placeholders');
 ok(page($j, '/trail')['code'] === 200 && page($j, '/saved')['code'] === 200 && page($j, '/search')['code'] === 200 && page($j, '/activity')['code'] === 200, '/trail (real), /saved, /search and /activity (placeholders) resolve to their own files');
 ok(page($j, '/admin/settings')['code'] === 403 && page($j, '/exports/')['code'] === 403 && page($j, '/proposals/')['code'] === 403, '/admin/settings, /exports/ and /proposals/ resolve (403 for a Space owner, by the right)');
-ok(page($j, '/pages/new')['code'] === 404 && page($j, '/spaces/1')['code'] === 404 && page($j, '/channels/1/members')['code'] === 404, '/pages/new, /spaces/1 and /channels/1/members are rewritten to files their slices have not built: 404');
-ok(page($j, '/pages/' . '0f3a5b7c-1111-4222-8333-444455556666')['code'] === 404, 'a UUID record (/pages/{uuid}) is rewritten to pages/view.php (slice 2): 404 until then');
+ok(page($j, '/channels/1/members')['code'] === 404 && page($j, '/databases/0f3a5b7c-1111-4222-8333-444455556666')['code'] === 404, '/channels/1/members and /databases/{uuid} are rewritten to files their slices (4, 5) have not built: 404');
+ok(page($j, '/pages/new')['code'] === 200 && page($j, '/spaces/1')['code'] === 200, '/pages/new reaches pages/form.php and /spaces/1 spaces/view.php (slices 2 and 1)');
+ok(page($j, '/pages/' . '0f3a5b7c-1111-4222-8333-444455556666')['code'] === 404, 'a UUID record (/pages/{uuid}) is rewritten to pages/view.php: 404 for a page that is not there');
 ok(req('GET', '/nosuchscreen', ['jar' => $j])['code'] === 404, 'an unknown path: 404');
 $tok = str_repeat('ab', 24);
 ok(req('GET', "/p/$tok")['code'] === 404 && req('GET', "/p/$tok/files/1")['code'] === 404 && req('GET', "/p/$tok/0f3a5b7c-1111-4222-8333-444455556666")['code'] === 404, 'the public door /p/{token}, its files and subpages are rewritten to p.php (slice 2) and answer 404 until then');

@@ -115,3 +115,33 @@ html.app-skin-dark .sp-tree-row > a:hover, html.app-skin-dark .sp-tree-row > a.a
 .sp-emoji-btn { min-width: 2.25rem; min-height: 2.25rem; font-size: 1.1rem; }
 .sp-drag-handle { cursor: grab; }
 .sortable-ghost { opacity: .4; }
+
+/* Slice 2 (2026-10-05) — pages: the reader (every adopted block type), the page menu popover, the public page. */
+.sp-page { max-width: 54rem; }
+.sp-page-title { font-size: 1.75rem; font-weight: 700; overflow-wrap: anywhere; }
+.sp-page-icon { font-size: 1.75rem; line-height: 1.2; }
+.sp-cover img { width: 100%; max-height: 16rem; object-fit: cover; border-radius: .5rem; }
+.sp-body { font-size: 1rem; line-height: 1.6; overflow-wrap: anywhere; }
+.sp-body .rt-block { margin-bottom: .5rem; }
+.sp-body h2 { font-size: 1.4rem; margin-top: 1.25rem; } .sp-body h3 { font-size: 1.2rem; margin-top: 1rem; } .sp-body h4 { font-size: 1.05rem; margin-top: .75rem; }
+.sp-body .rt-list { padding-left: 1.5rem; } .sp-body .rt-list .rt-list { margin-top: .25rem; }
+.sp-body .rt-todo { list-style: none; margin-left: -1.5rem; } .sp-body .rt-todo label { display: flex; gap: .5rem; align-items: flex-start; } .sp-body .rt-done > label > span { text-decoration: line-through; color: var(--bs-secondary-color, #6c757d); }
+.sp-body .rt-indent { padding-left: 1.5rem; }
+.sp-body blockquote { border-left: 3px solid #d9dce3; padding-left: .75rem; color: #495057; }
+.sp-body .rt-callout-box { display: flex; gap: .75rem; padding: .75rem 1rem; border-radius: .5rem; background: #f4f5f7; } .sp-body .rt-callout-box p:last-child { margin-bottom: 0; } .rt-callout-icon { font-size: 1.25rem; flex: 0 0 auto; }
+.sp-body pre { background: #f4f5f7; padding: .75rem; border-radius: .375rem; font-size: .85rem; overflow-x: auto; }
+.sp-body figure img { max-width: 100%; height: auto; border-radius: .375rem; } .sp-body figcaption, .rt-caption { font-size: .8rem; color: var(--bs-secondary-color, #6c757d); margin-top: .25rem; }
+.sp-body .rt-columns { display: grid; gap: 1rem; grid-template-columns: 1fr; } @media (min-width: 768px) { .sp-body .rt-columns { grid-auto-flow: column; grid-auto-columns: 1fr; } }
+.sp-body .rt-bookmark-card { border: 1px solid rgba(0,0,0,.1); border-radius: .5rem; padding: .75rem; } .rt-bookmark-link { display: flex; flex-direction: column; text-decoration: none; } .rt-bookmark-host { font-weight: 600; } .rt-bookmark-url { font-size: .8rem; color: var(--bs-secondary-color, #6c757d); overflow-wrap: anywhere; }
+.sp-body .rt-bookmark-card iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: .375rem; margin-bottom: .5rem; }
+.sp-body .rt-synced { border-left: 3px solid #cfd8ff; padding-left: .75rem; }
+.sp-body .rt-child-link, .sp-body .rt-page-link { font-weight: 600; text-decoration: underline; text-decoration-color: rgba(0,0,0,.2); }
+.sp-body .rt-table-grid td, .sp-body .rt-table-grid th { padding: .35rem .5rem; }
+.sp-body .rt-toc { list-style: none; padding-left: 0; } .rt-toc-2 { padding-left: 1rem; } .rt-toc-3 { padding-left: 2rem; }
+.rt-mention { background: rgba(52,84,209,.08); border-radius: .25rem; padding: 0 .25rem; font-weight: 600; text-decoration: none; }
+.rt-equation { font-family: ui-monospace, monospace; }
+.rt-color-gray { color: #6c757d; } .rt-color-brown { color: #8d5524; } .rt-color-orange { color: #d9730d; } .rt-color-yellow { color: #b28900; } .rt-color-green { color: #0f7b3f; } .rt-color-blue { color: #0b6bcb; } .rt-color-purple { color: #6940a5; } .rt-color-pink { color: #ad1a72; } .rt-color-red { color: #c0392b; }
+.rt-color-gray_background { background: #f1f1ef; } .rt-color-brown_background { background: #f4eeee; } .rt-color-orange_background { background: #fbecdd; } .rt-color-yellow_background { background: #fbf3db; } .rt-color-green_background { background: #edf3ec; } .rt-color-blue_background { background: #e7f3f8; } .rt-color-purple_background { background: #f6f3f9; } .rt-color-pink_background { background: #faf1f5; } .rt-color-red_background { background: #fdebec; }
+.sp-menu { position: relative; } .sp-menu > summary { list-style: none; cursor: pointer; } .sp-menu > summary::-webkit-details-marker { display: none; }
+.sp-menu-popover { position: absolute; right: 0; top: 100%; z-index: 1040; min-width: 15rem; max-width: 90vw; } .sp-menu-popover .list-group-item { min-height: 44px; display: flex; align-items: center; }
+.public-body { background: var(--bs-light, #f5f6fa); } .public-main { max-width: 820px; margin: 0 auto; padding: 1rem 16px 2rem; } .public-main .card { border-radius: .75rem; }

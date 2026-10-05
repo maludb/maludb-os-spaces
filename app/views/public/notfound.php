@@ -1,0 +1,2 @@
+<?php /** The one refusal page of the public door — the business's name and nothing else. Data: business */
+echo view('public/layout.php', ['business' => $business, 'title' => 'Not found', 'noindex' => true, 'content' => '<div class="card" id="public-notfound"><div class="card-body text-center py-5"><h1 class="h4">This page is not here.</h1><p class="text-muted mb-0">The link may have been changed or taken down.</p></div></div>']);

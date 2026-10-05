@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T17:00:01+00:00",
+    "generated_at": "2026-10-05T17:27:28+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -159,8 +159,8 @@
                 "kind",
                 "changed"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "page-add": {
             "screen": "page-add",
@@ -173,7 +173,7 @@
                 "template",
                 "private"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-view": {
@@ -182,7 +182,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "the page: for a reader the rendered tree, breadcrumb, icon and cover, properties when a row, comments; for an editor the same page editable (slice 3); the page menu — Share, Publish, Lock, Verify, Favorite, Move, Duplicate, Export, History, Trash",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-edit": {
@@ -191,7 +191,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "to change a page's title, icon, cover (the body is edited in place on the page)",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-share": {
@@ -200,7 +200,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "who can see the page and why: the inherited principals, the explicit ones, their levels; add a member, a department, a guest; restrict; the public link's state",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-move": {
@@ -209,7 +209,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "to move a page under another page, to a space's root, or to my private pages",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-history": {
@@ -218,7 +218,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "the page's versions: open one, compare two, restore one (slice 3 fills the diff)",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-publish": {
@@ -227,7 +227,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "to publish the page to the web: subpages yes or no, noindex, a database's layout; the link; rotate; unpublish",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-trash": {
@@ -236,7 +236,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "my trash (the admin's: everyone's): restore or purge; when each is purged",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "template-list": {
@@ -245,7 +245,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "the templates gallery: the workspace's and my spaces'; apply one",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "wiki-view": {
@@ -1257,7 +1257,7 @@
             "approval": null,
             "log_event": "page.create",
             "who": "edit on the parent or member of the space",
-            "built": false
+            "built": true
         },
         "page_update": {
             "action": "page_update",
@@ -1312,7 +1312,7 @@
             "approval": null,
             "log_event": "page.update",
             "who": "edit",
-            "built": false,
+            "built": true,
             "partial": true
         },
         "page_move": {
@@ -1356,7 +1356,7 @@
             "approval": null,
             "log_event": "page.move",
             "who": "full on the page and edit at the destination",
-            "built": false
+            "built": true
         },
         "page_duplicate": {
             "action": "page_duplicate",
@@ -1387,7 +1387,7 @@
             "approval": null,
             "log_event": "page.duplicate",
             "who": "view on the page and edit at the destination",
-            "built": false
+            "built": true
         },
         "page_trash": {
             "action": "page_trash",
@@ -1406,7 +1406,7 @@
             "approval": "deletion",
             "log_event": "page.trash",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_restore": {
             "action": "page_restore",
@@ -1425,7 +1425,7 @@
             "approval": null,
             "log_event": "page.restore",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_delete": {
             "action": "page_delete",
@@ -1446,7 +1446,7 @@
             "approval": "deletion",
             "log_event": "page.delete",
             "who": "full or trash.purge",
-            "built": false
+            "built": true
         },
         "trash_purge": {
             "action": "trash_purge",
@@ -1465,7 +1465,7 @@
             "approval": "deletion",
             "log_event": "trash.purge",
             "who": "trash.purge",
-            "built": false
+            "built": true
         },
         "page_lock": {
             "action": "page_lock",
@@ -1490,7 +1490,7 @@
             "approval": "other",
             "log_event": "page.lock",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_share_member": {
             "action": "page_share_member",
@@ -1527,7 +1527,7 @@
             "approval": null,
             "log_event": "page.share",
             "who": "full",
-            "built": false
+            "built": true
         },
         "share_guest": {
             "action": "share_guest",
@@ -1558,7 +1558,7 @@
             "approval": "external_send",
             "log_event": "page.share_guest",
             "who": "full and share.guest",
-            "built": false
+            "built": true
         },
         "page_unshare": {
             "action": "page_unshare",
@@ -1595,7 +1595,7 @@
             "approval": null,
             "log_event": "page.unshare",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_restrict": {
             "action": "page_restrict",
@@ -1614,7 +1614,7 @@
             "approval": null,
             "log_event": "page.restrict",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_unrestrict": {
             "action": "page_unrestrict",
@@ -1633,7 +1633,7 @@
             "approval": null,
             "log_event": "page.unrestrict",
             "who": "full",
-            "built": false
+            "built": true
         },
         "page_favorite": {
             "action": "page_favorite",
@@ -1658,7 +1658,7 @@
             "approval": null,
             "log_event": "page.favorite",
             "who": "view",
-            "built": false
+            "built": true
         },
         "page_publish": {
             "action": "page_publish",
@@ -1701,7 +1701,7 @@
             "approval": "external_send",
             "log_event": "page.publish",
             "who": "publish.web",
-            "built": false
+            "built": true
         },
         "page_publish_rotate": {
             "action": "page_publish_rotate",
@@ -1720,7 +1720,7 @@
             "approval": "external_send",
             "log_event": "page.publish_rotate",
             "who": "publish.web",
-            "built": false
+            "built": true
         },
         "page_unpublish": {
             "action": "page_unpublish",
@@ -1739,7 +1739,7 @@
             "approval": "external_send",
             "log_event": "page.unpublish",
             "who": "publish.web",
-            "built": false
+            "built": true
         },
         "template_apply": {
             "action": "template_apply",
@@ -1776,7 +1776,7 @@
             "approval": null,
             "log_event": "page.template_apply",
             "who": "edit at the destination",
-            "built": false
+            "built": true
         },
         "template_publish": {
             "action": "template_publish",
@@ -1801,7 +1801,7 @@
             "approval": "other",
             "log_event": "page.template_publish",
             "who": "owner of its space",
-            "built": false
+            "built": true
         },
         "page_verify": {
             "action": "page_verify",
@@ -1826,7 +1826,7 @@
             "approval": null,
             "log_event": "page.verify",
             "who": "the wiki owner or the space owner",
-            "built": false
+            "built": true
         },
         "page_owner_set": {
             "action": "page_owner_set",
@@ -1851,7 +1851,7 @@
             "approval": null,
             "log_event": "page.owner_set",
             "who": "full",
-            "built": false
+            "built": true
         },
         "space_wiki_set": {
             "action": "space_wiki_set",

@@ -1,0 +1,78 @@
+<?php
+/** Proof — move, duplicate, lock, favorite (spec "Proof", 3). */
+require __DIR__ . '/lib.php';
+$w = pages_world();
+$marco = as_member(27); $priya = as_member(26); $bea = as_member(28);
+$pr = $w['pricing']; $hb = $w['handbook']; $p27 = $w['pricing2027'];
+$edge = fn (string $parent, string $child) => one("SELECT id::text FROM blocks WHERE page_id = CAST(:p AS uuid) AND type = 'child_page' AND content->>'page_id' = :c", ['p' => $parent, 'c' => $child]);
+
+echo "1. Move\n";
+$since = last_activity_id();
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $pr, 'space' => $w['general']]);
+ok($c === 200 && page_row($pr)['parent_page_id'] === null && (int) page_row($pr)['space_id'] === $w['general'] && (int) page_row($p27)['space_id'] === $w['general'], 'Pricing moved to General\'s root; Pricing 2027 followed into the space');
+ok($edge($hb, $pr) === false, 'the edge block left the handbook');
+$log = activity('page.move', $since);
+ok(count($log) === 1 && json_decode((string) $log[0]['before'], true)['space_id'] === $w['product'] && json_decode((string) $log[0]['after'], true)['space_id'] === $w['general'], 'page.move logged before and after');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $pr, 'parent' => $hb]);
+ok($c === 403, 'in General Marco holds edit, not full: he cannot move it again (403)');
+$owner = as_member(1);
+[$c, $b] = act($owner, '/pages/move.php', ['page' => $pr, 'parent' => $hb]);
+ok($c === 200 && page_row($pr)['parent_page_id'] === $hb && (int) page_row($pr)['space_id'] === $w['product'] && $edge($hb, $pr) !== false, 'the admin moves it back under the handbook: a new edge block, the space the parent\'s');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $hb, 'parent' => $p27]);
+ok($c === 422 && msg($b) === 'A page cannot be moved under its own subpage', 'under its own subpage: the guard\'s words');
+[$c, $b] = act($priya, '/pages/move.php', ['page' => $pr, 'space' => $w['general']]);
+ok($c === 403 && msg($b) === 'You may not manage this page.', 'Priya (edit, not full): 403 in words');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $pr, 'parent' => $w['notes']]);
+ok($c === 404, 'to a page he cannot see: 404');
+act($marco, '/pages/save.php', ['title' => 'SMOKE Sibling A', 'parent' => $hb]);
+act($marco, '/pages/save.php', ['title' => 'SMOKE Sibling B', 'parent' => $hb]);
+$sa = page_by_title('SMOKE Sibling A'); $sb = page_by_title('SMOKE Sibling B');
+$order = fn () => array_column(q('SELECT plain_title FROM pages WHERE parent_page_id = CAST(:p AS uuid) AND archived_at IS NULL ORDER BY position', ['p' => $hb]), 'plain_title');
+ok($order() === ['SMOKE Pricing', 'SMOKE Sibling A', 'SMOKE Sibling B'], 'three subpages of the handbook in order');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $sb, 'after' => $pr]);
+ok($c === 200 && $order() === ['SMOKE Pricing', 'SMOKE Sibling B', 'SMOKE Sibling A'], 'after= reorders among siblings (the edge blocks and positions follow)');
+$edges = array_column(q("SELECT content->>'title' AS t FROM blocks WHERE page_id = CAST(:p AS uuid) AND type = 'child_page' ORDER BY position", ['p' => $hb]), 't');
+ok($edges === ['SMOKE Pricing', 'SMOKE Sibling B', 'SMOKE Sibling A'], 'the edge blocks in the same order');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $sa, 'private' => 'yes']);
+ok($c === 200 && page_row($sa)['space_id'] === null && (int) page_row($sa)['owner_member_id'] === 27 && $edge($hb, $sa) === false, 'to private: no space, Marco\'s, the edge gone');
+[$c, $b] = act($marco, '/pages/move.php', ['page' => $sa, 'space' => $w['product']]);
+ok($c === 200 && (int) page_row($sa)['space_id'] === $w['product'] && page_row($sa)['parent_page_id'] === null, 'and back to Product\'s root');
+
+echo "2. Duplicate\n";
+$since = last_activity_id();
+[$c, $b] = act($priya, '/pages/duplicate.php', ['page' => $pr]);
+$dup = (string) ($b['record_id'] ?? '');
+ok($c === 200 && is_uuid($dup) && page_row($dup)['plain_title'] === 'SMOKE Pricing (copy)' && page_row($dup)['parent_page_id'] === $hb, 'Priya duplicates Pricing beside it: "SMOKE Pricing (copy)" under the handbook');
+ok((int) one("SELECT count(*) FROM pages WHERE parent_page_id = CAST(:d AS uuid) AND plain_title = 'SMOKE Pricing 2027'", ['d' => $dup]) === 1, 'its subpage was copied too');
+ok(count(activity('page.duplicate', $since)) === 1 && json_decode((string) activity('page.duplicate', $since)[0]['after'], true)['source_page_id'] === $pr, 'page.duplicate logged with the source');
+[$c, $b] = act($marco, '/pages/duplicate.php', ['page' => $pr, 'title' => 'SMOKE Pricing in General', 'parent' => page_by_title('SMOKE Monday meeting')]);
+ok($c === 200 && (int) page_row((string) $b['record_id'])['space_id'] === $w['general'], 'duplicated under a page of another space with a title');
+act($marco, '/pages/trash.php', ['page' => $dup]);
+
+echo "3. Lock\n";
+$since = last_activity_id();
+[$c, $b] = act($marco, '/pages/lock.php', ['page' => $pr, 'locked' => 'yes']);
+ok($c === 200 && page_row($pr)['is_locked'] === true && ($b['version_no'] ?? 0) >= 1 && (int) one("SELECT count(*) FROM page_versions WHERE page_id = CAST(:p AS uuid) AND reason = 'lock'", ['p' => $pr]) === 1, 'locked, a lock version saved');
+[$c, $b] = act($marco, '/pages/save.php', ['page' => $pr, 'title' => 'SMOKE Pricing!']);
+ok($c === 422 && msg($b) === 'Page "SMOKE Pricing" is locked: unlock it to change it', 'a title change on a locked page: the guard\'s words');
+[$c, $b] = act($priya, '/pages/lock.php', ['page' => $pr, 'locked' => 'no']);
+ok($c === 403, 'Priya may not unlock (full)');
+[$c, $b] = act($marco, '/pages/lock.php', ['page' => $pr, 'locked' => 'no']);
+ok($c === 200 && page_row($pr)['is_locked'] === false && count(activity('page.lock', $since)) === 2, 'unlocked; page.lock logged twice');
+[$c, $b] = act($marco, '/pages/lock.php', ['page' => $pr, 'locked' => 'no']);
+ok($c === 422 && str_contains(msg($b), 'already unlocked'), 'unlocking again: 422');
+$h = page($marco, '/pages/' . $pr . '/history')['body'];
+ok(str_contains($h, 'id="version-table"') && preg_match('/id="version-row-\d+"/', $h) === 1 && str_contains($h, '>lock<'), 'the history screen lists the lock version');
+
+echo "4. Favorite\n";
+[$c, $b] = act($priya, '/pages/favorite.php', ['page' => $pr]);
+ok($c === 200 && (int) one('SELECT count(*) FROM page_favorites WHERE member_id = 26 AND page_id = CAST(:p AS uuid)', ['p' => $pr]) === 1, 'favorite on');
+$h = page($priya, '/')['body'];
+ok(str_contains($h, 'id="sidebar-favorites"') && str_contains($h, 'id="sidebar-page-' . $pr . '"'), 'in her sidebar\'s Favorites');
+[$c, $d] = screen($priya, '/pages/' . $pr);
+ok($d['page']['is_favorite'] === true, 'and on the page');
+[$c, $b] = act($priya, '/pages/favorite.php', ['page' => $pr, 'favorite' => 'no']);
+ok($c === 200 && (int) one('SELECT count(*) FROM page_favorites WHERE member_id = 26 AND page_id = CAST(:p AS uuid)', ['p' => $pr]) === 0 && !str_contains(page($priya, '/')['body'], 'id="sidebar-favorites"'), 'off again, gone from the sidebar');
+[$c, $b] = act($bea, '/pages/favorite.php', ['page' => $pr]);
+ok($c === 404, 'Bea (not in Product): 404');
+finish();

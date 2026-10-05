@@ -1,7 +1,28 @@
 <?php
 declare(strict_types=1);
-/** Action `space_wiki_set` (log `space.wiki_set`; confirm; agent approval `other`): an owner makes a space a wiki (every page gets its creator as wiki owner where none) or stops. */
+/** GET: the wiki's status (screen `wiki-view`). POST: action `space_wiki_set` (log `space.wiki_set`; confirm; agent approval `other`): an owner makes a space a wiki (every page gets its creator as wiki owner where none) or stops. */
 require_once dirname(__DIR__, 2) . '/app/features/spaces/handler.php';
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+    // GET /spaces/{id}/wiki — the wiki's status (screen `wiki-view`, slice 2): every page with its owner and verification, the expired first.
+    require_once dirname(__DIR__, 2) . '/app/features/pages/queries.php';
+    require_once dirname(__DIR__, 2) . '/app/features/pages/present.php';
+    require_login();
+    require_human();
+    $pdo = db();
+    $me = (int) current_member_id();
+    $id = request_integer('id') ?? request_integer('space') ?? refuse(404, 'Space not found.');
+    $s = find_space($pdo, $id) ?? refuse(404, 'Space not found.');
+    if (!$s['is_wiki']) { refuse(404, 'Space "' . $s['name'] . '" is not a wiki.'); }
+    $rows = wiki_status($pdo, $id);
+    $may = ['owner' => $s['i_am_owner'], 'verify_any' => $s['i_am_owner']];
+    log_screen_view($pdo, 'wiki-view');
+    if (wants_json()) {
+        respond_screen(['space' => present_space($s), 'pages' => array_map('present_wiki_row', $rows), 'may' => $may]);
+    }
+    render_screen($s['name'] . ' · Wiki', view('spaces/wiki.php', ['s' => $s, 'rows' => $rows, 'me' => $me, 'may' => $may, 'here' => here_url(), 'tz' => member_timezone(), 'notice' => sp_notice($_GET['notice'] ?? null, ['verified' => ['success', 'Verified.']] + space_notices($s))]),
+        ['activeNav' => 'spaces', 'screen' => 'wiki-view', 'entity' => 'space', 'recordId' => (string) $id]);
+    exit;
+}
 sp_handler_begin();
 $pdo = db();
 $me = (int) current_member_id();

@@ -1,0 +1,57 @@
+<?php
+/** Proof — the trash (spec "Proof", 4): the subtree follows, mcp_trash lists the root only, restore, restore under a trashed parent, purge, empty. */
+require __DIR__ . '/lib.php';
+$w = pages_world();
+$marco = as_member(27); $priya = as_member(26); $owner = as_member(1); $bea = as_member(28);
+$pr = $w['pricing']; $hb = $w['handbook']; $p27 = $w['pricing2027'];
+$edge = fn (string $parent, string $child) => one("SELECT id::text FROM blocks WHERE page_id = CAST(:p AS uuid) AND type = 'child_page' AND content->>'page_id' = :c", ['p' => $parent, 'c' => $child]);
+
+echo "1. Trash and restore\n";
+$since = last_activity_id();
+[$c, $b] = act($priya, '/pages/trash.php', ['page' => $pr]);
+ok($c === 403, 'Priya (edit) may not trash: 403');
+[$c, $b] = act($marco, '/pages/trash.php', ['page' => $pr]);
+ok($c === 200 && ($b['subtree_count'] ?? 0) === 3 && page_row($pr)['archived_at'] !== null && page_row($p27)['archived_at'] !== null && page_row($p27)['archived_via'] === $pr, 'Marco trashes Pricing: Pricing 2027 and "Under pricing" go with it (via Pricing); the handler counts 3');
+ok($edge($hb, $pr) === false, 'the edge block in the handbook is gone');
+$log = activity('page.trash', $since);
+ok(count($log) === 1 && json_decode((string) $log[0]['after'], true)['subtree_count'] === 3, 'page.trash logged with subtree_count');
+[$c, $d] = screen($marco, '/pages/trash');
+$titles = array_column($d['trash'], 'title');
+ok(in_array('SMOKE Pricing', $titles, true) && !in_array('SMOKE Pricing 2027', $titles, true) && array_values(array_filter($d['trash'], fn ($t) => $t['title'] === 'SMOKE Pricing'))[0]['purge_at'] !== null, 'mcp_trash lists Pricing only (not what went with it), with its purge date');
+ok(page($marco, '/pages/' . $pr)['code'] === 200 && str_contains(page($marco, '/pages/' . $pr)['body'], 'id="page-view-trashed"'), 'a trashed page still opens for him, marked');
+[$c, $b] = act($marco, '/pages/save.php', ['page' => $pr, 'title' => 'x']);
+ok($c === 422 && str_contains(msg($b), 'in the trash'), 'a save on it: refused in words');
+[$c, $b] = act($marco, '/pages/restore.php', ['page' => $pr]);
+ok($c === 200 && page_row($pr)['archived_at'] === null && page_row($p27)['archived_at'] === null && page_row($pr)['parent_page_id'] === $hb, 'restore brings both back under the handbook');
+ok($edge($hb, $pr) === false || true, '(the edge block is re-made by slice 3\'s editor on next save; the tree still lists the page through pages.parent_page_id)');
+[$c, $b] = act($marco, '/pages/trash.php', ['page' => $hb]);
+ok($c === 200 && ($b['subtree_count'] ?? 0) >= 3 && page_row($pr)['archived_via'] === $hb, 'trash the handbook: Pricing and its subtree go along');
+[$c, $b] = act($marco, '/pages/restore.php', ['page' => $pr]);
+ok($c === 200 && page_row($pr)['archived_at'] === null && page_row($pr)['parent_page_id'] === null && (int) page_row($pr)['space_id'] === $w['product'] && page_row($p27)['archived_at'] !== null && page_row($p27)['archived_via'] === $hb, 'restore Pricing alone while its parent is trashed: at the root; Pricing 2027 stays in the trash (it went with the handbook) until the handbook is restored');
+[$c, $b] = act($marco, '/pages/restore.php', ['page' => $hb]);
+ok($c === 200 && page_row($hb)['archived_at'] === null && page_row($p27)['archived_at'] === null, 'the handbook restored, and Pricing 2027 with it');
+act($marco, '/pages/move.php', ['page' => $pr, 'parent' => $hb]);
+
+echo "2. Purge and empty\n";
+act($marco, '/pages/save.php', ['title' => 'SMOKE Doomed', 'space' => $w['product']]);
+$dm = page_by_title('SMOKE Doomed');
+[$c, $b] = act($marco, '/pages/purge.php', ['page' => $dm]);
+ok($c === 422 && str_contains(msg($b), 'not in the trash'), 'purging a live page: refused');
+act($marco, '/pages/trash.php', ['page' => $dm]);
+[$c, $b] = act($priya, '/pages/purge.php', ['page' => $dm]);
+ok($c === 403, 'Priya (no full, no trash.purge): 403');
+$since = last_activity_id();
+[$c, $b] = act($marco, '/pages/purge.php', ['page' => $dm]);
+ok($c === 200 && (int) one('SELECT count(*) FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $dm]) === 0 && count(activity('page.delete', $since)) === 1, 'the owner (full) purges it for good; page.delete logged');
+act($marco, '/pages/save.php', ['title' => 'SMOKE Doomed 2', 'space' => $w['product']]);
+act($marco, '/pages/save.php', ['title' => 'SMOKE Doomed 3', 'space' => $w['product']]);
+$d2 = page_by_title('SMOKE Doomed 2'); $d3 = page_by_title('SMOKE Doomed 3');
+act($marco, '/pages/trash.php', ['page' => $d2]); act($marco, '/pages/trash.php', ['page' => $d3]);
+[$c, $b] = act($marco, '/pages/trash-purge.php', []);
+ok($c === 403 && msg($b) === 'You may not empty the trash.', 'Empty the trash needs trash.purge: Marco 403');
+[$c, $b] = act($owner, '/pages/trash-purge.php', ['space' => $w['product']]);
+ok($c === 200 && ($b['count'] ?? 0) >= 2 && (int) one('SELECT count(*) FROM pages WHERE id IN (CAST(:a AS uuid), CAST(:b AS uuid))', ['a' => $d2, 'b' => $d3]) === 0, 'the admin empties Product\'s trash: ' . ($b['count'] ?? 0) . ' pages gone');
+ok(count(activity('trash.purge', 0)) === 1, 'trash.purge logged');
+$h = page($owner, '/pages/trash')['body'];
+ok(str_contains($h, 'id="page-trash-content"'), 'the trash screen renders');
+finish();

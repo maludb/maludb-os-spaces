@@ -146,3 +146,29 @@ The world (`tests/phase3/slice2/lib.php` `pages_world()`): slice 1's world; Prod
 - [ ] **375 × 740 and 1280 × 800**: the reader at both; the page menu a popover; the share table scrolls within the page; the public page at 375; every control ≥ 44 px, `scrollWidth` = viewport, no console errors; JavaScript off creates, shares and publishes; the registry reads 12 screens and 24 actions built.
 
 ## Open questions
+
+## Built and proven (2026-10-05)
+Built exactly as the Files list says: `app/richtext/render.php` (`render_blocks()`, `render_rich_text()` — every adopted type, consecutive list items grouped into
+one list, numbered per sibling group, a toggleable heading and a toggle as `<details>`, columns as a grid stacked at 375 px, a table with its header row, an embed's
+iframe only for `allowed_embed_hosts`, mentions as chips, `data-block-id` on every block), `app/features/pages/{handler,queries,present,write}.php`,
+`app/features/public/{queries,render}.php`, the 26 controllers under `html/pages/` (`edit.php` is the vhost's name for the UUID record's form), `html/templates/index.php`,
+`html/spaces/wiki.php` (GET the wiki's status, POST slice 1's `space_wiki_set`), `html/p.php`, the views with their five partials and the public layouts,
+`PARTIAL_UPDATE_TARGETS['/pages/save.php']` (a UUID id), the reader's styles. **Decisions taken in the build:** a page with neither `space` nor `parent` is private
+(`pages.private`); `markdown` on create seeds one paragraph block (slice 3's converter replaces that); a `space` the caller cannot see answers 404 (the view's truth — a
+guest gets 404 where the spec said 403); a page moved into a space where the mover holds only edit is no longer theirs to move again (the database's rule — the proof
+has the admin move it back); the trash's cascade stamps `archived_via` with the page that was trashed, so restoring a subpage alone brings back only what went with
+*it*; `page_delete` on a live page is refused in words; the public door's rate limit counts the trail's `page.public_view` rows per address (60 a minute → 429); the
+public door sets `app.member_id` to nothing and reads the base tables through `sp_public_page_lookup()`; a `navigate`-free reply partial. **The reader's title
+helper** fetches every page a tree refers to in one query (`page_titles_in_tree()`), so a link to a page the reader cannot see says so. **Proof** `tests/phase3/slice2/run.sh`
+— **271 checks green** (make 20, read 30, move 28, trash 19, share 35, publish 28, wiki 29, json 44, browser 38) plus the registry and approvals checks: every box above
+— the world (the handbook › Pricing › Pricing 2027, Bea's private notes, General a wiki), create in a space, under a page and privately with the refusals in words, a page
+from the Meeting notes template with its four headings, every block type rendered (a synced copy of an original the reader cannot see says so, never the words), the
+breadcrumb, recents, `page.view`, move / reorder / private / duplicate with the subtree / lock with its version / favorite in the sidebar, the trash's cascade and `mcp_trash`,
+restore under a trashed parent, purge and Empty by `trash.purge`, share to a department (the everyone row carried along), a guest's share and her sidebar and
+`mcp_members`, restrict and unrestrict, the share screen's sources, a private page shared, publish (the link once, the hash stored, `page.publish` without the token),
+the public door with subpages, an image through its own door, noindex, rotate, a trashed page's link, unpublish, the 429, `page.public_view` as `portal`, verify (3 months),
+the owner's and the space owner's rights, an expired badge, `wiki-view` ordered, a template made, hidden from the sidebar and the list, applied in General, every handler
+under an action token answering `{ok, did, record_id, location, refresh}` with a UUID `record_id`, `_partial=1` keeping the icon, the expert making a page in General and
+sharing a private page of its own (a General page it holds at edit, not full, exactly as a person), the screens at 375 and 1280 (the page menu a popover, the share table
+within the page, the public page bare at 375, JavaScript off creating, sharing and publishing). The registry reads 12 screens and 22 actions of this slice built (24 screens,
+45 actions in all). Screenshots `/tmp/sp-shots-s2/`. Phase 2's `gates` and `vhost` proofs were updated for the screens slices 1 and 2 made real.

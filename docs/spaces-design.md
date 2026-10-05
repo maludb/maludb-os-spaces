@@ -674,7 +674,10 @@ and the brand, sixteen placeholders naming their slices; **312 checks green** un
 sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63), the registry and approvals in step, Phase 0's 18 still green.
 **SLICE 1 — spaces, membership and sections, THE CRUD EXEMPLAR FOR WORKERS — BUILT and proven 2026-10-05** (`docs/build-specs/spaces-core.md`,
 "Built and proven"): 8 screens, 18 actions, the feature's four files on the kit's shape, **226 checks green** (`tests/phase3/slice1/run.sh`: seeds 19,
-spaces 41, membership 56, sections 27, visibility 40, browser 43); `db/018` fixes the member guard on a space's delete cascade. Next: slice 2.
+spaces 41, membership 56, sections 27, visibility 40, browser 43); `db/018` fixes the member guard on a space's delete cascade.
+**SLICE 2 — pages: the tree, sharing, the wiki, the trash, templates, the public page — BUILT and proven 2026-10-05** (`docs/build-specs/pages-tree.md`,
+"Built and proven"): the reader (`app/richtext/render.php`, every adopted block type), 12 screens, 22 actions, the public door `/p/{token}`, **271 checks green**
+(`tests/phase3/slice2/run.sh`: make 20, read 30, move 28, trash 19, share 35, publish 28, wiki 29, json 44, browser 38). Next: slice 3, the block editor — THE FIRST EXEMPLAR.
 
 **Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 
