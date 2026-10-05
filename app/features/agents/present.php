@@ -29,7 +29,7 @@ function present_dispatch(array $d): array
             'kind' => $d['kind'], 'channel' => $d['channel_id'] === null ? null : ['channel_id' => (int) $d['channel_id'], 'name' => $d['channel_name'] ?? null, 'kind' => $d['channel_kind'] ?? null],
             'message_id' => $d['message_id'] === null ? null : (int) $d['message_id'], 'first_line' => $d['first_line'] ?? null,
             'status' => dispatch_status_key($d), 'attempts' => (int) $d['attempts'], 'run_id' => $d['run_id'] === null ? null : (int) $d['run_id'], 'detail' => $d['detail'] ?? null,
-            'created_at' => json_ts($d['created_at']), 'answered_at' => json_ts($d['answered_at'] ?? null), 'reply_excerpt' => $d['reply_excerpt'] ?? null, 'may_retry' => $d['status'] === 'failed'];
+            'created_at' => json_ts($d['created_at']), 'answered_at' => json_ts($d['answered_at'] ?? null), 'reply_excerpt' => $d['reply_excerpt'] ?? null, 'may_retry' => in_array($d['status'], ['failed', 'awaiting_approval'], true)];
 }
 
 function present_agent(array $a): array

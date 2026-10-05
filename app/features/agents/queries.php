@@ -85,15 +85,15 @@ function find_dispatch(PDO $pdo, int $id): ?array
 }
 
 /**
- * The admin's retry: a failed dispatch goes back to `sent`, due now. The attempts are KEPT but never above five — db/016 offers a dispatch only
+ * The admin's retry: a failed dispatch — or one waiting for an approval the admin gives up on — goes back to `sent`, due now. The attempts are KEPT but never above five — db/016 offers a dispatch only
  * while attempts <= 5, so a retried one has exactly one more try (it fails again for good if it does).
  */
 function retry_dispatch(PDO $pdo, int $id, int $by): void
 {
-    $st = $pdo->prepare("UPDATE agent_dispatches SET status = 'sent', run_id = NULL, next_attempt_at = now(), attempts = least(attempts, 5), detail = NULL WHERE id = :d AND status = 'failed' AND record_type = 'message'");
+    $st = $pdo->prepare("UPDATE agent_dispatches SET status = 'sent', run_id = NULL, next_attempt_at = now(), attempts = least(attempts, 5), detail = NULL WHERE id = :d AND status IN ('failed', 'awaiting_approval') AND record_type = 'message'");
     $st->execute(['d' => $id]);
     if ($st->rowCount() !== 1) {
-        throw new DomainException('Only a failed dispatch is retried.');
+        throw new DomainException('Only a failed dispatch, or one still waiting for an approval, is retried.');
     }
 }
 

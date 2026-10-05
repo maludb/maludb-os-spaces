@@ -11,13 +11,14 @@ require dirname(__DIR__) . '/slice6/lib.php';
 function kernel_chat(array $s): void
 {
     kernel_state(function ($st) use ($s) {
-        foreach (['chat_mode', 'chat_status', 'chat_message', 'run_pending', 'run_reply', 'run_status', 'chat'] as $k) { unset($st[$k]); }
+        foreach (['chat_mode', 'chat_status', 'chat_message', 'run_pending', 'run_reply', 'run_status', 'run_outcome', 'chat'] as $k) { unset($st[$k]); }
         if (isset($s['mode'])) { $st['chat_mode'] = $s['mode']; }
         if (isset($s['status'])) { $st['chat_status'] = $s['status']; }
         if (isset($s['message'])) { $st['chat_message'] = $s['message']; }
         if (array_key_exists('pending', $s)) { $st['run_pending'] = (bool) $s['pending']; }
         if (isset($s['run_reply'])) { $st['run_reply'] = $s['run_reply']; }
         if (isset($s['run_status'])) { $st['run_status'] = $s['run_status']; }
+        if (isset($s['outcome'])) { $st['run_outcome'] = $s['outcome']; }
         if (isset($s['reply'])) { $st['chat'] = ['run_id' => 'n', 'status' => 'succeeded', 'finished' => true, 'reply' => $s['reply'], 'actions' => [], 'cost' => 0.0345, 'currency' => 'USD']; }
         return $st;
     });
@@ -37,7 +38,7 @@ function worker_pass(array $env = []): array
     $out = trim((string) shell_exec($cmd . 'php ' . escapeshellarg(dirname(__DIR__, 3) . '/bin/worker.php') . ' dispatches 2>&1'));
     return json_decode($out, true) ?? ['raw' => $out];
 }
-function dispatch_db(int $id): array { return q('SELECT id, record_id, agent_member_id, acting_member_id, kind, status, run_id, attempts, detail, next_attempt_at, pending_message_id, reply_message_id, reply_excerpt, conversation_id, channel_id FROM agent_dispatches WHERE id = :d', ['d' => $id])[0] ?? []; }
+function dispatch_db(int $id): array { return q('SELECT id, record_id, agent_member_id, acting_member_id, kind, status, run_id, request_id, attempts, detail, next_attempt_at, pending_message_id, reply_message_id, reply_excerpt, conversation_id, channel_id FROM agent_dispatches WHERE id = :d', ['d' => $id])[0] ?? []; }
 function dispatch_of(int $messageId, int $agent): array { return q("SELECT id FROM agent_dispatches WHERE record_type = 'message' AND record_id = :m AND agent_member_id = :a", ['m' => $messageId, 'a' => $agent])[0] ?? []; }
 function dispatch_id_of(int $messageId, int $agent): int { return (int) (dispatch_of($messageId, $agent)['id'] ?? 0); }
 /** A dispatch due now (a proof does not wait out a backoff). */
@@ -86,6 +87,10 @@ function agents_browser_world(): array
     [, $b] = post($priya, $launch, '@SMOKE Seamus browser question two');
     $running = (int) $b['record_id'];
     worker_pass();
+    [, $b] = act($priya, '/dm/open.php', ['member' => 40]);
+    $dm = (int) $b['record_id'];
+    post($priya, $dm, 'SMOKE browser DM question');
+    worker_pass();
     kernel_chat(['mode' => 'reply']);
     [, $b] = post($priya, $launch, 'SMOKE We decided: browser banner stays blue.');
     $root = (int) $b['record_id'];
@@ -97,5 +102,5 @@ function agents_browser_world(): array
     [, $b] = act_token('/proposals/save.php', ['kind' => 'orphan', 'title' => 'SMOKE Browser: an orphan', 'reason' => 'Nothing links here.', 'page' => (string) $b['record_id']], $lib);
     $p2 = (int) $b['record_id'];
     [, $b] = act($marco, '/pages/save.php', ['title' => 'SMOKE Browser parent', 'space' => $product]);
-    return ['product' => $product, 'launch' => $launch, 'answered' => $answered, 'running' => $running, 'running_dispatch' => dispatch_id_of($running, 40), 'failed_dispatch' => $failed, 'proposal_thread' => $p1, 'proposal_orphan' => $p2, 'draft' => $draft, 'parent' => (string) $b['record_id']];
+    return ['product' => $product, 'launch' => $launch, 'answered' => $answered, 'running' => $running, 'running_dispatch' => dispatch_id_of($running, 40), 'dm' => $dm, 'failed_dispatch' => $failed, 'proposal_thread' => $p1, 'proposal_orphan' => $p2, 'draft' => $draft, 'parent' => (string) $b['record_id']];
 }

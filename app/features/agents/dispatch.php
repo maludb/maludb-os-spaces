@@ -37,8 +37,9 @@ function dispatch_context(array $d): string
     $where = in_array($d['channel_kind'] ?? '', ['dm', 'group_dm'], true)
         ? 'sent a direct message'
         : 'mentioned in #' . (string) ($d['channel_name'] ?? '') . (($d['space_name'] ?? '') !== '' ? ' of space ' . $d['space_name'] : '');
-    return 'You are ' . $name . ', a member of Spaces. You were ' . $where . ".\nThe thread so far:\n" . trim((string) ($d['context'] ?? ''))
-        . "\nAnswer in this thread, once, as yourself, citing the page or message you took it from. Never write @channel, @here or @everyone.";
+    $so = in_array($d['channel_kind'] ?? '', ['dm', 'group_dm'], true) ? 'The conversation so far' : 'The thread so far';
+    return 'You are ' . $name . ', a member of Spaces. You were ' . $where . ".\n" . $so . ":\n" . trim((string) ($d['context'] ?? ''))
+        . "\nAnswer in this " . (in_array($d['channel_kind'] ?? '', ['dm', 'group_dm'], true) ? 'conversation' : 'thread') . ", once, as yourself, citing the page or message you took it from. Never write @channel, @here or @everyone.";
 }
 
 /** The facts a dispatch row needs beside what sp_dispatches_due() gives: the agent's name, the space's id and name. */
@@ -72,12 +73,6 @@ function dispatch_record(PDO $pdo, int $id, string $status, ?int $runId = null, 
     $st->execute(['d' => $id, 's' => $status, 'r' => $runId, 'q' => $requestId, 'b' => $reply === null ? null : json_encode($reply, JSON_UNESCAPED_UNICODE), 't' => $detail === null ? null : mb_substr($detail, 0, 500)]);
     $v = $st->fetchColumn();
     return $v === false || $v === null ? null : (int) $v;
-}
-
-/** Whether the dispatch already has its "thinking" placeholder. */
-function dispatch_has_placeholder(PDO $pdo, int $id): bool
-{
-    return (bool) one_value($pdo, 'SELECT pending_message_id IS NOT NULL FROM agent_dispatches WHERE id = :d', ['d' => $id]);
 }
 
 /** Log a dispatch event: the ids, never the words. The actor is the asker for a call, the agent for what it did. */
@@ -146,6 +141,10 @@ function dispatch_agent(PDO $pdo, array $d): array
         return ['outcome' => dispatch_fail($pdo, $d, 'failed', $answer === null ? 'The kernel did not answer.' : 'The kernel answered ' . $http . '.'), 'http' => $http];
     }
     $body = $answer['body'] ?? [];
+    if ($http === 409) {                                           // the agent is busy with another turn: not a refusal — the backoff retries it
+        $why = is_array($body['error'] ?? null) ? (string) ($body['error']['message'] ?? '') : '';
+        return ['outcome' => dispatch_fail($pdo, $d, 'failed', $why !== '' ? $why : 'The agent is busy with another turn.'), 'http' => $http];
+    }
     if ($http >= 400) {
         $why = is_array($body['error'] ?? null) ? (string) ($body['error']['message'] ?? '') : '';
         return ['outcome' => dispatch_fail($pdo, $d, 'refused', $why !== '' ? $why : 'The kernel refused this turn (' . $http . ').'), 'http' => $http];
@@ -155,10 +154,7 @@ function dispatch_agent(PDO $pdo, array $d): array
     $state = (string) ($body['status'] ?? '');
     if ($state === 'pending_approval' || (empty($body['finished']) && !empty($body['approval_request_id']))) {
         $detail = 'Waiting for a person\'s approval (request ' . (int) ($body['approval_request_id'] ?? 0) . ')';
-        if (!dispatch_has_placeholder($pdo, (int) $d['dispatch_id'])) {
-            dispatch_record($pdo, (int) $d['dispatch_id'], 'running', $runId, $requestId);          // the placeholder is born, so the thread can say it waits
-        }
-        dispatch_record($pdo, (int) $d['dispatch_id'], 'awaiting_approval', null, $requestId, null, $detail);
+        dispatch_record($pdo, (int) $d['dispatch_id'], 'awaiting_approval', $runId, $requestId, null, $detail);   // keeps the run and the placeholder; polled until the person decides
         dispatch_log($pdo, 'agent.dispatch', $d, ['status' => 'awaiting_approval', 'approval_request_id' => (int) ($body['approval_request_id'] ?? 0), 'run_id' => $runId]);
         return ['outcome' => 'awaiting', 'http' => $http];
     }
@@ -212,6 +208,47 @@ function poll_running_dispatches(PDO $pdo, DateTimeImmutable $now): array
     return $out;
 }
 
+const WAITING_DECLINED = ['declined', 'rejected', 'refused', 'denied', 'cancelled', 'canceled'];
+
+/**
+ * The dispatches waiting for a person's approval (sp_dispatches_waiting(): a run kept, due for a poll): GET ?run= for each. The run answered → the reply is posted;
+ * the kernel says it was declined, refused or is gone (a 4xx) → `refused` with its sentence and the placeholder removed; still going or still awaiting (or the kernel
+ * did not answer) → 'awaiting_approval' again, which moves next_attempt_at on. Returns ['polled', 'answered', 'refused', 'awaiting'].
+ */
+function poll_waiting_dispatches(PDO $pdo): array
+{
+    $out = ['polled' => 0, 'answered' => 0, 'refused' => 0, 'awaiting' => 0];
+    $rows = $pdo->query('SELECT w.*, d.kind FROM sp_dispatches_waiting(50) w JOIN agent_dispatches d ON d.id = w.dispatch_id')->fetchAll();
+    foreach ($rows as $r) {
+        $out['polled']++;
+        try {
+            $d = dispatch_enrich($pdo, $r);
+            $answer = kernel_call('GET', '/api/v1/agents/chat.php?run=' . (int) $r['run_id'], null, ['X-Acting-Member: ' . (int) $r['acting_member_id']], 20);
+            $http = $answer['status'] ?? null;
+            $body = $answer['body'] ?? [];
+            $state = (string) ($body['status'] ?? '');
+            $why = is_array($body['error'] ?? null) ? (string) ($body['error']['message'] ?? '') : (string) ($body['error'] ?? '');
+            if ($answer !== null && $http >= 400 && $http < 500) {
+                dispatch_fail($pdo, $d, 'refused', $why !== '' ? $why : 'The kernel does not know that run (' . $http . ').', (int) $r['run_id']);
+                $out['refused']++;
+            } elseif ($answer !== null && $http < 300 && in_array($state, WAITING_DECLINED, true)) {
+                dispatch_fail($pdo, $d, 'refused', $why !== '' ? $why : 'The approval was declined.', (int) $r['run_id']);
+                $out['refused']++;
+            } elseif ($answer !== null && $http < 300 && !empty($body['finished'])) {
+                $res = dispatch_finish($pdo, $d, $body, (int) $r['run_id'], $r['request_id'] ?? null);
+                $out[$res === 'answered' ? 'answered' : 'refused']++;
+            } else {
+                dispatch_record($pdo, (int) $r['dispatch_id'], 'awaiting_approval', null, null, null, null);
+                $out['awaiting']++;
+            }
+        } catch (Throwable $e) {
+            error_log('poll of waiting dispatch ' . $r['dispatch_id'] . ': ' . $e->getMessage());
+            if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        }
+    }
+    return $out;
+}
+
 /**
  * One pass of the step: the runs going are polled, then what is due (at most $limit) is called. Idempotent — a second pass dispatches nothing new.
  * ['called', 'answered', 'running', 'refused', 'failed', 'polled', 'awaiting'].
@@ -224,6 +261,11 @@ function dispatches_pass(PDO $pdo, DateTimeImmutable $now, int $limit): array
     $out['answered'] += $polled['answered'];
     $out['failed'] += $polled['failed'];
     $out['running'] += $polled['running'];
+    $waited = poll_waiting_dispatches($pdo);
+    $out['polled'] += $waited['polled'];
+    $out['answered'] += $waited['answered'];
+    $out['refused'] += $waited['refused'];
+    $out['awaiting'] += $waited['awaiting'];
     $due = $pdo->prepare('SELECT * FROM sp_dispatches_due(:n)');
     $due->execute(['n' => max(1, $limit)]);
     foreach ($due->fetchAll() as $d) {

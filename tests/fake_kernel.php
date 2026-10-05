@@ -53,7 +53,7 @@ switch ($path) {
         // slice 7: one turn of an agent (POST ?agent=) and a run polled (GET ?run=), as state.chat_mode scripts them:
         //   absent / reply   → 200, finished, state.chat (or the canned reply; "{agent}" in a reply is the agent id asked)
         //   running          → 202 {run_id, request_id, status: running, finished: false}; GET ?run= answers the same until state.run_pending is false, then state.run_reply finished
-        //   approval         → 200 {status: pending_approval, approval_request_id: 77, finished: false}
+        //   approval         → 200 {status: pending_approval, approval_request_id: 77, finished: false}; GET ?run= says the same until state.run_outcome = answered (finished, state.run_reply) or refused (declined)
         //   error500         → 500; state.chat_status (a refusal status, as before) wins over a mode
         $log = (string) getenv('FAKE_KERNEL_STATE') . '.chat';
         $isPoll = ($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'GET' && isset($_GET['run']);
@@ -64,6 +64,8 @@ switch ($path) {
         if ($isPoll) {
             $run = (int) $_GET['run'];
             if (isset($state['run_status']) && $state['run_status'] === 404) { $out(['error' => ['code' => 'not_found', 'message' => 'No such run.']], 404); }
+            if (($state['run_outcome'] ?? '') === 'refused') { $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'declined', 'finished' => true, 'reply' => '', 'error' => 'The approval was declined by a super-admin.']); }
+            if (($state['chat_mode'] ?? '') === 'approval' && ($state['run_outcome'] ?? '') !== 'answered') { $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'pending_approval', 'finished' => false, 'reply' => '', 'approval_request_id' => 77]); }
             if (!empty($state['run_pending'])) { $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'running', 'finished' => false, 'reply' => '']); }
             $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'succeeded', 'finished' => true, 'reply' => $state['run_reply'] ?? 'The run finished.', 'actions' => [], 'cost' => 0.0123, 'currency' => 'USD']);
         }

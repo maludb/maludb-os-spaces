@@ -36,13 +36,13 @@ one dispatch per message and agent, the backoff and the five attempts, the place
    (`kind = message`, `sent_at` now) — the trigger counts, notifies the asker (`agent_replied`), indexes it; the kernel's `cost` and `currency`
    go in the log. **202** (a run still going) → `sp_dispatch_record(id, 'running', run_id, request_id)` — the placeholder row is born ("thinking…"),
    and the next passes `GET /api/v1/agents/chat.php?run=<id>` until it finishes (`poll_running_dispatches()`); after 10 minutes → `failed`
-   ("the run did not finish"). **A refusal** (403/409/422 from the kernel: the agent not hired, inactive, the application not granted, a bad
+   ("the run did not finish"). **A refusal** (403/422 and the other 4xx from the kernel — a 409, the agent busy, is `failed` with backoff: the agent not hired, inactive, the application not granted, a bad
    conversation) → `refused` with the kernel's sentence; a `pending_approval` answer (the agent's action paused) → `awaiting_approval` with the
    `approval_request_id` in `detail` (the placeholder stays: "waiting for a person's approval"); unreachable or 5xx → `failed` with backoff
    (`sp_dispatch_record` doubles the wait; five attempts then failed for good — the placeholder removed, the asker told once: `sp_notify(asker,
    'agent_replied', '<agent> could not answer', detail)`).
 4. Log `agent.dispatch` (sent), `agent.reply` (`run_id`, `request_id`, `reply_length`, `cost`), `agent.fail` (`attempts`, `detail`) — never the words.
-5. `dispatch_retry` (the admin's action) resets a failed one to `sent`, `attempts` kept, `next_attempt_at` now.
+5. `dispatch_retry` (the admin's action) resets a failed one (or one awaiting an approval) to `sent`, `attempts` kept, `next_attempt_at` now.
 **K8** (the kernel waking an agent instead of a chat turn) is owed: when it lands, step 2 becomes the wake call; nothing else changes.
 
 ## The Librarian's proposals
@@ -135,14 +135,19 @@ now records the conversation id, the context, `wait` and the polls.
 - The failure notice (after the fifth attempt) is sent by the worker with `sp_notify()` and links to the asker's message; the placeholder is removed by `sp_dispatch_record()`.
 - `agent.dispatch` is logged with the asker as actor at the call; `agent.reply` and `agent.fail` with the agent as actor; all source `cron`; never the words.
 - Phase 2's `gates.php` now expects `/proposals/` open to an owner and a member (200) and the exports placeholder as its example of an unbuilt screen; `vhost.php` resolves `/admin/agents` (403 for a Space owner) in place of `/proposals/`.
-**Proven by `tests/phase3/slice7/run.sh` — PICKER, DISPATCH, FAILURES, PROPOSALS, ADMIN, JSON, BROWSER (223 checks green (picker 10, dispatch 37, failures 33, proposals 44, admin 32, json 23, browser 44); Phase 2 and slice 4 re-run green).**
+**Proven by `tests/phase3/slice7/run.sh` — PICKER, DISPATCH, FAILURES, PROPOSALS, ADMIN, JSON, BROWSER (the first build: 223 checks; after the three decisions 244 green: picker 10, dispatch 41, failures 47, proposals 44, admin 32, json 23, browser 47); Phase 2 and slice 4 (241, its `agent.php` §4 updated) re-run green).**
 Every box of the checklist has at least one `ok()` line; the worker is run as a process (`php bin/worker.php dispatches`) against the fake kernel.
 
+**Decided by the planning model 2026-10-05, built here (the three open questions the first build left):**
+- **A DM's reply is inline and the DM is the conversation (`db/022_dm_dispatch_inline.sql`; db/012 and db/016 untouched).** For a channel of kind `dm` or `group_dm`: `sp_dispatch_from_message()` writes `conversation_id = spaces:dm:<channel_id>` (a space channel keeps `spaces:thread:<root>`);
+  `sp_dispatch_record()` makes the placeholder and the reply top-level messages of the channel (`thread_root_id` NULL), so the DM shows "<agent> is thinking…" inline and the poll's hash swap (the hash includes `kind`) turns it into the reply in place; `sp_dispatches_due()` gives a DM `thread_root_id` NULL and
+  the context from the new `sp_dm_context(channel, 12)` — the channel's last 12 sent, undeleted turns of kind `message` as "Name: text" lines — so the agent remembers the DM; the context sentence says "The conversation so far" and "Answer in this conversation".
+- **An awaiting dispatch is polled until the person decides.** `sp_dispatch_record(…, 'awaiting_approval', run, request)` keeps `run_id`, `request_id` and the placeholder (born there when the dispatch has none), does not bump `attempts`, and sets `next_attempt_at` one minute ahead on the first call and, when it is already awaiting, half the
+  dispatch's age (at least one minute, at most thirty — so the wait roughly doubles and stops at half an hour). `sp_dispatches_waiting(limit)` offers the awaiting ones with a run that are due; the pass (`poll_waiting_dispatches()`) GETs `?run=` as the asker: answered → `answered` (reply posted, asker told); the kernel says declined/rejected/refused/denied/cancelled or a 4xx
+  (a 404: the run is gone) → `refused` with its sentence and the placeholder removed; still going, still awaiting or no answer → `awaiting_approval` again. `dispatch_retry` also resets an awaiting dispatch (an admin giving up on the approval; the placeholder stays and the next turn replaces it); the dispatches page shows an awaiting one with its age and "Give up waiting and retry".
+  `tests/fake_kernel.php`: in `approval` mode `GET ?run=` says pending_approval until `state.run_outcome` is `answered` (finished, `state.run_reply`) or `refused` (declined).
+- **A 409 is `failed` with backoff, not a refusal** (the agent is busy with another turn; `sp_dispatch_record()`'s backoff retries it). The other 4xx stay `refused`.
+Proof added: a DM's conversation id, inline reply and memory across messages; a 409 then an answer; paused → waiting (placeholder stays, polled only when due) → approved (reply, asker told); paused → declined (refused, placeholder removed); a forgotten run (404); an admin's Retry of an awaiting dispatch; the DM's thinking row and in-place reply in the browser; slice 4's `agent.php` §4 expects the DM reply inline.
+
 ## Open questions
-1. **A DM's reply is a thread reply.** `sp_dispatch_record()` (db/016) puts the reply in `thread_root_id = COALESCE(thread_root, message)`, so in a DM the agent's answer sits under the person's message ("1 reply") rather than in the DM's main
-   view, and `conversation_id` (`spaces:thread:<message>`) makes every DM message its own conversation: the agent has no memory of the DM's earlier turns beyond that message. Should a DM's reply be inline and the conversation the DM
-   (`spaces:dm:<channel>`, the context the DM's last turns)? It would be a `db/022` redefining the trigger and the record function; nothing was changed.
-2. **An `awaiting_approval` dispatch has no way out.** `sp_dispatch_record()` clears `run_id` for it, `sp_dispatches_due()` never offers it, and `dispatch_retry` is for a failed one: when the person approves in the OS and the kernel's run goes on,
-   nothing here learns of it and no reply is posted. Should the worker keep the run id and poll an awaiting dispatch (as it polls a running one), or may Retry reset an awaiting one?
-3. **409 is a refusal for good.** The spec lists 403/409/422 as `refused`. The kernel answers 409 when the agent is busy with another turn (one run at a time), so a second mention while the agent works is refused permanently (and not retried
-   by the admin: Retry is for `failed`). Should a 409 be a `failed` with backoff instead?
+(none)
