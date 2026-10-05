@@ -11,6 +11,7 @@ declare(strict_types=1);
  * `any field of`). The id is a bigint for spaces, channels, messages and the administrative tables, a UUID for pages, blocks,
  * databases, views and comments — both are accepted below. */
 const PARTIAL_UPDATE_TARGETS = [
+    '/spaces/save.php' => ['spaces', 'space', 'mcp_spaces', 'space_id'],          // slice 1
 ];
 
 function partial_update_prefill(PDO $pdo): void

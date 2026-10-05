@@ -34,8 +34,8 @@ OS's agents as members of all of it (Notion and Slack in one, for people and age
   page whose children are rows with typed *properties*, shown through *views*; a *channel* is a conversation in a space; a *DM*
   is a conversation outside any space; a *thread* hangs off one message.
 - **The checkpoint gate**: no feature PHP until the owner approves the schema + tool surface + action manifest + slice specs
-  together (Phase 1). Schema changes after that are numbered additive migrations, each with sign-off. **Never modify a
-  migration; add one.**
+  together (Phase 1 — approved 2026-10-05). Schema changes after that are numbered additive migrations, each with sign-off (`db/018`
+  the first, a guard fix found by slice 1's proof). **Never modify a migration; add one.**
 - **The database is the referee**: a block belongs to one parent and one page; a page's effective permission is resolved by
   one function; a private page is its owner's alone; a locked page refuses block writes; a published page has one token;
   a stale block save (version mismatch) is refused, never merged; a DM has exactly its two members; a thread's parent is a
@@ -126,4 +126,4 @@ slice and is written into the spec's "Open questions" for the owner — never gu
   8391–8397).
 - Nothing is installed yet; `plan` only, never `apply`, from this clone (the owner runs `apply`).
 - Proof scratch databases: `sp_dev0` (tests/phase0/run.sh), `sp_dev` (tests/setup_dev.sh); the schema proof alone: `sudo -u postgres psql -v ON_ERROR_STOP=1 -d <scratch> -f db/proof/phase0_proof.sql`.
-- **State (2026-10-05): Phase 0 complete** — schema db/001–017 (281 checks), the kit (18 checks), maludb-os.json, os/, skills/, deploy/; the installer's plan clean. **Phase 1 written and APPROVED** (57 + 6 tools, 58 screens, 118 actions, 32 approvals, ten specs). **Phase 2 BUILT and proven** — the shell (`tests/phase2/run.sh`, 312 checks under `php -S` and under Apache with `SP_APP=apache`; screenshots `/tmp/sp-shots/`). **Next: slice 1** (spaces, membership, settings — the CRUD exemplar), then 2, then the two exemplars 3 and 4, then the handoff.
+- **State (2026-10-05): Phase 0 complete** — schema db/001–017 (281 checks), the kit (18 checks), maludb-os.json, os/, skills/, deploy/; the installer's plan clean. **Phase 1 written and APPROVED** (57 + 6 tools, 58 screens, 118 actions, 32 approvals, ten specs). **Phase 2 BUILT and proven** — the shell (`tests/phase2/run.sh`, 312 checks under `php -S` and under Apache with `SP_APP=apache`). **Slice 1 BUILT and proven** — spaces, membership, sections, THE CRUD EXEMPLAR (`tests/phase3/slice1/run.sh`, 226 checks; `db/018` the delete-cascade guard — the highest migration). **Next: slice 2** (pages), then the two exemplars 3 and 4, then the handoff.

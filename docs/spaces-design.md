@@ -671,7 +671,10 @@ pane and the tab bar Home · Channels · Pages · Search · Me at 375, the heade
 the command bar through the kernel's chat endpoint (a `navigate` followed), presence once a minute plus the heartbeat, My settings with the
 digest, away minutes, the status line (`status_set`) and the read-only time zone, the trail at `/trail`, the attachment door, the assets
 and the brand, sixteen placeholders naming their slices; **312 checks green** under `php -S` and under a real Apache (sso 56, gates 110,
-sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63), the registry and approvals in step, Phase 0's 18 still green. Next: slice 1.
+sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63), the registry and approvals in step, Phase 0's 18 still green.
+**SLICE 1 — spaces, membership and sections, THE CRUD EXEMPLAR FOR WORKERS — BUILT and proven 2026-10-05** (`docs/build-specs/spaces-core.md`,
+"Built and proven"): 8 screens, 18 actions, the feature's four files on the kit's shape, **226 checks green** (`tests/phase3/slice1/run.sh`: seeds 19,
+spaces 41, membership 56, sections 27, visibility 40, browser 43); `db/018` fixes the member guard on a space's delete cascade. Next: slice 2.
 
 **Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 

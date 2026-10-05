@@ -123,3 +123,27 @@ The world (`tests/phase3/slice1/lib.php` `spaces_world()`): the fixture's nine m
 - [ ] **375 × 740 and 1280 × 800**: the three card groups stack; the form's emoji picker is a popover; the members table scrolls within the page, not the viewport; every control ≥ 44 px, `scrollWidth` = viewport, no console errors; JavaScript off joins, requests and saves; the registry reads 8 screens and 18 actions built.
 
 ## Open questions
+
+## Built and proven (2026-10-05)
+Built on the Phase 2 shell exactly as the Files list says: `app/features/spaces/{handler,queries,present,write}.php` (the prelude: `space_from_request()`,
+`require_space_owner()`, `space_log()` stamping `space_id`, `space_notices()`; the reads through `mcp_spaces`, `mcp_space_members`,
+`mcp_space_join_requests`, `mcp_space_sections`, `mcp_pages`, `mcp_channels`; the writes in `write.php`, every refusal a sentence), the 24 controllers
+under `html/spaces/`, the views with the four partials, `PARTIAL_UPDATE_TARGETS['/spaces/save.php']`, the emoji popover (`<details>`, never a modal) and
+the drag handle in `app-overrides.css`. **Decisions taken in the build:** a kind change sent to `space_update` is refused pointing at `space_kind_set`
+(the form posts the kind change as its own confirmed action); becoming open gives the workspace's `default_everyone_level`, leaving open sets `none`;
+`space_delete` also removes the space's channels and its trashed pages (the FKs would otherwise block it); a guest added to a space by hand may leave it;
+a request its reader may not see answers 404 (the view shows a request to its owner and its author); `space_wiki_set`'s file is named absolutely in the
+manifest (`/spaces/wiki.php`) since the row sits in slice 2's table under base `/pages/`. **Schema defect found and fixed additively — `db/018`:**
+`sp_space_members_guard()` read a space row already gone on the delete cascade ("Space "<NULL>" needs an owner") and so no space could be deleted;
+the guard now steps aside when its space is being deleted. **Proof** `tests/phase3/slice1/run.sh` — **226 checks green** (seeds 19, spaces 41, membership 56,
+sections 27, visibility 40, browser 43) plus the registry and approvals checks: every box above — the seeds and the cards per person (the fixture's
+standing departments are Accounting and IT: Bea derived into Accounting, the owner owning IT as its manager; Design and Engineering have no space),
+create with the slug `smoke-product-2`, the guest's 403 in words, `everyone_level` forced to none, the logs with `space_id` and never a description's or
+a message's words, update keeping what it is not sent, the kind with General's guard sentence, archive keeping pages readable and refusing writes,
+restore, delete refused while a page lives and done when empty, the wiki giving creators as owners, join / leave / request / withdraw / decide with the
+notices queued (`join_request` to owners, `join_decided`, `share`), the derived member's words, the last owner's guard, add by member and by department
+(rows counted), an agent added (D10), owners made and stepped down, sections made / moved / renamed / deleted with pages moving by `sp_position_between`,
+the admin's logged look at a private space, `mcp_spaces` answering each person exactly the cards shown, every handler under an action token answering
+`{ok, did, record_id, location, refresh}`, `_partial=1` keeping the untouched fields, the expert (a run token with the relay) making a space and adding a
+member as `source agent`, the screens at 375 and 1280 (cards stacking, the popover, the members table, a section dragged, the field error in `#flash`,
+JavaScript off). The registry reads 8 screens and 18 actions of this slice built (14 screens, 23 actions in all). Screenshots `/tmp/sp-shots-s1/`.

@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T16:36:08+00:00",
+    "generated_at": "2026-10-05T17:00:01+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -82,8 +82,8 @@
                 "kind",
                 "q"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "space-add": {
             "screen": "space-add",
@@ -91,7 +91,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "to make a space: name, icon, kind, description, levels, wiki",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-view": {
@@ -100,7 +100,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "a space's home: description, its sections with root pages, its channels, its members with agents marked, the wiki's status when it is one, Join or Request",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-edit": {
@@ -109,7 +109,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "to change a space's name, icon, description, kind, default levels, wiki setting",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-members": {
@@ -118,7 +118,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "who is in the space and who owns it; add a member, a department's members or an agent; make an owner; remove",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-sections": {
@@ -127,7 +127,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "the sidebar's sections of the space and their order; move root pages between them",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-requests": {
@@ -136,7 +136,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "the pending requests to join a closed space, to approve or decline",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "space-templates": {
@@ -145,7 +145,7 @@
             "section": "Spaces and membership (slice 1)",
             "when": "the templates of this space and the workspace's: open one, apply one, publish a page as a template",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-list": {
@@ -254,7 +254,7 @@
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
             "when": "a wiki space's status: every page with its owner and verification, the expired first; stale, orphaned, duplicated, broken (slice 6 fills the reports)",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "page-version": {
@@ -777,7 +777,7 @@
             "approval": null,
             "log_event": "space.create",
             "who": "member",
-            "built": false
+            "built": true
         },
         "space_update": {
             "action": "space_update",
@@ -838,7 +838,7 @@
             "approval": null,
             "log_event": "space.update",
             "who": "owner",
-            "built": false,
+            "built": true,
             "partial": true
         },
         "space_kind_set": {
@@ -864,7 +864,7 @@
             "approval": "other",
             "log_event": "space.kind_set",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_archive": {
             "action": "space_archive",
@@ -883,7 +883,7 @@
             "approval": "other",
             "log_event": "space.archive",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_restore": {
             "action": "space_restore",
@@ -902,7 +902,7 @@
             "approval": null,
             "log_event": "space.restore",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_delete": {
             "action": "space_delete",
@@ -921,7 +921,7 @@
             "approval": "other",
             "log_event": "space.delete",
             "who": "admin",
-            "built": false
+            "built": true
         },
         "space_join": {
             "action": "space_join",
@@ -940,7 +940,7 @@
             "approval": null,
             "log_event": "space.member_add",
             "who": "member",
-            "built": false
+            "built": true
         },
         "space_leave": {
             "action": "space_leave",
@@ -959,7 +959,7 @@
             "approval": null,
             "log_event": "space.member_remove",
             "who": "member",
-            "built": false
+            "built": true
         },
         "space_join_request": {
             "action": "space_join_request",
@@ -984,7 +984,7 @@
             "approval": null,
             "log_event": "space.join_request",
             "who": "member",
-            "built": false
+            "built": true
         },
         "space_join_withdraw": {
             "action": "space_join_withdraw",
@@ -1003,7 +1003,7 @@
             "approval": null,
             "log_event": "space.join_withdraw",
             "who": "own",
-            "built": false
+            "built": true
         },
         "space_join_decide": {
             "action": "space_join_decide",
@@ -1028,7 +1028,7 @@
             "approval": null,
             "log_event": "space.join_decide",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_member_add": {
             "action": "space_member_add",
@@ -1065,7 +1065,7 @@
             "approval": null,
             "log_event": "space.member_add",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_member_remove": {
             "action": "space_member_remove",
@@ -1090,7 +1090,7 @@
             "approval": "other",
             "log_event": "space.member_remove",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "space_owner_set": {
             "action": "space_owner_set",
@@ -1121,7 +1121,7 @@
             "approval": null,
             "log_event": "space.owner_set",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "section_save": {
             "action": "section_save",
@@ -1158,7 +1158,7 @@
             "approval": null,
             "log_event": "section.save",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "section_delete": {
             "action": "section_delete",
@@ -1177,7 +1177,7 @@
             "approval": null,
             "log_event": "section.delete",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "page_section_set": {
             "action": "page_section_set",
@@ -1208,7 +1208,7 @@
             "approval": null,
             "log_event": "page.section_set",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "page_create": {
             "action": "page_create",
@@ -1856,7 +1856,7 @@
         "space_wiki_set": {
             "action": "space_wiki_set",
             "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
-            "endpoint": "/pages/wiki.php",
+            "endpoint": "/spaces/wiki.php",
             "params": [
                 {
                     "name": "space",
@@ -1882,7 +1882,7 @@
             "approval": "other",
             "log_event": "space.wiki_set",
             "who": "owner",
-            "built": false
+            "built": true
         },
         "block_append": {
             "action": "block_append",

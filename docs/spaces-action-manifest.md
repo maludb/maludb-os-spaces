@@ -172,7 +172,7 @@ Actions (base `/pages/`):
 | `template_publish` | `template-publish.php` | **page**, template (yes or no: make it a template or stop) | template_publish | | other | `page.template_publish` | owner of its space |
 | `page_verify` | `verify.php` | **page** (a wiki page I own), months (1 or 3 or 6 or 12; the space's default) | — | | | `page.verify` | the wiki owner or the space owner |
 | `page_owner_set` | `owner.php` | **page** (a wiki page), **member** | restore prior | | | `page.owner_set` | full |
-| `space_wiki_set` | `wiki.php` | **space**, wiki (yes or no), verify_months (1 or 3 or 6 or 12) | restore prior | ✔ | other | `space.wiki_set` | owner |
+| `space_wiki_set` | `/spaces/wiki.php` | **space**, wiki (yes or no), verify_months (1 or 3 or 6 or 12) | restore prior | ✔ | other | `space.wiki_set` | owner |
 
 ## The block editor — THE FIRST EXEMPLAR (slice 3)
 
