@@ -207,6 +207,9 @@
           "my_open_discussions",
           "agents_here",
           "librarian_proposals",
+          "page_blocks",
+          "channel_members",
+          "my_notifications",
           "records_search"
         ],
         "Activity MCP": [
@@ -280,6 +283,8 @@
           "database_rows",
           "librarian_proposals",
           "get_settings",
+          "page_blocks",
+          "channel_members",
           "records_search"
         ],
         "Activity MCP": [
@@ -305,35 +310,133 @@
     }
   ],
   "approvals": [
-    {"action": "page_publish", "category": "external_send"},
-    {"action": "page_publish_rotate", "category": "external_send"},
-    {"action": "page_unpublish", "category": "external_send"},
-    {"action": "share_guest", "category": "external_send"},
-    {"action": "channel_guest_add", "category": "external_send"},
-    {"action": "export_space", "category": "external_send"},
-    {"action": "export_channel", "category": "external_send"},
-    {"action": "export_all", "category": "external_send"},
-    {"action": "channel_announce", "category": "other"},
-    {"action": "page_delete", "category": "deletion"},
-    {"action": "page_trash", "category": "deletion"},
-    {"action": "block_delete", "category": "deletion"},
-    {"action": "database_delete", "category": "deletion"},
-    {"action": "channel_archive", "category": "deletion"},
-    {"action": "channel_delete", "category": "deletion"},
-    {"action": "message_delete", "category": "deletion"},
-    {"action": "comment_delete", "category": "deletion"},
-    {"action": "trash_purge", "category": "deletion"},
-    {"action": "version_restore", "category": "deletion"},
-    {"action": "attachment_delete", "category": "deletion"},
-    {"action": "retention_set", "category": "other"},
-    {"action": "space_delete", "category": "other"},
-    {"action": "space_archive", "category": "other"},
-    {"action": "space_kind_set", "category": "other"},
-    {"action": "settings_save", "category": "other"},
-    {"action": "template_publish", "category": "other"},
-    {"action": "space_member_remove", "category": "other"},
-    {"action": "page_lock", "category": "other"},
-    {"action": "database_schema_save", "category": "other"},
-    {"action": "database_property_remove", "category": "other"}
+    {
+      "action": "attachment_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "block_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "channel_announce",
+      "category": "other"
+    },
+    {
+      "action": "channel_archive",
+      "category": "deletion"
+    },
+    {
+      "action": "channel_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "channel_guest_add",
+      "category": "external_send"
+    },
+    {
+      "action": "comment_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "database_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "database_property_remove",
+      "category": "other"
+    },
+    {
+      "action": "database_schema_save",
+      "category": "other"
+    },
+    {
+      "action": "export_all",
+      "category": "external_send"
+    },
+    {
+      "action": "export_channel",
+      "category": "external_send"
+    },
+    {
+      "action": "export_space",
+      "category": "external_send"
+    },
+    {
+      "action": "message_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "page_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "page_lock",
+      "category": "other"
+    },
+    {
+      "action": "page_publish",
+      "category": "external_send"
+    },
+    {
+      "action": "page_publish_rotate",
+      "category": "external_send"
+    },
+    {
+      "action": "page_trash",
+      "category": "deletion"
+    },
+    {
+      "action": "page_unpublish",
+      "category": "external_send"
+    },
+    {
+      "action": "retention_set",
+      "category": "other"
+    },
+    {
+      "action": "row_delete",
+      "category": "deletion"
+    },
+    {
+      "action": "settings_save",
+      "category": "other"
+    },
+    {
+      "action": "share_guest",
+      "category": "external_send"
+    },
+    {
+      "action": "space_archive",
+      "category": "other"
+    },
+    {
+      "action": "space_delete",
+      "category": "other"
+    },
+    {
+      "action": "space_kind_set",
+      "category": "other"
+    },
+    {
+      "action": "space_member_remove",
+      "category": "other"
+    },
+    {
+      "action": "space_wiki_set",
+      "category": "other"
+    },
+    {
+      "action": "template_publish",
+      "category": "other"
+    },
+    {
+      "action": "trash_purge",
+      "category": "deletion"
+    },
+    {
+      "action": "version_restore",
+      "category": "deletion"
+    }
   ]
 }

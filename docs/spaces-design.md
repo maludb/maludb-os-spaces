@@ -650,8 +650,23 @@ agents hired on install, 30 approval categories), `os/{expert,librarian}.md`, ei
 covered). The shared-schema rule (§6.1) applied: every table marked read / reuse / new. Found on the way: the estate's
 `attachments` needs an optional UUID record key (proposed to the catalogue); PostgreSQL evaluates an uncorrelated subquery
 before a function beside it, so a proof that runs a pass and inspects it must do so in two statements.
-**Next: Phase 1 — `docs/spaces-mcp-tool-surface.md`, `docs/spaces-action-manifest.md`, `mcp/action_registry.json` and the slice
-specs, for the owner's checkpoint.**
+**PHASE 1 — written 2026-10-05, for the checkpoint.** The tool surface (`docs/spaces-mcp-tool-surface.md`: **57 records tools** — `app_roles`,
+`records_search` and the two K7 shares included — and **6 activity tools**; every question of §7 named to a tool; the resolve table of 12 entities;
+the log-payload rules; the two share documents), the action manifest (`docs/spaces-action-manifest.md`: **58 screens, 118 actions in ten sections;
+32 actions carry an approval category** — 8 `external_send` (publishing, rotating and revoking a public page, a guest on a page or a channel,
+exporting a space, a channel or everything), 12 `deletion` (trashing and purging, deleting a database, a channel, a block, another's message or
+comment, archiving a channel, restoring a version), 12 `other` (shouting, retention, a space's kind, archive, deletion and member removal, locking,
+a database's schema, templates, the settings)), the registry built from it clean (`mcp/action_registry.json`, no unresolved endpoint, no prose
+parameter), `maludb-os.json`'s `approvals[]` regenerated from the manifest by `bin/sync_approvals.php` (one source; `--check` in every proof), and
+**ten specs** in `docs/build-specs/`: `sso-shell` (Phase 2), `spaces-core` (1, the CRUD exemplar for workers), `pages-tree` (2), **`block-editor` (3,
+THE FIRST EXEMPLAR)**, **`channels` (4, THE SECOND EXEMPLAR)**, `databases` (5), `notify-search-wiki` (6), `agents-in-spaces` (7),
+`worker-import-export` (8), `home-admin` (9). Every action and screen name in the specs matches the manifest (checked by script; every action
+claimed by exactly one slice). Every "Open questions" section is empty. Decisions taken in the specs rather than asked: Phase 2's own-trail page is
+`/trail` and `/activity` is the feed (the manifest says so); a member added to a space and a wiki page's new owner are told with the `share` kind
+(db/012 has no kind of their own); the editor's presence is a file-backed cache, never a table; the dispatch loop (the worker calling the kernel's
+chat endpoint) is slice 7's step, slice 4 proves its two halves through the SQL functions. **The owner approves Phase 1 as a whole before any PHP.**
+
+**Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 
 **2026-10-05 — the plan written and approved.** Notion and Slack researched (§0); the repository `maludb/maludb-os-spaces`
 created in the org and cloned to `/srv/apps/spaces`; this document, `CLAUDE.md` and `README.md` committed; **the owner answered

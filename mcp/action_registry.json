@@ -1,0 +1,4242 @@
+{
+    "generated_from": "docs/spaces-action-manifest.md",
+    "generated_at": "2026-10-05T15:50:21+00:00",
+    "screens": {
+        "home": {
+            "screen": "home",
+            "url": "/",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "home: unread channels with their first unread lines, mentions and replies waiting, pages recently edited in my spaces, my favorites, pages I own needing verification, the Librarian's last Monday note; a space owner's pending joins and unanswered questions; the admin's pending dispatches, published pages and trash size",
+            "params": [],
+            "built": true,
+            "stub": false
+        },
+        "activity": {
+            "screen": "activity",
+            "url": "/activity",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "my Activity: who mentioned me, replied to me, reacted to me, commented on my pages",
+            "params": [
+                "since",
+                "kind"
+            ],
+            "built": true,
+            "stub": false
+        },
+        "saved": {
+            "screen": "saved",
+            "url": "/saved",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "the messages I saved (Later) and my reminders",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "notifications": {
+            "screen": "notifications",
+            "url": "/notifications",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "what the bell holds, and to mark it read",
+            "params": [],
+            "built": true,
+            "stub": false
+        },
+        "trail": {
+            "screen": "trail",
+            "url": "/trail",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "my own activity trail, or a record's history",
+            "params": [
+                "space",
+                "channel",
+                "message",
+                "page"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "settings": {
+            "screen": "settings",
+            "url": "/settings/",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "how I am told (email, text, which kinds, digest), my status line, my time zone",
+            "params": [],
+            "built": true,
+            "stub": false
+        },
+        "tokens": {
+            "screen": "tokens",
+            "url": "/settings/tokens/",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "when": "my own MCP tokens: mint one, revoke one",
+            "params": [],
+            "built": true,
+            "stub": false
+        },
+        "space-list": {
+            "screen": "space-list",
+            "url": "/spaces/",
+            "section": "Spaces and membership (slice 1)",
+            "when": "the spaces as cards by kind: mine, open ones to join, closed ones to request; the private ones only as a member",
+            "params": [
+                "kind",
+                "q"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "space-add": {
+            "screen": "space-add",
+            "url": "/spaces/new",
+            "section": "Spaces and membership (slice 1)",
+            "when": "to make a space: name, icon, kind, description, levels, wiki",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-view": {
+            "screen": "space-view",
+            "url": "/spaces/{id}",
+            "section": "Spaces and membership (slice 1)",
+            "when": "a space's home: description, its sections with root pages, its channels, its members with agents marked, the wiki's status when it is one, Join or Request",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-edit": {
+            "screen": "space-edit",
+            "url": "/spaces/{id}/edit",
+            "section": "Spaces and membership (slice 1)",
+            "when": "to change a space's name, icon, description, kind, default levels, wiki setting",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-members": {
+            "screen": "space-members",
+            "url": "/spaces/{id}/members",
+            "section": "Spaces and membership (slice 1)",
+            "when": "who is in the space and who owns it; add a member, a department's members or an agent; make an owner; remove",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-sections": {
+            "screen": "space-sections",
+            "url": "/spaces/{id}/sections",
+            "section": "Spaces and membership (slice 1)",
+            "when": "the sidebar's sections of the space and their order; move root pages between them",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-requests": {
+            "screen": "space-requests",
+            "url": "/spaces/{id}/requests",
+            "section": "Spaces and membership (slice 1)",
+            "when": "the pending requests to join a closed space, to approve or decline",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "space-templates": {
+            "screen": "space-templates",
+            "url": "/spaces/{id}/templates",
+            "section": "Spaces and membership (slice 1)",
+            "when": "the templates of this space and the workspace's: open one, apply one, publish a page as a template",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-list": {
+            "screen": "page-list",
+            "url": "/pages/",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "the pages I can see, newest edited first, by space; a search by title",
+            "params": [
+                "space",
+                "q",
+                "kind",
+                "changed"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "page-add": {
+            "screen": "page-add",
+            "url": "/pages/new",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "to make a page: title, icon, where (a space or a parent page, or private), a template",
+            "params": [
+                "space",
+                "parent",
+                "template",
+                "private"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "page-view": {
+            "screen": "page-view",
+            "url": "/pages/{id}",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "the page: for a reader the rendered tree, breadcrumb, icon and cover, properties when a row, comments; for an editor the same page editable (slice 3); the page menu — Share, Publish, Lock, Verify, Favorite, Move, Duplicate, Export, History, Trash",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-edit": {
+            "screen": "page-edit",
+            "url": "/pages/{id}/edit",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "to change a page's title, icon, cover (the body is edited in place on the page)",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-share": {
+            "screen": "page-share",
+            "url": "/pages/{id}/share",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "who can see the page and why: the inherited principals, the explicit ones, their levels; add a member, a department, a guest; restrict; the public link's state",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-move": {
+            "screen": "page-move",
+            "url": "/pages/{id}/move",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "to move a page under another page, to a space's root, or to my private pages",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-history": {
+            "screen": "page-history",
+            "url": "/pages/{id}/history",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "the page's versions: open one, compare two, restore one (slice 3 fills the diff)",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-publish": {
+            "screen": "page-publish",
+            "url": "/pages/{id}/publish",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "to publish the page to the web: subpages yes or no, noindex, a database's layout; the link; rotate; unpublish",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-trash": {
+            "screen": "page-trash",
+            "url": "/pages/trash",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "my trash (the admin's: everyone's): restore or purge; when each is purged",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "template-list": {
+            "screen": "template-list",
+            "url": "/templates/",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "the templates gallery: the workspace's and my spaces'; apply one",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "wiki-view": {
+            "screen": "wiki-view",
+            "url": "/spaces/{id}/wiki",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "when": "a wiki space's status: every page with its owner and verification, the expired first; stale, orphaned, duplicated, broken (slice 6 fills the reports)",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "page-version": {
+            "screen": "page-version",
+            "url": "/pages/{id}/versions/{version}",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "when": "one version of the page as it was, with a diff against the current page or another version",
+            "params": [
+                "against"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "channel-browse": {
+            "screen": "channel-browse",
+            "url": "/channels/",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "the channels of my spaces: the ones I follow and the ones I can join, by space; archived apart",
+            "params": [
+                "space",
+                "q",
+                "archived"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "channel-add": {
+            "screen": "channel-add",
+            "url": "/channels/new",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "to make a channel in a space: name, kind, topic, purpose",
+            "params": [
+                "space"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "channel-view": {
+            "screen": "channel-view",
+            "url": "/channels/{id}",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "the channel: messages newest at the bottom, day dividers, the unread line, threads collapsed, reactions, pins, the composer; polling while open",
+            "params": [
+                "message"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "channel-edit": {
+            "screen": "channel-edit",
+            "url": "/channels/{id}/edit",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "to change a channel's name, topic, purpose, kind (public or private), retention",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "channel-members": {
+            "screen": "channel-members",
+            "url": "/channels/{id}/members",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "who is in a private channel or follows a public one; add a member or a guest; remove",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "channel-pins": {
+            "screen": "channel-pins",
+            "url": "/channels/{id}/pins",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "what is pinned and bookmarked in the channel",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "thread-view": {
+            "screen": "thread-view",
+            "url": "/channels/{id}/threads/{message}",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "a thread: the first message and every reply, in order; reply; also send to channel",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "dm-list": {
+            "screen": "dm-list",
+            "url": "/dm/",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "my direct and group messages with their last lines and unread counts",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "dm-new": {
+            "screen": "dm-new",
+            "url": "/dm/new",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "to start a direct or group message: a people picker that finds or makes the conversation",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "dm-view": {
+            "screen": "dm-view",
+            "url": "/dm/{id}",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "a direct or group message, read and answered like a channel; a DM to an agent shows \"agent\" and its thinking state",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "scheduled-list": {
+            "screen": "scheduled-list",
+            "url": "/channels/scheduled",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "my scheduled messages, to change or cancel",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "reminder-list": {
+            "screen": "reminder-list",
+            "url": "/reminders/",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "when": "my reminders, due and done",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "database-list": {
+            "screen": "database-list",
+            "url": "/databases/",
+            "section": "Databases and views (slice 5)",
+            "when": "the databases in my spaces as cards with their row counts",
+            "params": [
+                "space",
+                "q"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "database-view": {
+            "screen": "database-view",
+            "url": "/databases/{id}",
+            "section": "Databases and views (slice 5)",
+            "when": "a database through its views: the tabs; the table with inline editing, add a row, hide or show properties, filters, sorts, groups; the board with drag between columns; the gallery; the list; the calendar; the timeline; a row opens as a page",
+            "params": [
+                "view"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "database-schema": {
+            "screen": "database-schema",
+            "url": "/databases/{id}/schema",
+            "section": "Databases and views (slice 5)",
+            "when": "the properties: add, rename, change type where lossless, options, a relation's target and whether two-way, a rollup's source and function, a unique id's prefix; remove one",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "view-add": {
+            "screen": "view-add",
+            "url": "/databases/{id}/views/new",
+            "section": "Databases and views (slice 5)",
+            "when": "to add a view: name, layout, the properties it needs",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "view-edit": {
+            "screen": "view-edit",
+            "url": "/databases/{id}/views/{view}/edit",
+            "section": "Databases and views (slice 5)",
+            "when": "to change a view's name, layout, filter, sort, group, visible properties, card settings",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "row-view": {
+            "screen": "row-view",
+            "url": "/databases/{id}/rows/{row}",
+            "section": "Databases and views (slice 5)",
+            "when": "one row as a page: its properties in a panel, its body below (the editor, slice 3)",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "search": {
+            "screen": "search",
+            "url": "/search",
+            "section": "Notifications, search and the wiki's reports (slice 6)",
+            "when": "to find something across pages, rows, messages and comments, with the modifiers as chips; results grouped, the match in context",
+            "params": [
+                "q",
+                "in",
+                "from",
+                "has",
+                "before",
+                "after",
+                "is",
+                "space"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "wiki-report": {
+            "screen": "wiki-report",
+            "url": "/spaces/{id}/wiki/report",
+            "section": "Notifications, search and the wiki's reports (slice 6)",
+            "when": "the wiki's reports for a space: expired, unverified, stale, orphans, broken links, duplicates; nudge an owner",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "agent-list": {
+            "screen": "agent-list",
+            "url": "/admin/agents",
+            "section": "Agents in Spaces (slice 7)",
+            "when": "the agents that are members here, their spaces and channels, their last reply, their pending and failed dispatches — read-only; hiring and grants link to the kernel",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "dispatch-list": {
+            "screen": "dispatch-list",
+            "url": "/admin/dispatches",
+            "section": "Agents in Spaces (slice 7)",
+            "when": "every dispatch: pending, running, answered, failed; retry a failed one",
+            "params": [
+                "status",
+                "agent"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "proposal-list": {
+            "screen": "proposal-list",
+            "url": "/proposals/",
+            "section": "Agents in Spaces (slice 7)",
+            "when": "the Librarian's proposals: accept or dismiss each",
+            "params": [
+                "status",
+                "kind"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "connection-list": {
+            "screen": "connection-list",
+            "url": "/admin/connections",
+            "section": "Agents in Spaces (slice 7)",
+            "when": "which sibling applications read what of ours (the two shares) and when — the kernel's facts, read-only",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "import": {
+            "screen": "import",
+            "url": "/import",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "when": "to import: a Markdown file or zip, a Notion export zip, a CSV into a database; a preview; the log of past imports",
+            "params": [
+                "space",
+                "parent",
+                "database"
+            ],
+            "built": false,
+            "stub": false
+        },
+        "export-list": {
+            "screen": "export-list",
+            "url": "/exports/",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "when": "my exports (the admin's: everyone's): make one, download one before it expires",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "admin-settings": {
+            "screen": "admin-settings",
+            "url": "/admin/settings",
+            "section": "Admin and settings (slice 9)",
+            "when": "the workspace's settings: business name, default space kind and levels, snapshot interval, version and trash retention, stale days, unanswered hours, verification default, the attachment limit, embed hosts, public pages noindex, digest hour, week start, time zone, group DM size, away minutes, the admin channel",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "admin-spaces": {
+            "screen": "admin-spaces",
+            "url": "/admin/spaces",
+            "section": "Admin and settings (slice 9)",
+            "when": "every space, the private ones marked (opening one is logged `space.admin_view`); archive, restore, delete",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "admin-published": {
+            "screen": "admin-published",
+            "url": "/admin/published",
+            "section": "Admin and settings (slice 9)",
+            "when": "every published page, its views and last opened; rotate or unpublish",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "admin-retention": {
+            "screen": "admin-retention",
+            "url": "/admin/retention",
+            "section": "Admin and settings (slice 9)",
+            "when": "every channel's retention and the version and trash retentions",
+            "params": [],
+            "built": false,
+            "stub": false
+        },
+        "admin-trash": {
+            "screen": "admin-trash",
+            "url": "/admin/trash",
+            "section": "Admin and settings (slice 9)",
+            "when": "everyone's trash: restore, purge, purge all",
+            "params": [],
+            "built": false,
+            "stub": false
+        }
+    },
+    "actions": {
+        "prefs_save": {
+            "action": "prefs_save",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "endpoint": "/settings/prefs.php",
+            "params": [
+                {
+                    "name": "email_enabled",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "text_enabled",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "digest",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "kinds",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                },
+                {
+                    "name": "text_kinds",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                },
+                {
+                    "name": "away_minutes",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "prefs.save",
+            "who": "own",
+            "built": true
+        },
+        "status_set": {
+            "action": "status_set",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "endpoint": "/settings/status.php",
+            "params": [
+                {
+                    "name": "text",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "up to 100 characters; empty clears"
+                },
+                {
+                    "name": "emoji",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "until",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a time; empty means until cleared"
+                }
+            ],
+            "undo": "status_set",
+            "confirm": false,
+            "approval": null,
+            "log_event": "status.set",
+            "who": "own",
+            "built": false
+        },
+        "notification_read": {
+            "action": "notification_read",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "endpoint": "/settings/notifications/read.php",
+            "params": [
+                {
+                    "name": "notification",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "empty marks all"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "notification.read",
+            "who": "own",
+            "built": true
+        },
+        "token_mint": {
+            "action": "token_mint",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "endpoint": "/settings/tokens/mint.php",
+            "params": [
+                {
+                    "name": "label",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "scope",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "mcp or api"
+                }
+            ],
+            "undo": "token_revoke",
+            "confirm": false,
+            "approval": null,
+            "log_event": "token.mint",
+            "who": "own",
+            "built": true
+        },
+        "token_revoke": {
+            "action": "token_revoke",
+            "section": "Home, me and the shell (Phase 2 and slice 9)",
+            "endpoint": "/settings/tokens/revoke.php",
+            "params": [
+                {
+                    "name": "token",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "token.revoke",
+            "who": "own",
+            "built": true
+        },
+        "space_create": {
+            "action": "space_create",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/save.php",
+            "params": [
+                {
+                    "name": "name",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "kind",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "open or closed or private; closed by default"
+                },
+                {
+                    "name": "icon",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "an emoji"
+                },
+                {
+                    "name": "description",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member_level",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "edit by default"
+                },
+                {
+                    "name": "everyone_level",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "an open space; view by default"
+                },
+                {
+                    "name": "is_wiki",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "space_archive",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.create",
+            "who": "member",
+            "built": false
+        },
+        "space_update": {
+            "action": "space_update",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/save.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "name",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "kind",
+                    "repeated": false,
+                    "hint": "open or closed or private; closed by default"
+                },
+                {
+                    "required": false,
+                    "name": "icon",
+                    "repeated": false,
+                    "hint": "an emoji"
+                },
+                {
+                    "required": false,
+                    "name": "description",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "member_level",
+                    "repeated": false,
+                    "hint": "edit by default"
+                },
+                {
+                    "required": false,
+                    "name": "everyone_level",
+                    "repeated": false,
+                    "hint": "an open space; view by default"
+                },
+                {
+                    "required": false,
+                    "name": "is_wiki",
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.update",
+            "who": "owner",
+            "built": false,
+            "partial": true
+        },
+        "space_kind_set": {
+            "action": "space_kind_set",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/kind.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "kind",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "open or closed or private"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "space.kind_set",
+            "who": "owner",
+            "built": false
+        },
+        "space_archive": {
+            "action": "space_archive",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/archive.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "space_restore",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "space.archive",
+            "who": "owner",
+            "built": false
+        },
+        "space_restore": {
+            "action": "space_restore",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/restore.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "space_archive",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.restore",
+            "who": "owner",
+            "built": false
+        },
+        "space_delete": {
+            "action": "space_delete",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/delete.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "archived and empty of pages"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "other",
+            "log_event": "space.delete",
+            "who": "admin",
+            "built": false
+        },
+        "space_join": {
+            "action": "space_join",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/join.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "an open one"
+                }
+            ],
+            "undo": "space_leave",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.member_add",
+            "who": "member",
+            "built": false
+        },
+        "space_leave": {
+            "action": "space_leave",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/leave.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "not the default one"
+                }
+            ],
+            "undo": "space_join",
+            "confirm": true,
+            "approval": null,
+            "log_event": "space.member_remove",
+            "who": "member",
+            "built": false
+        },
+        "space_join_request": {
+            "action": "space_join_request",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/request.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a closed one"
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "space_join_withdraw",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.join_request",
+            "who": "member",
+            "built": false
+        },
+        "space_join_withdraw": {
+            "action": "space_join_withdraw",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/request-withdraw.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.join_withdraw",
+            "who": "own",
+            "built": false
+        },
+        "space_join_decide": {
+            "action": "space_join_decide",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/request-decide.php",
+            "params": [
+                {
+                    "name": "request",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "decision",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "approve or decline"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "space.join_decide",
+            "who": "owner",
+            "built": false
+        },
+        "space_member_add": {
+            "action": "space_member_add",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/members/add.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "department",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "role",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "member or owner; member by default"
+                }
+            ],
+            "undo": "space_member_remove",
+            "confirm": false,
+            "approval": null,
+            "log_event": "space.member_add",
+            "who": "owner",
+            "built": false
+        },
+        "space_member_remove": {
+            "action": "space_member_remove",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/members/remove.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "space_member_add",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "space.member_remove",
+            "who": "owner",
+            "built": false
+        },
+        "space_owner_set": {
+            "action": "space_owner_set",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/members/owner.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "owner",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": true,
+            "approval": null,
+            "log_event": "space.owner_set",
+            "who": "owner",
+            "built": false
+        },
+        "section_save": {
+            "action": "section_save",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/sections/save.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "name",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the section it follows"
+                },
+                {
+                    "name": "section",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "to rename or move an existing one"
+                }
+            ],
+            "undo": "section_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "section.save",
+            "who": "owner",
+            "built": false
+        },
+        "section_delete": {
+            "action": "section_delete",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/sections/delete.php",
+            "params": [
+                {
+                    "name": "section",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "its pages go to the space root"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "section.delete",
+            "who": "owner",
+            "built": false
+        },
+        "page_section_set": {
+            "action": "page_section_set",
+            "section": "Spaces and membership (slice 1)",
+            "endpoint": "/spaces/sections/assign.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a root page of the space"
+                },
+                {
+                    "name": "section",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "empty for none"
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the page it follows"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.section_set",
+            "who": "owner",
+            "built": false
+        },
+        "page_create": {
+            "action": "page_create",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/save.php",
+            "params": [
+                {
+                    "name": "title",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "icon",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "an emoji"
+                },
+                {
+                    "name": "template",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a template to apply"
+                },
+                {
+                    "name": "markdown",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the body to start with"
+                }
+            ],
+            "undo": "page_trash",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.create",
+            "who": "edit on the parent or member of the space",
+            "built": false
+        },
+        "page_update": {
+            "action": "page_update",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/save.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "title",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "space",
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "required": false,
+                    "name": "parent",
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "required": false,
+                    "name": "icon",
+                    "repeated": false,
+                    "hint": "an emoji"
+                },
+                {
+                    "required": false,
+                    "name": "template",
+                    "repeated": false,
+                    "hint": "a template to apply"
+                },
+                {
+                    "required": false,
+                    "name": "markdown",
+                    "repeated": false,
+                    "hint": "the body to start with"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.update",
+            "who": "edit",
+            "built": false,
+            "partial": true
+        },
+        "page_move": {
+            "action": "page_move",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/move.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "private",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the sibling it follows"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.move",
+            "who": "full on the page and edit at the destination",
+            "built": false
+        },
+        "page_duplicate": {
+            "action": "page_duplicate",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/duplicate.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "title",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "where; beside the original by default"
+                }
+            ],
+            "undo": "page_trash",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.duplicate",
+            "who": "view on the page and edit at the destination",
+            "built": false
+        },
+        "page_trash": {
+            "action": "page_trash",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/trash.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "its subpages go with it"
+                }
+            ],
+            "undo": "page_restore",
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "page.trash",
+            "who": "full",
+            "built": false
+        },
+        "page_restore": {
+            "action": "page_restore",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/restore.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "from the trash; to the root when its parent is still trashed"
+                }
+            ],
+            "undo": "page_trash",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.restore",
+            "who": "full",
+            "built": false
+        },
+        "page_delete": {
+            "action": "page_delete",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/purge.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "page (one in the trash"
+                },
+                {
+                    "name": null,
+                    "note": "for good)"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "page.delete",
+            "who": "full or trash.purge",
+            "built": false
+        },
+        "trash_purge": {
+            "action": "trash_purge",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/trash-purge.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "empty for everything I may purge"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "trash.purge",
+            "who": "trash.purge",
+            "built": false
+        },
+        "page_lock": {
+            "action": "page_lock",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/lock.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "locked",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "page_lock",
+            "confirm": false,
+            "approval": "other",
+            "log_event": "page.lock",
+            "who": "full",
+            "built": false
+        },
+        "page_share_member": {
+            "action": "page_share_member",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/share.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "department",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "level",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "page_unshare",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.share",
+            "who": "full",
+            "built": false
+        },
+        "share_guest": {
+            "action": "share_guest",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/share-guest.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "guest",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "an external member holding Guest"
+                },
+                {
+                    "name": "level",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "view or comment or edit"
+                }
+            ],
+            "undo": "page_unshare",
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "page.share_guest",
+            "who": "full and share.guest",
+            "built": false
+        },
+        "page_unshare": {
+            "action": "page_unshare",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/unshare.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "department",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "guest",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                }
+            ],
+            "undo": "page_share_member",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.unshare",
+            "who": "full",
+            "built": false
+        },
+        "page_restrict": {
+            "action": "page_restrict",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/restrict.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "only the principals named on it reach it"
+                }
+            ],
+            "undo": "page_unrestrict",
+            "confirm": true,
+            "approval": null,
+            "log_event": "page.restrict",
+            "who": "full",
+            "built": false
+        },
+        "page_unrestrict": {
+            "action": "page_unrestrict",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/unrestrict.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the space's default comes back"
+                }
+            ],
+            "undo": "page_restrict",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.unrestrict",
+            "who": "full",
+            "built": false
+        },
+        "page_favorite": {
+            "action": "page_favorite",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/favorite.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "favorite",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no; yes by default"
+                }
+            ],
+            "undo": "page_favorite",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.favorite",
+            "who": "view",
+            "built": false
+        },
+        "page_publish": {
+            "action": "page_publish",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/publish.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "include_subpages",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "noindex",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no; yes by default"
+                },
+                {
+                    "name": "layout",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "table or gallery for a database"
+                },
+                {
+                    "name": "public_properties",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                }
+            ],
+            "undo": "page_unpublish",
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "page.publish",
+            "who": "publish.web",
+            "built": false
+        },
+        "page_publish_rotate": {
+            "action": "page_publish_rotate",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/publish-rotate.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a new link; the old one stops"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "page.publish_rotate",
+            "who": "publish.web",
+            "built": false
+        },
+        "page_unpublish": {
+            "action": "page_unpublish",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/unpublish.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "page_publish",
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "page.unpublish",
+            "who": "publish.web",
+            "built": false
+        },
+        "template_apply": {
+            "action": "template_apply",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/template-apply.php",
+            "params": [
+                {
+                    "name": "template",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "title",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "page_trash",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.template_apply",
+            "who": "edit at the destination",
+            "built": false
+        },
+        "template_publish": {
+            "action": "template_publish",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/template-publish.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "template",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no: make it a template or stop"
+                }
+            ],
+            "undo": "template_publish",
+            "confirm": false,
+            "approval": "other",
+            "log_event": "page.template_publish",
+            "who": "owner of its space",
+            "built": false
+        },
+        "page_verify": {
+            "action": "page_verify",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/verify.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a wiki page I own"
+                },
+                {
+                    "name": "months",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "1 or 3 or 6 or 12; the space's default"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.verify",
+            "who": "the wiki owner or the space owner",
+            "built": false
+        },
+        "page_owner_set": {
+            "action": "page_owner_set",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/owner.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a wiki page"
+                },
+                {
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.owner_set",
+            "who": "full",
+            "built": false
+        },
+        "space_wiki_set": {
+            "action": "space_wiki_set",
+            "section": "Pages: the tree, sharing, the wiki, the trash, templates (slice 2)",
+            "endpoint": "/pages/wiki.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "wiki",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "verify_months",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "1 or 3 or 6 or 12"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "space.wiki_set",
+            "who": "owner",
+            "built": false
+        },
+        "block_append": {
+            "action": "block_append",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/blocks/append.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "one or many blocks"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a block to nest under"
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the block it follows; the end by default"
+                }
+            ],
+            "undo": "block_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "block.append",
+            "who": "edit",
+            "built": false
+        },
+        "block_insert": {
+            "action": "block_insert",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/blocks/insert.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "type",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a block type"
+                },
+                {
+                    "name": "content",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the type's object; empty for a blank one"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "at_start",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "block_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "block.insert",
+            "who": "edit",
+            "built": false
+        },
+        "block_update": {
+            "action": "block_update",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/blocks/update.php",
+            "params": [
+                {
+                    "name": "block",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "version",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the one the editor read"
+                },
+                {
+                    "name": "content",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "markdown",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "type",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "to turn it into another type"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "block.update",
+            "who": "edit",
+            "built": false
+        },
+        "block_move": {
+            "action": "block_move",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/blocks/move.php",
+            "params": [
+                {
+                    "name": "block",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a block or empty for the root"
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the sibling it follows; empty for first"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "block.move",
+            "who": "edit",
+            "built": false
+        },
+        "block_delete": {
+            "action": "block_delete",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/blocks/delete.php",
+            "params": [
+                {
+                    "name": "block",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "and its children"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "block.delete",
+            "who": "edit",
+            "built": false
+        },
+        "version_save": {
+            "action": "version_save",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/versions/save.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.version_save",
+            "who": "edit",
+            "built": false
+        },
+        "version_restore": {
+            "action": "version_restore",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/versions/restore.php",
+            "params": [
+                {
+                    "name": "version",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the present is snapshotted first"
+                }
+            ],
+            "undo": "version_restore",
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "page.version_restore",
+            "who": "full",
+            "built": false
+        },
+        "comment_add": {
+            "action": "comment_add",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/comments/add.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "block",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "an inline comment on a block"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a reply in a discussion"
+                }
+            ],
+            "undo": "comment_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "comment.add",
+            "who": "comment",
+            "built": false
+        },
+        "comment_edit": {
+            "action": "comment_edit",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/comments/edit.php",
+            "params": [
+                {
+                    "name": "comment",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "comment.edit",
+            "who": "own",
+            "built": false
+        },
+        "comment_resolve": {
+            "action": "comment_resolve",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/comments/resolve.php",
+            "params": [
+                {
+                    "name": "comment",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a discussion's first"
+                },
+                {
+                    "name": "resolved",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no; yes by default"
+                }
+            ],
+            "undo": "comment_resolve",
+            "confirm": false,
+            "approval": null,
+            "log_event": "comment.resolve",
+            "who": "comment",
+            "built": false
+        },
+        "comment_delete": {
+            "action": "comment_delete",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/pages/comments/delete.php",
+            "params": [
+                {
+                    "name": "comment",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "comment.delete",
+            "who": "own or full",
+            "built": false
+        },
+        "file_upload": {
+            "action": "file_upload",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/files/upload.php",
+            "params": [
+                {
+                    "name": "file",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "multipart"
+                },
+                {
+                    "name": "block",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "comment",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "row",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "property",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a row's files property"
+                }
+            ],
+            "undo": "attachment_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "attachment.add",
+            "who": "edit on the page or channel on the message",
+            "built": false
+        },
+        "attachment_delete": {
+            "action": "attachment_delete",
+            "section": "The block editor — THE FIRST EXEMPLAR (slice 3)",
+            "endpoint": "/files/delete.php",
+            "params": [
+                {
+                    "name": "attachment",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "attachment.delete",
+            "who": "edit on the page or own message",
+            "built": false
+        },
+        "channel_create": {
+            "action": "channel_create",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/save.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "name (lowercase"
+                },
+                {
+                    "name": "digits",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "dashes)"
+                },
+                {
+                    "name": "kind",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "public or private; public by default"
+                },
+                {
+                    "name": "topic",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "purpose",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "channel_archive",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.create",
+            "who": "member of the space with channels.create",
+            "built": false
+        },
+        "channel_update": {
+            "action": "channel_update",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/save.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "space",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "digits",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "kind",
+                    "repeated": false,
+                    "hint": "public or private; public by default"
+                },
+                {
+                    "required": false,
+                    "name": "topic",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "purpose",
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.update",
+            "who": "channel for topic and purpose; owner or channel.manage for the rest",
+            "built": false,
+            "partial": true
+        },
+        "channel_archive": {
+            "action": "channel_archive",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/archive.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "channel (readable"
+                },
+                {
+                    "name": null,
+                    "note": "never writable afterwards)"
+                }
+            ],
+            "undo": "channel_unarchive",
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "channel.archive",
+            "who": "owner or channel.manage",
+            "built": false
+        },
+        "channel_unarchive": {
+            "action": "channel_unarchive",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/unarchive.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "channel_archive",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.unarchive",
+            "who": "owner or channel.manage",
+            "built": false
+        },
+        "channel_delete": {
+            "action": "channel_delete",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/delete.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "channel (an archived one"
+                },
+                {
+                    "name": null,
+                    "note": "for good)"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "channel.delete",
+            "who": "admin",
+            "built": false
+        },
+        "channel_join": {
+            "action": "channel_join",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/join.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "follow a public one; join a private one I was invited to"
+                }
+            ],
+            "undo": "channel_leave",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.join",
+            "who": "member of the space",
+            "built": false
+        },
+        "channel_leave": {
+            "action": "channel_leave",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/leave.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "not a space's default"
+                }
+            ],
+            "undo": "channel_join",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.leave",
+            "who": "own",
+            "built": false
+        },
+        "channel_member_add": {
+            "action": "channel_member_add",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/members/add.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "a public one's follower)"
+                }
+            ],
+            "undo": "channel_member_remove",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.member_add",
+            "who": "channel",
+            "built": false
+        },
+        "channel_guest_add": {
+            "action": "channel_guest_add",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/members/add-guest.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "guest",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "an external member holding Guest"
+                }
+            ],
+            "undo": "channel_member_remove",
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "channel.guest_add",
+            "who": "owner and share.guest",
+            "built": false
+        },
+        "channel_member_remove": {
+            "action": "channel_member_remove",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/members/remove.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "channel_member_add",
+            "confirm": true,
+            "approval": null,
+            "log_event": "channel.member_remove",
+            "who": "owner or channel.manage",
+            "built": false
+        },
+        "channel_notify_set": {
+            "action": "channel_notify_set",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/notify.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "notify",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "all or mentions or none"
+                },
+                {
+                    "name": "muted_until",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a time; empty unmutes"
+                },
+                {
+                    "name": "starred",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "section",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "my sidebar section"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.notify_set",
+            "who": "own",
+            "built": false
+        },
+        "retention_set": {
+            "action": "retention_set",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/retention.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "days",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "1 to 3650; empty keeps forever"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "channel.retention_set",
+            "who": "retention.manage or channel.manage",
+            "built": false
+        },
+        "channel_pin": {
+            "action": "channel_pin",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/pins/add.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                }
+            ],
+            "undo": "channel_unpin",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.pin",
+            "who": "channel",
+            "built": false
+        },
+        "channel_unpin": {
+            "action": "channel_unpin",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/pins/remove.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                }
+            ],
+            "undo": "channel_pin",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.unpin",
+            "who": "channel",
+            "built": false
+        },
+        "bookmark_save": {
+            "action": "bookmark_save",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/bookmarks/save.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "title",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "url",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "emoji",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "bookmark",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "to change one"
+                }
+            ],
+            "undo": "bookmark_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.bookmark_save",
+            "who": "channel",
+            "built": false
+        },
+        "bookmark_delete": {
+            "action": "bookmark_delete",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/bookmarks/delete.php",
+            "params": [
+                {
+                    "name": "bookmark",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.bookmark_delete",
+            "who": "channel",
+            "built": false
+        },
+        "message_post": {
+            "action": "message_post",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/post.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "mentions as @Name; never @channel — see channel_announce"
+                },
+                {
+                    "name": "schedule_for",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a time; sends later"
+                },
+                {
+                    "name": "attachments",
+                    "required": false,
+                    "repeated": true,
+                    "hint": "attachment ids uploaded first"
+                }
+            ],
+            "undo": "message_delete_own",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.post",
+            "who": "channel",
+            "built": false
+        },
+        "thread_reply": {
+            "action": "thread_reply",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/reply.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "message (the thread's first"
+                },
+                {
+                    "name": null,
+                    "note": "or any in it)"
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "also_to_channel",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": "message_delete_own",
+            "confirm": false,
+            "approval": null,
+            "log_event": "thread.reply",
+            "who": "channel",
+            "built": false
+        },
+        "channel_announce": {
+            "action": "channel_announce",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/announce.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "reach",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "channel or here or everyone; channel by default"
+                }
+            ],
+            "undo": "message_delete_own",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "message.announce",
+            "who": "channel",
+            "built": false
+        },
+        "message_edit": {
+            "action": "message_edit",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/edit.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "markdown",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.edit",
+            "who": "own",
+            "built": false
+        },
+        "message_delete_own": {
+            "action": "message_delete_own",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/delete-own.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "my own; a tombstone stays"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "message.delete_own",
+            "who": "own",
+            "built": false
+        },
+        "message_delete": {
+            "action": "message_delete",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/delete.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "anyone's; a tombstone stays"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "message.delete",
+            "who": "owner or channel.manage",
+            "built": false
+        },
+        "message_schedule": {
+            "action": "message_schedule",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/schedule.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "one of mine not yet sent"
+                },
+                {
+                    "name": "schedule_for",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a time; empty sends now"
+                }
+            ],
+            "undo": "message_unschedule",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.schedule",
+            "who": "own",
+            "built": false
+        },
+        "message_unschedule": {
+            "action": "message_unschedule",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/unschedule.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a scheduled one of mine — it is discarded"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "message.unschedule",
+            "who": "own",
+            "built": false
+        },
+        "reaction_add": {
+            "action": "reaction_add",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/react.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "emoji",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a Unicode emoji or :shortcode:"
+                }
+            ],
+            "undo": "reaction_remove",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.react",
+            "who": "channel",
+            "built": false
+        },
+        "reaction_remove": {
+            "action": "reaction_remove",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/unreact.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "emoji",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "reaction_add",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.unreact",
+            "who": "own",
+            "built": false
+        },
+        "message_save": {
+            "action": "message_save",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/messages/save.php",
+            "params": [
+                {
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "saved",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no; yes by default"
+                }
+            ],
+            "undo": "message_save",
+            "confirm": false,
+            "approval": null,
+            "log_event": "message.save",
+            "who": "channel",
+            "built": false
+        },
+        "channel_mark_read": {
+            "action": "channel_mark_read",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/channels/read.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "up to this one; the latest by default"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.read",
+            "who": "own",
+            "built": false
+        },
+        "dm_open": {
+            "action": "dm_open",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/dm/open.php",
+            "params": [
+                {
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a person or an agent"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.create",
+            "who": "dm.write",
+            "built": false
+        },
+        "group_dm_open": {
+            "action": "group_dm_open",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/dm/open-group.php",
+            "params": [
+                {
+                    "name": "members",
+                    "required": true,
+                    "repeated": true,
+                    "hint": "two to eight others"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "channel.create",
+            "who": "dm.write",
+            "built": false
+        },
+        "reminder_set": {
+            "action": "reminder_set",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/reminders/save.php",
+            "params": [
+                {
+                    "name": "remind_at",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a time"
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "text",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                }
+            ],
+            "undo": "reminder_done",
+            "confirm": false,
+            "approval": null,
+            "log_event": "reminder.set",
+            "who": "own",
+            "built": false
+        },
+        "reminder_done": {
+            "action": "reminder_done",
+            "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
+            "endpoint": "/reminders/done.php",
+            "params": [
+                {
+                    "name": "reminder",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "reminder.done",
+            "who": "own",
+            "built": false
+        },
+        "database_create": {
+            "action": "database_create",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/save.php",
+            "params": [
+                {
+                    "name": "title",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "inline",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no: shown inside the parent page"
+                },
+                {
+                    "name": "properties",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the schema as JSON; a Name title by default"
+                },
+                {
+                    "name": "template",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a database template to copy"
+                }
+            ],
+            "undo": "page_trash",
+            "confirm": false,
+            "approval": null,
+            "log_event": "database.create",
+            "who": "edit on the parent or member of the space",
+            "built": false
+        },
+        "database_update": {
+            "action": "database_update",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/save.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "title",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "space",
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "required": false,
+                    "name": "parent",
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "required": false,
+                    "name": "inline",
+                    "repeated": false,
+                    "hint": "yes or no: shown inside the parent page"
+                },
+                {
+                    "required": false,
+                    "name": "properties",
+                    "repeated": false,
+                    "hint": "the schema as JSON; a Name title by default"
+                },
+                {
+                    "required": false,
+                    "name": "template",
+                    "repeated": false,
+                    "hint": "a database template to copy"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "database.update",
+            "who": "edit",
+            "built": false,
+            "partial": true
+        },
+        "database_schema_save": {
+            "action": "database_schema_save",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/schema.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "properties",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the whole schema as JSON"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": true,
+            "approval": "other",
+            "log_event": "database.schema_save",
+            "who": "edit",
+            "built": false
+        },
+        "database_property_save": {
+            "action": "database_property_save",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/properties/save.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "key",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the property's key or name"
+                },
+                {
+                    "name": "type",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "options[] (select"
+                },
+                {
+                    "name": null,
+                    "note": "multi-select"
+                },
+                {
+                    "name": null,
+                    "note": "status)"
+                },
+                {
+                    "name": "relation_database",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a relation's target"
+                },
+                {
+                    "name": "two_way",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "rollup_relation",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "rollup_property",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "rollup_function",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "prefix",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a unique id"
+                },
+                {
+                    "name": "number_format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "database.property_save",
+            "who": "edit",
+            "built": false
+        },
+        "database_property_remove": {
+            "action": "database_property_remove",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/properties/remove.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "key",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "purge_values",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no; no keeps the rows' values"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "other",
+            "log_event": "database.property_remove",
+            "who": "edit",
+            "built": false
+        },
+        "database_delete": {
+            "action": "database_delete",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/delete.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "database (to the trash"
+                },
+                {
+                    "name": null,
+                    "note": "rows and views with it)"
+                }
+            ],
+            "undo": "page_restore",
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "database.delete",
+            "who": "full",
+            "built": false
+        },
+        "row_create": {
+            "action": "row_create",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/rows/save.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "title",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "properties (the values as JSON"
+                },
+                {
+                    "name": null,
+                    "note": "keyed by property name)"
+                },
+                {
+                    "name": "template",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a row template"
+                },
+                {
+                    "name": "markdown",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the body"
+                }
+            ],
+            "undo": "row_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "row.create",
+            "who": "edit_content",
+            "built": false
+        },
+        "row_update": {
+            "action": "row_update",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/rows/save.php",
+            "params": [
+                {
+                    "name": "row",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "database",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "title",
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "template",
+                    "repeated": false,
+                    "hint": "a row template"
+                },
+                {
+                    "required": false,
+                    "name": "markdown",
+                    "repeated": false,
+                    "hint": "the body"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "row.update",
+            "who": "edit_content",
+            "built": false,
+            "partial": true
+        },
+        "row_delete": {
+            "action": "row_delete",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/rows/delete.php",
+            "params": [
+                {
+                    "name": "row",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "to the trash"
+                }
+            ],
+            "undo": "page_restore",
+            "confirm": true,
+            "approval": "deletion",
+            "log_event": "row.delete",
+            "who": "edit_content",
+            "built": false
+        },
+        "row_relation_set": {
+            "action": "row_relation_set",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/rows/relation.php",
+            "params": [
+                {
+                    "name": "row",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "property",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a relation"
+                },
+                {
+                    "name": "targets",
+                    "required": false,
+                    "repeated": true,
+                    "hint": "the related rows; the whole list"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "row.relation_set",
+            "who": "edit_content",
+            "built": false
+        },
+        "view_save": {
+            "action": "view_save",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/views/save.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "name",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "layout",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "table or board or gallery or list or calendar or timeline"
+                },
+                {
+                    "name": "filter",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "Notion's filter object as JSON"
+                },
+                {
+                    "name": "sort",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "as JSON"
+                },
+                {
+                    "name": "group_by",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "sub_group_by",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "visible_properties",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                },
+                {
+                    "name": "calendar_by",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "timeline_start",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "timeline_end",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "card_size",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "card_cover",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "wrap",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                },
+                {
+                    "name": "linked_from",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a page this view is embedded on"
+                },
+                {
+                    "name": "view",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "to change one"
+                }
+            ],
+            "undo": "view_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "view.save",
+            "who": "edit",
+            "built": false
+        },
+        "view_delete": {
+            "action": "view_delete",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/views/delete.php",
+            "params": [
+                {
+                    "name": "view",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "not a database's last"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "view.delete",
+            "who": "edit",
+            "built": false
+        },
+        "view_reorder": {
+            "action": "view_reorder",
+            "section": "Databases and views (slice 5)",
+            "endpoint": "/databases/views/reorder.php",
+            "params": [
+                {
+                    "name": "view",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "after",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the view it follows; empty for first"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": null,
+            "log_event": "view.reorder",
+            "who": "edit",
+            "built": false
+        },
+        "wiki_nudge_send": {
+            "action": "wiki_nudge_send",
+            "section": "Notifications, search and the wiki's reports (slice 6)",
+            "endpoint": "/spaces/wiki/nudge.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a wiki page needing a hand"
+                },
+                {
+                    "name": "member",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "its owner by default"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "page.nudge",
+            "who": "owner",
+            "built": false
+        },
+        "proposal_make": {
+            "action": "proposal_make",
+            "section": "Agents in Spaces (slice 7)",
+            "endpoint": "/proposals/save.php",
+            "params": [
+                {
+                    "name": "kind",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "thread_to_page or verify or orphan or duplicate or broken_link or unanswered or stale"
+                },
+                {
+                    "name": "title",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "reason",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "message",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "proposed_page",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the draft made"
+                }
+            ],
+            "undo": "proposal_dismiss",
+            "confirm": false,
+            "approval": null,
+            "log_event": "librarian.propose",
+            "who": "member",
+            "built": false
+        },
+        "proposal_accept": {
+            "action": "proposal_accept",
+            "section": "Agents in Spaces (slice 7)",
+            "endpoint": "/proposals/accept.php",
+            "params": [
+                {
+                    "name": "proposal",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a thread_to_page one moves its draft where I say: parent"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "librarian.accept",
+            "who": "member with edit at the destination",
+            "built": false
+        },
+        "proposal_dismiss": {
+            "action": "proposal_dismiss",
+            "section": "Agents in Spaces (slice 7)",
+            "endpoint": "/proposals/dismiss.php",
+            "params": [
+                {
+                    "name": "proposal",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "reason",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "librarian.dismiss",
+            "who": "member",
+            "built": false
+        },
+        "dispatch_retry": {
+            "action": "dispatch_retry",
+            "section": "Agents in Spaces (slice 7)",
+            "endpoint": "/admin/dispatches/retry.php",
+            "params": [
+                {
+                    "name": "dispatch",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a failed one"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "agent.dispatch",
+            "who": "agents.settings",
+            "built": false
+        },
+        "import_start": {
+            "action": "import_start",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/import/start.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "file (multipart: .md"
+                },
+                {
+                    "name": "kind",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "markdown or markdown_zip or notion_zip or csv; from the file by default"
+                },
+                {
+                    "name": "space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "parent",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "one of these is required"
+                },
+                {
+                    "name": "database",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a CSV's target"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": null,
+            "log_event": "page.import",
+            "who": "edit at the destination",
+            "built": false
+        },
+        "export_page": {
+            "action": "export_page",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/page.php",
+            "params": [
+                {
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "md or html; md by default"
+                },
+                {
+                    "name": "include_subpages",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "yes or no"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.export",
+            "who": "view and export.own",
+            "built": false
+        },
+        "export_database": {
+            "action": "export_database",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/database.php",
+            "params": [
+                {
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "csv or json"
+                },
+                {
+                    "name": "view",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "a view's filter and columns"
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "page.export",
+            "who": "view and export.own",
+            "built": false
+        },
+        "export_space": {
+            "action": "export_space",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/space.php",
+            "params": [
+                {
+                    "name": "space",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "zip of md or zip of html or json"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "space.export",
+            "who": "owner and export.space",
+            "built": false
+        },
+        "export_channel": {
+            "action": "export_channel",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/channel.php",
+            "params": [
+                {
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "json or md or csv"
+                },
+                {
+                    "name": "from",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "to",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "channel.export",
+            "who": "owner and export.space",
+            "built": false
+        },
+        "export_all": {
+            "action": "export_all",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/all.php",
+            "params": [
+                {
+                    "name": "format",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "zip"
+                }
+            ],
+            "undo": null,
+            "confirm": true,
+            "approval": "external_send",
+            "log_event": "export.all",
+            "who": "export.all",
+            "built": false
+        },
+        "export_delete": {
+            "action": "export_delete",
+            "section": "The worker, imports, exports and retention (slice 8)",
+            "endpoint": "/exports/delete.php",
+            "params": [
+                {
+                    "name": "export",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "export.delete",
+            "who": "own",
+            "built": false
+        },
+        "settings_save": {
+            "action": "settings_save",
+            "section": "Admin and settings (slice 9)",
+            "endpoint": "/admin/settings.php",
+            "params": [
+                {
+                    "name": null,
+                    "note": "any field of the settings (business_name"
+                },
+                {
+                    "name": "default_space_kind",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "default_member_level",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "default_everyone_level",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "version_snapshot_minutes",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "version_retention_days",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "trash_retention_days",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "stale_page_days",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "unanswered_hours",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "wiki_default_verify_months",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "max_attachment_bytes",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "allowed_embed_hosts",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                },
+                {
+                    "name": "public_pages_noindex",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "public_base_url",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "digest_hour",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "week_start_dow",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "timezone",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "group_dm_max_members",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "away_minutes",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "admin_channel_name",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": null,
+                    "note": "agents_join_default_space)"
+                }
+            ],
+            "undo": "restore prior",
+            "confirm": false,
+            "approval": "other",
+            "log_event": "settings.save",
+            "who": "admin",
+            "built": false
+        },
+        "emoji_save": {
+            "action": "emoji_save",
+            "section": "Admin and settings (slice 9)",
+            "endpoint": "/admin/emoji.php",
+            "params": [
+                {
+                    "name": "shortcode",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "emoji",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                },
+                {
+                    "name": "keywords",
+                    "required": false,
+                    "repeated": true,
+                    "hint": ""
+                }
+            ],
+            "undo": "emoji_delete",
+            "confirm": false,
+            "approval": null,
+            "log_event": "emoji.save",
+            "who": "admin",
+            "built": false
+        },
+        "emoji_delete": {
+            "action": "emoji_delete",
+            "section": "Admin and settings (slice 9)",
+            "endpoint": "/admin/emoji-delete.php",
+            "params": [
+                {
+                    "name": "shortcode",
+                    "required": true,
+                    "repeated": false,
+                    "hint": ""
+                }
+            ],
+            "undo": null,
+            "confirm": false,
+            "approval": null,
+            "log_event": "emoji.delete",
+            "who": "admin",
+            "built": false
+        }
+    }
+}

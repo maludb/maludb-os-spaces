@@ -22,4 +22,4 @@ install** (the fourth, with HR, Projects and Help Desk), granted to every inside
 
 - **The plan:** `docs/spaces-design.md` (Phase 0, 2026-10-05 — **approved**; the owner's sixteen decisions are §15, D1–D16).
 - **The build:** `CLAUDE.md` — the order, the rules, the handoff to the worker model.
-- Status: **Phase 0 complete 2026-10-05** — the schema (db/001–017, 281 proof checks), the kit (18 checks), `maludb-os.json`, the agents' job descriptions, eight skills, the deploy templates; the kernel's installer plan reads the repository clean. Phase 1 (the tool surface, the action manifest, the slice specs) next, for the owner's checkpoint.
+- Status: **Phase 0 complete 2026-10-05** — the schema (db/001–017, 281 proof checks), the kit (18 checks), `maludb-os.json`, the agents' job descriptions, eight skills, the deploy templates; the kernel's installer plan reads the repository clean. **Phase 1 written 2026-10-05** — the tool surface (57 records + 6 activity tools), the action manifest (58 screens, 118 actions, 32 approval categories), the registry, ten slice specs — for the owner's checkpoint; no PHP until it is approved.

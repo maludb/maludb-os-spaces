@@ -166,7 +166,7 @@ function sp_notice(?string $key, array $map): ?array
 }
 
 /** The handler's end: what it did, the record, where to land; JSON gets it all, HTMX follows, a browser is redirected. */
-function sp_done(string $did, ?int $recordId, string $land, string $event = '', array $extra = []): never
+function sp_done(string $did, int|string|null $recordId, string $land, string $event = '', array $extra = []): never   // a UUID for a page, block, database, view or comment
 {
     emit_action_status(true, ['did' => $did, 'record_id' => $recordId, 'refresh' => $event] + $extra);
     if (wants_json()) {

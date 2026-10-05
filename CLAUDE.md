@@ -126,4 +126,4 @@ slice and is written into the spec's "Open questions" for the owner — never gu
   8391–8397).
 - Nothing is installed yet; `plan` only, never `apply`, from this clone (the owner runs `apply`).
 - Proof scratch databases: `sp_dev0` (tests/phase0/run.sh), `sp_dev` (tests/setup_dev.sh); the schema proof alone: `sudo -u postgres psql -v ON_ERROR_STOP=1 -d <scratch> -f db/proof/phase0_proof.sql`.
-- **State (2026-10-05): Phase 0 complete** — schema db/001–017 (281 checks), the kit (18 checks), maludb-os.json, os/, skills/, deploy/; the installer's plan clean. Phase 1 next (design §16).
+- **State (2026-10-05): Phase 0 complete** — schema db/001–017 (281 checks), the kit (18 checks), maludb-os.json, os/, skills/, deploy/; the installer's plan clean. **Phase 1 written** — the tool surface (57 + 6 tools), the manifest (58 screens, 118 actions, 32 approvals), the registry, ten specs — **awaiting the owner's checkpoint** (design §16). Nothing of Phase 2 until then.
