@@ -1,4 +1,4 @@
-<?php /** The reader (screen `page-view`). Data: p, bodyHtml, pub, may, here, tz, notice */ $pid = (string) $p['page_id']; ?>
+<?php /** The reader (screen `page-view`; `row-view` adds the properties panel). Data: p, bodyHtml, pub, may, here, tz, notice, panel? */ $pid = (string) $p['page_id']; ?>
 <div class="page-header" id="page-view-header">
     <div class="page-header-left d-flex align-items-center min-w-0">
         <div class="page-header-title min-w-0"><h5 class="m-b-10 text-truncate"><?= e($p['plain_title'] !== '' ? $p['plain_title'] : 'Untitled') ?></h5></div>
@@ -31,7 +31,7 @@
             <?php if ($p['wiki_owner_member_id'] !== null): ?><span class="text-muted ms-1" id="page-wiki-owner">owner: <?= e($p['wiki_owner_name']) ?></span><?php endif; ?>
             <span class="text-muted ms-auto" id="page-edited">edited <?= e(format_ts($p['last_edited_at'], $tz, 'M j, g:i A')) ?><?= $p['editor_name'] ? ' by ' . e($p['editor_name']) : '' ?></span>
         </div>
-        <?php if ($p['is_row']): ?><div class="alert alert-light border fs-12" id="page-row-note">A row of a database — its properties panel is slice 5's.</div><?php endif; ?>
+        <?php if (!empty($panel)): ?><?= $panel ?><link rel="stylesheet" href="/assets/css/databases.css"><script src="/assets/js/databases.js"></script><?php endif; ?>
         <?php if (!empty($editor)): ?><?= $bodyHtml ?><?php else: ?><div class="sp-body" id="page-body"><?= $bodyHtml !== '' ? $bodyHtml : '<p class="text-muted" id="page-body-empty">An empty page.</p>' ?></div><?php endif; ?>
         <?php if (empty($editor) && $may['comment']): ?><link rel="stylesheet" href="/assets/css/editor.css"><script src="/assets/js/richtext.js" defer></script><script src="/assets/js/editor.js" defer></script><?php endif; ?>
         <div class="d-flex flex-wrap gap-2 align-items-center mt-3 fs-12" id="page-comments-bar">

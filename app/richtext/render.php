@@ -294,6 +294,11 @@ function rt_block(array $b, array $opts): string
             }
             return '<div' . rt_attrs($b, 'rt-synced') . ($from !== null ? ' data-synced-from="' . e((string) $from) . '"' : '') . '>' . $kids . '</div>';
         case 'link_to_page':
+            if (isset($c['database_id'], $c['view']) && is_string($c['view']) && preg_match('/^[0-9a-f-]{36}$/i', $c['view']) && preg_match('/^[0-9a-f-]{36}$/i', (string) $c['database_id'])) {
+                // a linked view of a database (slice 5): the rows of the view, read-only, through the database layouts
+                require_once dirname(__DIR__) . '/features/databases/handler.php';
+                return '<div' . rt_attrs($b, 'rt-linked-view-block') . '>' . linked_view_html((string) $c['database_id'], (string) $c['view']) . '</div>';
+            }
             $id = (string) ($c['page_id'] ?? ($c['database_id'] ?? ''));
             $title = $opts['titles'][$id] ?? 'A page you cannot see';
             $url = $id !== '' ? $opts['page_url']($id) : null;

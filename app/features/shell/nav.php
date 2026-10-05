@@ -18,6 +18,7 @@ function nav_groups(): array
             ['search',    '/search',     'feather-search',        'Search',          'spaces.join|spaces.guest'],
             ['spaces',    '/spaces/',    'feather-layers',        'Spaces',          'spaces.join'],
             ['pages',     '/pages/',     'feather-file-text',     'Pages',           'spaces.join|spaces.guest'],
+            ['databases', '/databases/', 'feather-database',      'Databases',       'spaces.join|spaces.guest'],
             ['channels',  '/channels/',  'feather-hash',          'Channels',        'spaces.join|spaces.guest'],
             ['dms',       '/dm/',        'feather-message-circle','Direct messages', 'dm.write|spaces.guest'],
         ],
@@ -141,7 +142,7 @@ function back_link(): ?array
     }
     $path = parse_url($back, PHP_URL_PATH) ?: '/';
     $labels = ['/' => 'Home', '/notifications' => 'Notifications', '/activity' => 'Activity', '/trail' => 'My trail', '/settings/' => 'My settings', '/settings/tokens/' => 'Tokens',
-               '/saved' => 'Saved', '/search' => 'Search', '/spaces/' => 'Spaces', '/pages/' => 'Pages', '/channels/' => 'Channels', '/dm/' => 'Direct messages', '/trash' => 'Trash'];
+               '/saved' => 'Saved', '/search' => 'Search', '/spaces/' => 'Spaces', '/pages/' => 'Pages', '/databases/' => 'Databases', '/channels/' => 'Channels', '/dm/' => 'Direct messages', '/trash' => 'Trash'];
     foreach ($labels as $p => $label) {
         if ($path === $p) {
             return [$back, $label];

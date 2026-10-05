@@ -18,7 +18,7 @@ $block = req_has('block') && (string) req_val('block') !== '' ? (string) req_val
 $page = req_has('page') && (string) req_val('page') !== '' ? (string) req_val('page') : null;
 $comment = req_has('comment') && (string) req_val('comment') !== '' ? (string) req_val('comment') : null;
 $message = req_has('message') && (string) req_val('message') !== '' ? request_integer('message') : null;
-if (req_has('row') && (string) req_val('row') !== '') { refuse(422, 'A file on a row\'s property is slice 5\'s.'); }
+$rowId = req_has('row') && (string) req_val('row') !== '' ? (string) req_val('row') : null;
 if ($message !== null) {
     // slice 4: a file for a message being composed in a channel — a pending slot (record_id 0) the post re-points to the message
     require_once dirname(__DIR__, 2) . '/app/features/channels/queries.php';
@@ -32,6 +32,28 @@ if ($message !== null) {
         return $a;
     });
     sp_done('Attached ' . $a['filename'], (int) $a['id'], '/channels/' . $ch['channel_id'], 'blockChanged', ['attachment' => ['attachment_id' => (int) $a['id'], 'filename' => $a['filename'], 'mime_type' => $a['mime_type'], 'byte_size' => $a['byte_size'], 'url' => '/files/' . $a['id']], 'channel_id' => $ch['channel_id']]);
+}
+if ($rowId !== null) {
+    // slice 5: a file on a row's `files` property — an attachment of kind row_files, its id appended to the property
+    require_once dirname(__DIR__, 2) . '/app/features/databases/handler.php';
+    $row = is_uuid($rowId) ? find_row($pdo, $rowId) : null;
+    $row ?? refuse(404, 'Row not found.');
+    require_page_level($row['page_id'], 'edit_content', 'Row');
+    $d = $row['database'] ?? refuse(404, 'Database not found.');
+    $pk = resolve_property_key($pdo, $d['properties'], (string) (req_val('property') ?? ''));
+    if ($pk === null || ($d['properties'][$pk]['type'] ?? '') !== 'files') { sp_refuse_fields(['property' => 'Name a files property of the database.']); }
+    $a = sp_guard($pdo, static function () use ($pdo, $me, $file, $row, $d, $pk): array {
+        $pdo->beginTransaction();
+        $a = store_attachment($pdo, $file, 'row_files', $row['page_id'], $me);
+        $have = array_map(static fn ($x): int => (int) (is_array($x) ? ($x['id'] ?? 0) : $x), (array) (row_stored($pdo, $row['page_id'])[$pk] ?? []));
+        update_row($pdo, $row['page_id'], [$pk => array_values(array_unique(array_merge($have, [(int) $a['id']])))], $me);
+        log_activity($pdo, 'attachment.add', 'attachment', $a['id'], ['space_id' => $row['space_id'], 'entity_uuid' => $row['page_id'], 'after' => ['attachment_id' => $a['id'], 'record_type' => 'row_files', 'filename' => $a['filename'], 'mime_type' => $a['mime_type'], 'byte_size' => $a['byte_size'], 'page_id' => $row['page_id'], 'key' => $pk]]);
+        database_log($pdo, 'row.update', 'row', $row['page_id'], $row['space_id'], ['after' => ['database_id' => $d['database_id'], 'keys' => [$pk]]]);
+        $pdo->commit();
+        return $a;
+    });
+    $arow = attachment_for($pdo, (int) $a['id']);
+    sp_done('Attached ' . $a['filename'], (int) $a['id'], sp_land('/databases/' . $d['database_id'] . '/rows/' . $row['page_id'], 'uploaded'), 'rowChanged', ['attachment' => $arow === null ? null : present_attachment($arow), 'row_id' => $row['page_id'], 'key' => $pk]);
 }
 if ($block !== null) {
     [$b, $p] = block_for_write($pdo, $block);

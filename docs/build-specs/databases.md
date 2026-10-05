@@ -109,4 +109,31 @@ The world (`tests/phase3/slice5/lib.php` `databases_world()`): slice 2's world; 
 - [ ] **JSON mode**: every handler under a signed action token answers the contract; `row_create` with `properties` keyed by display names and a person by name; `database_query`'s filter object round-trips through `view_save`; `_partial=1` on `database_update` keeps the description; the expert (run token + relay) creates a row and sets a relation, `source agent`; its `database_delete` pauses `deletion` on the MCP path (Phase 4).
 - [ ] **375 × 740 and 1280 × 800**: the table scrolls inside its card (`scrollWidth` of the page = viewport), the board's columns scroll horizontally, the calendar becomes the week list, the gallery and list stack; the inline cell editor and the chip pickers are popovers; every control ≥ 44 px, no console errors; JavaScript off saves a cell through its form; the registry reads 6 screens and 13 actions built.
 
+## Built and proven (2026-10-05)
+Built as the Files list says, plus the pieces the screens needed. `app/features/databases/{queries,present,write,handler,filters,render}.php` (`DATABASE_SELECT` over `mcp_databases` joined to `mcp_pages` for the level and
+the editor; `database_cast()` orders the schema; `database_rows()` is `sp_database_rows()` decoded; `coerce_value()` / `coerce_row_values()` turn a form field, an agent's JSON value or a name into a stored value and
+file each refusal under `p[key]`; `save_property()` converts every row in the retype's transaction; `render_layout()` is the one place the six layouts are chosen, for the screen and for a linked view;
+`display_value()` / `render_value()` show a value as text / HTML), 14 controllers under `html/databases/` (`index`, `view`, `schema`, `save`, `delete`, `properties/{save,remove}`, `rows/{view,save,delete,relation}`,
+`views/{form,save,delete,reorder}`), the views with their partials (`field`, `cell`, `row-row`, `row-card`, the six `layout-*`, `toolbar`, `properties-panel`, `filter-editor`, `relation-picker`, `database-card`),
+`html/assets/js/databases.js`, `databases.css`; `app/features/pages/screen.php` (slice 2's page screen as a function, shared by `page-view` and `row-view`); `html/pages/view.php` sends a browser asked for a database or a
+row to its own page (JSON still answers as a page); `html/files/upload.php` learned `row` + `property` (an attachment of kind `row_files`, its id appended to the files property); the vhost, the dev router and the
+registry builder learned `/databases/{id}/views/new`, `/views/{view}/edit` and `/rows/{row}`; `PARTIAL_UPDATE_TARGETS` gained both entries and **the prefill now skips the jsonb columns `title` and `properties`** (a copied
+JSON string would have been read as new text); the shell menu gained **Databases** (the list needed a way in).
+**Decisions taken in the build (the spec was silent or the schema forbade the literal reading):**
+- **`db/019_database_duplicate.sql`** — `sp_page_duplicate()` made a page of kind `database` with no `databases` row, so a database template (or Duplicate) came out broken. It now copies the schema (a relation or rollup is
+  left out: it points into another database), the database's own views and its live rows with their blocks (unique ids renumbered). Slice 2's `template_apply` of a database template is fixed with it.
+- **A linked view is a `link_to_page` block carrying `database_id` and `view`, not a `child_database` block**: db/008's edge trigger re-parents the database under the page that holds a `child_database` block and
+  `sp_page_duplicate` would deep-copy it. See Open questions.
+- **Property order**: jsonb keeps keys by length and name, so each property carries `order` (set when added; a seeded or dual one follows); `schema_ordered()` sorts everywhere, the title first.
+- **Rename** is `database_property_save` with a new optional **`name`** (manifest and registry updated); keys are the lowercase slug of the name (`Related to …` for a two-way mirror, written by the database).
+- Values: a select/status is `{name, color}`, a multi-select a list of them, people member ids (by id or by name), a date `{start, end}`, files attachment ids; a unique id, a rollup, a relation and the created/edited
+  ones in a POST are ignored. A row may be untitled. A retype is lossless only: number, select, multi-select, status, url, email, phone and checkbox may become text; select may become multi-select; checkbox may become
+  select (Yes/No); date, people, files, relation, rollup and unique id never change type (the spec's own sentence), the title never.
+- Rows' handlers refuse in "You may not edit the rows of this database."; a trashed row is restored with `page_restore` (needs `full`, slice 2's rule).
+- The filter editor posts `f[n]`, `fj` and `g[i]` (the server builds Notion's object); the hidden `filter` keeps the JSON for what it cannot draw; an agent's `filter` is validated for shape and property names and kept as sent.
+- A board groups by select, status or people only (the sentence says so); a view's CHECKs are shown in words by constraint name.
+- The calendar draws a month grid (≥ 576 px) and a week list (below); the timeline 8 weeks, bars as a percentage of the window; Load more raises `?limit=` by 100.
+**Proven by `tests/phase3/slice5/run.sh` — CREATE, ROWS, RELATIONS, VIEWS, ACCESS, JSON, BROWSER (367 checks green (create 49, rows 50, relations 33, views 86, access 52, json 38, browser 59); Phase 2 (312), slices 1, 2, 3 and 4 re-run green).** Every box of the checklist has at least one `ok()` line.
+
 ## Open questions
+- **Linked views**: this spec says a linked view is embedded as a `child_database` block pointing at the database with `view` in its content. db/008's `sp_blocks_after` makes such a block the database's tree edge (it moves the database under the page) and `sp_page_duplicate` copies the database it names. Built as a `link_to_page` block with `database_id` and `view` instead. Owner: keep that, or add a migration letting `child_database` carry a `view` without being an edge?

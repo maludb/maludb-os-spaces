@@ -14,7 +14,12 @@ const PARTIAL_UPDATE_TARGETS = [
     '/spaces/save.php' => ['spaces', 'space', 'mcp_spaces', 'space_id'],          // slice 1
     '/pages/save.php' => ['pages', 'page', 'mcp_pages', 'page_id'],               // slice 2 (a UUID id)
     '/channels/save.php' => ['channels', 'channel', 'mcp_channels', 'channel_id'],   // slice 4
+    '/databases/save.php' => ['pages', 'database', 'mcp_databases', 'database_id'],  // slice 5 (a UUID id; the database's page fields)
+    '/databases/rows/save.php' => ['pages', 'row', 'mcp_pages', 'page_id'],          // slice 5 (a UUID id; a row's values are merged by the handler itself, so the prefill skips them)
 ];
+
+/** Columns the prefill never copies into the request: a page's title and a row's values are jsonb — the handler merges those itself (a copied JSON string would be read as new text). */
+const PARTIAL_UPDATE_SKIP = ['title', 'properties'];
 
 function partial_update_prefill(PDO $pdo): void
 {
@@ -48,7 +53,7 @@ function partial_update_prefill(PDO $pdo): void
         return;
     }
     foreach ($row as $column => $value) {
-        if ($column === $pk || $value === null || array_key_exists($column, $_POST)) {
+        if ($column === $pk || $value === null || array_key_exists($column, $_POST) || in_array($column, PARTIAL_UPDATE_SKIP, true)) {
             continue;
         }
         $_POST[$column] = is_bool($value) ? ($value ? '1' : '0') : (string) $value;

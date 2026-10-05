@@ -1,0 +1,103 @@
+<?php
+/** Proof — JSON mode (spec "Proof", 6): every handler under a signed action token answers the contract; names for keys, a person by name; a filter object round-trips; _partial keeps what is not sent; the expert writes as itself; what pauses for an agent. */
+require __DIR__ . '/lib.php';
+$w = databases_world();
+$product = $w['product'];
+$tok = ['X-Action-Token: ' . person_token(27)];
+$ptok = ['X-Action-Token: ' . person_token(26)];
+$adm = ['X-Action-Token: ' . person_token(1)];
+$contract = fn (array $b) => ($b['ok'] ?? false) === true && array_key_exists('record_id', $b) && isset($b['location'], $b['did'], $b['refresh']);
+
+echo "1. Every action under the action token\n";
+[$c, $b] = act_token('/databases/save.php', ['title' => 'SMOKE Token db', 'space' => $product, 'properties' => json_encode(['Name' => 'title', 'Points' => 'number', 'Kind' => ['type' => 'select', 'options' => ['Bug', 'Feature']], 'Owner' => 'people', 'Due' => 'date'])], $tok);
+$db = (string) ($b['record_id'] ?? '');
+ok($c === 200 && $contract($b) && is_uuid($db) && str_starts_with((string) $b['location'], '/databases/' . $db) && $b['refresh'] === 'databaseChanged', 'database_create: {ok, did, record_id (a UUID), location, refresh}');
+[$c, $b] = act_token('/databases/save.php', ['database' => $db, 'description' => 'Where tokens work'], $tok);
+ok($c === 200 && $contract($b) && $b['record_id'] === $db, 'database_update: the contract');
+[$c, $b] = act_token('/databases/save.php', ['database' => $db, 'title' => 'SMOKE Token db 2', '_partial' => '1'], $tok);
+ok($c === 200 && one('SELECT plain_title FROM pages WHERE id = CAST(:d AS uuid)', ['d' => $db]) === 'SMOKE Token db 2' && one('SELECT sp_rich_text_plain(description) FROM databases WHERE id = CAST(:d AS uuid)', ['d' => $db]) === 'Where tokens work', '_partial=1 on database_update: the title changed, the description kept');
+[$c, $b] = act_token('/databases/save.php', ['database' => $db, 'title' => '', '_partial' => '1'], $tok);
+ok($c === 422 && ($b['error']['code'] ?? '') === 'invalid' && isset($b['error']['fields']['title']), '422 {error: {code: invalid, fields}}');
+[$c, $b] = act_token('/databases/properties/save.php', ['database' => $db, 'key' => 'Tags', 'type' => 'multi_select', 'options' => ['ui', 'db']], $tok);
+ok($c === 200 && $contract($b) && $b['record_id'] === $db && $b['key'] === 'tags', 'database_property_save: the contract (and the key made)');
+[$c, $b] = act_token('/databases/properties/save.php', ['database' => $db, 'key' => 'Epic', 'type' => 'relation', 'relation_database' => $w['epics'], 'two_way' => 'no'], $tok);
+ok($c === 200 && $contract($b), 'a relation property by token');
+$sch = db_schema($db);
+$sch['note'] = ['id' => 'note', 'name' => 'Note', 'type' => 'rich_text'];
+[$c, $b] = act_token('/databases/schema.php', ['database' => $db, 'properties' => json_encode($sch)], $tok);
+ok($c === 200 && $contract($b) && $b['properties_added'] === ['note'], 'database_schema_save: the contract, the keys added');
+[$c, $b] = act_token('/databases/properties/remove.php', ['database' => $db, 'key' => 'Note', 'purge_values' => 'yes'], $tok);
+ok($c === 200 && $contract($b) && $b['purge_values'] === true, 'database_property_remove: the contract');
+$since = last_activity_id();
+[$c, $b] = act_token('/databases/rows/save.php', ['database' => $db, 'title' => 'SMOKE Token row', 'properties' => json_encode(['Points' => 4, 'Kind' => 'Feature', 'Owner' => ['SMOKE Priya'], 'Due' => ['start' => '2026-12-01', 'end' => '2026-12-03'], 'Tags' => ['ui']])], $tok);
+$row = (string) ($b['record_id'] ?? '');
+$p = row_props($row);
+ok($c === 200 && $contract($b) && is_uuid($row) && str_contains((string) $b['location'], '/rows/' . $row) && $p['points'] === 4 && $p['kind']['name'] === 'Feature' && $p['owner'] === [26] && $p['due']['end'] === '2026-12-03' && array_column($p['tags'], 'name') === ['ui'],
+    'row_create with `properties` keyed by display names and a person by name: the contract; every value in its type');
+$l = activity('row.create', $since);
+ok(count($l) === 1 && $l[0]['source'] === 'assistant' && $l[0]['entity_uuid'] === $row, 'logged with source assistant (a person\'s token)');
+[$c, $b] = act_token('/databases/rows/save.php', ['row' => $row, 'p' => ['points' => '6'], '_partial' => '1'], $tok);
+$p = row_props($row);
+ok($c === 200 && $contract($b) && $p['points'] === 6 && $p['kind']['name'] === 'Feature' && row_title($row) === 'SMOKE Token row' && $p['owner'] === [26], '_partial=1 on row_update: one property changed; the title and the other values kept');
+[$c, $b] = act_token('/databases/rows/save.php', ['row' => $row, 'title' => 'SMOKE Token row 2'], $tok);
+ok($c === 200 && row_title($row) === 'SMOKE Token row 2' && row_props($row)['points'] === 6, 'and the title alone, no _partial: the values stay (a row\'s update is always a merge)');
+$row2 = (string) (act_token('/databases/rows/save.php', ['database' => $w['epics'], 'title' => 'SMOKE Token epic'], $tok)[1]['record_id'] ?? '');
+[$c, $b] = act_token('/databases/rows/relation.php', ['row' => $row, 'property' => 'Epic', 'targets' => $row2], $tok);
+ok($c === 200 && $contract($b) && relations_of($row, 'epic') === [$row2], 'row_relation_set: the contract; `targets` as a comma list is accepted');
+[$c, $b] = act_token('/databases/views/save.php', ['database' => $db, 'name' => 'Token view', 'layout' => 'board', 'group_by' => 'Kind', 'filter' => json_encode(['property' => 'Points', 'number' => ['greater_than' => 1]]), 'sort' => json_encode([['property' => 'Points', 'direction' => 'descending']]), 'visible_properties' => 'Points,Kind'], $tok);
+$vw = (string) ($b['record_id'] ?? '');
+$vr = view_row($vw);
+ok($c === 200 && $contract($b) && is_uuid($vw) && $vr['layout'] === 'board' && $vr['group_by'] === 'kind' && json_decode($vr['filter'], true) == ['property' => 'Points', 'number' => ['greater_than' => 1]] && json_decode($vr['sort'], true) == [['property' => 'points', 'direction' => 'descending']] && $vr['visible_properties'] === '{points,kind}',
+    'view_save: the contract; a Notion filter object as JSON, a sort as JSON, visible_properties as a comma list');
+$vw2 = mkview(['jar' => ''] ? as_member(27) : '', $db, 'Second');
+[$c, $b] = act_token('/databases/views/reorder.php', ['view' => $vw2, 'after' => ''], $tok);
+ok($c === 200 && $contract($b), 'view_reorder: the contract');
+[$c, $b] = act_token('/databases/views/delete.php', ['view' => $vw2], $tok);
+ok($c === 200 && $contract($b), 'view_delete: the contract');
+[$c, $b] = act_token('/databases/rows/delete.php', ['row' => $row2], $tok);
+ok($c === 200 && $contract($b), 'row_delete: the contract');
+[$c, $b] = act_token('/databases/delete.php', ['database' => $db], $tok);
+ok($c === 200 && $contract($b) && $b['row_count'] === 1, 'database_delete: the contract and the row count');
+[$c, $b] = act_token('/databases/delete.php', ['database' => '00000000-0000-0000-0000-000000000000'], $tok);
+ok($c === 404, 'a database that is not there: 404');
+foreach (['/databases/', '/databases/' . $w['tasks'], '/databases/' . $w['tasks'] . '/schema', '/databases/' . $w['tasks'] . '/views/new', '/databases/' . $w['tasks'] . '/views/' . views_of($w['tasks'])[0]['id'] . '/edit', '/databases/' . $w['tasks'] . '/rows/' . $w['fix']] as $path) {
+    [$c, $d] = screen(as_member(27), $path);
+    ok($c === 200 && $d !== [], "$path answers JSON");
+}
+
+echo "2. The expert (a run token with the relay)\n";
+act(as_member(27), '/spaces/members/add.php', ['space' => $product, 'member' => 40]);
+kernel_state(function ($s) { $s['facts']['721'] = ['valid' => true, 'is_agent' => true, 'member_id' => 40, 'run_id' => 721, 'request_id' => 'req-721', 'trigger' => 'chat', 'endpoints' => [['name' => 'Records MCP']]]; return $s; });
+$rt = as_agent(run_token(40, 721));
+$since = last_activity_id();
+[$c, $b] = act_token('/databases/rows/save.php', ['database' => $w['tasks'], 'title' => 'SMOKE Agent row', 'properties' => json_encode(['Points' => 1, 'Owner' => ['SMOKE Priya'], 'Status' => 'Todo'])], $rt);
+$ar = (string) ($b['record_id'] ?? '');
+ok($c === 200 && is_uuid($ar) && row_props($ar)['status']['name'] === 'Todo', 'Seamus creates a row in Tasks (it is in Product)');
+$l = activity('row.create', $since);
+ok(count($l) === 1 && $l[0]['source'] === 'agent' && (int) $l[0]['agent_run_id'] === 721 && (int) $l[0]['actor_member_id'] === 40, 'row.create: source agent, run 721, actor Seamus');
+[$c, $b] = act_token('/databases/rows/relation.php', ['row' => $w['launch'], 'property' => 'Tasks', 'targets' => implode(',', [$w['fix'], $w['build'], $ar])], $rt);
+ok($c === 200 && in_array($ar, relations_of($w['launch'], 'tasks'), true), 'and sets a relation on an epic');
+$l = activity('row.relation_set', $since);
+ok(count($l) === 1 && $l[0]['source'] === 'agent', 'logged as the agent');
+act(as_member(27), '/databases/rows/relation.php', ['row' => $w['launch'], 'property' => 'Tasks', 'targets' => [$w['fix'], $w['build']]]);
+[$c, $b] = act_token('/databases/rows/save.php', ['row' => $ar, 'p' => ['points' => 2]], $rt);
+ok($c === 200 && row_props($ar)['points'] === 2, 'and updates a cell');
+$noteCount = count(notes(26, 'mention', 0));
+ok(count(q("SELECT 1 FROM notifications WHERE member_id = 40")) === 0, 'an agent is dispatched, never notified: no bell row for Seamus');
+ok(count(array_filter(notes(26, 'mention', 0), fn ($n) => str_contains($n['title'], 'SMOKE Agent row'))) === 1, 'but Priya, named on the agent\'s row, is told');
+
+echo "3. What pauses for an agent\n";
+$reg = json_decode(file_get_contents(dirname(__DIR__, 3) . '/mcp/action_registry.json'), true)['actions'];
+$cat = fn (string $a) => $reg[$a]['approval'] ?? ($reg[$a]['approval_category'] ?? null);
+ok($cat('database_delete') === 'deletion' && $cat('row_delete') === 'deletion', 'database_delete and row_delete pause as `deletion` (the actions server holds them for a person — Phase 4)');
+ok($cat('database_schema_save') === 'other' && $cat('database_property_remove') === 'other', 'database_schema_save and database_property_remove pause as `other`');
+ok($cat('row_create') === null && $cat('row_update') === null && $cat('view_save') === null && $cat('database_property_save') === null, 'creating, changing and relating never pause');
+$m = json_decode(file_get_contents(dirname(__DIR__, 3) . '/maludb-os.json'), true);
+$appr = array_column($m['approvals'] ?? [], 'category', 'action');
+ok(($appr['database_delete'] ?? '') === 'deletion' && ($appr['row_delete'] ?? '') === 'deletion' && ($appr['database_schema_save'] ?? '') === 'other' && ($appr['database_property_remove'] ?? '') === 'other', 'maludb-os.json approvals[] carry the four actions with their categories');
+ok(($reg['database_property_save']['params'] ?? []) !== [] && in_array('name', array_column($reg['database_property_save']['params'], 'name'), true), 'the registry\'s database_property_save takes `name` (rename)');
+$regAll = json_decode(file_get_contents(dirname(__DIR__, 3) . '/mcp/action_registry.json'), true);
+$scr = ['database-list', 'database-view', 'database-schema', 'view-add', 'view-edit', 'row-view'];
+$act = ['database_create', 'database_update', 'database_schema_save', 'database_property_save', 'database_property_remove', 'database_delete', 'row_create', 'row_update', 'row_delete', 'row_relation_set', 'view_save', 'view_delete', 'view_reorder'];
+ok(count(array_filter($scr, fn ($x) => ($regAll['screens'][$x]['built'] ?? false) === true)) === 6 && count(array_filter($act, fn ($x) => ($regAll['actions'][$x]['built'] ?? false) === true)) === 13, 'the registry reads the 6 screens and 13 actions of the slice as built');
+finish();
