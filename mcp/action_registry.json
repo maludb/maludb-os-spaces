@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T18:04:12+00:00",
+    "generated_at": "2026-10-05T18:55:17+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -29,8 +29,8 @@
             "section": "Home, me and the shell (Phase 2 and slice 9)",
             "when": "the messages I saved (Later) and my reminders",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "notifications": {
             "screen": "notifications",
@@ -278,8 +278,8 @@
                 "q",
                 "archived"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "channel-add": {
             "screen": "channel-add",
@@ -289,7 +289,7 @@
             "params": [
                 "space"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "channel-view": {
@@ -300,7 +300,7 @@
             "params": [
                 "message"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "channel-edit": {
@@ -309,7 +309,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "to change a channel's name, topic, purpose, kind (public or private), retention",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "channel-members": {
@@ -318,7 +318,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "who is in a private channel or follows a public one; add a member or a guest; remove",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "channel-pins": {
@@ -327,7 +327,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "what is pinned and bookmarked in the channel",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "thread-view": {
@@ -336,7 +336,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "a thread: the first message and every reply, in order; reply; also send to channel",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "dm-list": {
@@ -345,8 +345,8 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "my direct and group messages with their last lines and unread counts",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "dm-new": {
             "screen": "dm-new",
@@ -354,7 +354,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "to start a direct or group message: a people picker that finds or makes the conversation",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "dm-view": {
@@ -363,7 +363,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "a direct or group message, read and answered like a channel; a DM to an agent shows \"agent\" and its thinking state",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "scheduled-list": {
@@ -372,7 +372,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "my scheduled messages, to change or cancel",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "reminder-list": {
@@ -381,7 +381,7 @@
             "section": "Channels and messages — THE SECOND EXEMPLAR (slice 4)",
             "when": "my reminders, due and done",
             "params": [],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "database-list": {
@@ -2330,7 +2330,7 @@
             "approval": null,
             "log_event": "channel.create",
             "who": "member of the space with channels.create",
-            "built": false
+            "built": true
         },
         "channel_update": {
             "action": "channel_update",
@@ -2379,7 +2379,7 @@
             "approval": null,
             "log_event": "channel.update",
             "who": "channel for topic and purpose; owner or channel.manage for the rest",
-            "built": false,
+            "built": true,
             "partial": true
         },
         "channel_archive": {
@@ -2401,7 +2401,7 @@
             "approval": "deletion",
             "log_event": "channel.archive",
             "who": "owner or channel.manage",
-            "built": false
+            "built": true
         },
         "channel_unarchive": {
             "action": "channel_unarchive",
@@ -2420,7 +2420,7 @@
             "approval": null,
             "log_event": "channel.unarchive",
             "who": "owner or channel.manage",
-            "built": false
+            "built": true
         },
         "channel_delete": {
             "action": "channel_delete",
@@ -2441,7 +2441,7 @@
             "approval": "deletion",
             "log_event": "channel.delete",
             "who": "admin",
-            "built": false
+            "built": true
         },
         "channel_join": {
             "action": "channel_join",
@@ -2460,7 +2460,7 @@
             "approval": null,
             "log_event": "channel.join",
             "who": "member of the space",
-            "built": false
+            "built": true
         },
         "channel_leave": {
             "action": "channel_leave",
@@ -2479,7 +2479,7 @@
             "approval": null,
             "log_event": "channel.leave",
             "who": "own",
-            "built": false
+            "built": true
         },
         "channel_member_add": {
             "action": "channel_member_add",
@@ -2502,7 +2502,7 @@
             "approval": null,
             "log_event": "channel.member_add",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "channel_guest_add": {
             "action": "channel_guest_add",
@@ -2527,7 +2527,7 @@
             "approval": "external_send",
             "log_event": "channel.guest_add",
             "who": "owner and share.guest",
-            "built": false
+            "built": true
         },
         "channel_member_remove": {
             "action": "channel_member_remove",
@@ -2552,7 +2552,7 @@
             "approval": null,
             "log_event": "channel.member_remove",
             "who": "owner or channel.manage",
-            "built": false
+            "built": true
         },
         "channel_notify_set": {
             "action": "channel_notify_set",
@@ -2595,7 +2595,7 @@
             "approval": null,
             "log_event": "channel.notify_set",
             "who": "own",
-            "built": false
+            "built": true
         },
         "retention_set": {
             "action": "retention_set",
@@ -2620,7 +2620,7 @@
             "approval": "other",
             "log_event": "channel.retention_set",
             "who": "retention.manage or channel.manage",
-            "built": false
+            "built": true
         },
         "channel_pin": {
             "action": "channel_pin",
@@ -2651,7 +2651,7 @@
             "approval": null,
             "log_event": "channel.pin",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "channel_unpin": {
             "action": "channel_unpin",
@@ -2682,7 +2682,7 @@
             "approval": null,
             "log_event": "channel.unpin",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "bookmark_save": {
             "action": "bookmark_save",
@@ -2731,7 +2731,7 @@
             "approval": null,
             "log_event": "channel.bookmark_save",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "bookmark_delete": {
             "action": "bookmark_delete",
@@ -2750,7 +2750,7 @@
             "approval": null,
             "log_event": "channel.bookmark_delete",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "message_post": {
             "action": "message_post",
@@ -2787,7 +2787,7 @@
             "approval": null,
             "log_event": "message.post",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "thread_reply": {
             "action": "thread_reply",
@@ -2820,7 +2820,7 @@
             "approval": null,
             "log_event": "thread.reply",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "channel_announce": {
             "action": "channel_announce",
@@ -2851,7 +2851,7 @@
             "approval": "other",
             "log_event": "message.announce",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "message_edit": {
             "action": "message_edit",
@@ -2876,7 +2876,7 @@
             "approval": null,
             "log_event": "message.edit",
             "who": "own",
-            "built": false
+            "built": true
         },
         "message_delete_own": {
             "action": "message_delete_own",
@@ -2895,7 +2895,7 @@
             "approval": null,
             "log_event": "message.delete_own",
             "who": "own",
-            "built": false
+            "built": true
         },
         "message_delete": {
             "action": "message_delete",
@@ -2914,7 +2914,7 @@
             "approval": "deletion",
             "log_event": "message.delete",
             "who": "owner or channel.manage",
-            "built": false
+            "built": true
         },
         "message_schedule": {
             "action": "message_schedule",
@@ -2939,7 +2939,7 @@
             "approval": null,
             "log_event": "message.schedule",
             "who": "own",
-            "built": false
+            "built": true
         },
         "message_unschedule": {
             "action": "message_unschedule",
@@ -2958,7 +2958,7 @@
             "approval": null,
             "log_event": "message.unschedule",
             "who": "own",
-            "built": false
+            "built": true
         },
         "reaction_add": {
             "action": "reaction_add",
@@ -2983,7 +2983,7 @@
             "approval": null,
             "log_event": "message.react",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "reaction_remove": {
             "action": "reaction_remove",
@@ -3008,7 +3008,7 @@
             "approval": null,
             "log_event": "message.unreact",
             "who": "own",
-            "built": false
+            "built": true
         },
         "message_save": {
             "action": "message_save",
@@ -3033,7 +3033,7 @@
             "approval": null,
             "log_event": "message.save",
             "who": "channel",
-            "built": false
+            "built": true
         },
         "channel_mark_read": {
             "action": "channel_mark_read",
@@ -3058,7 +3058,7 @@
             "approval": null,
             "log_event": "channel.read",
             "who": "own",
-            "built": false
+            "built": true
         },
         "dm_open": {
             "action": "dm_open",
@@ -3077,7 +3077,7 @@
             "approval": null,
             "log_event": "channel.create",
             "who": "dm.write",
-            "built": false
+            "built": true
         },
         "group_dm_open": {
             "action": "group_dm_open",
@@ -3096,7 +3096,7 @@
             "approval": null,
             "log_event": "channel.create",
             "who": "dm.write",
-            "built": false
+            "built": true
         },
         "reminder_set": {
             "action": "reminder_set",
@@ -3133,7 +3133,7 @@
             "approval": null,
             "log_event": "reminder.set",
             "who": "own",
-            "built": false
+            "built": true
         },
         "reminder_done": {
             "action": "reminder_done",
@@ -3152,7 +3152,7 @@
             "approval": null,
             "log_event": "reminder.done",
             "who": "own",
-            "built": false
+            "built": true
         },
         "database_create": {
             "action": "database_create",

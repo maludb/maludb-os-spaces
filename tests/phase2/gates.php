@@ -40,8 +40,8 @@ ok(str_contains($r['body'], 'You may not change the workspace settings.'), 'a re
 ok(str_contains(page($jGuest, '/spaces/')['body'], 'You may not join spaces.'), 'a guest on Spaces: "You may not join spaces."');
 $stubs = trim((string) shell_exec('grep -rl "render_nav_stub(" ' . escapeshellarg(dirname(__DIR__, 2) . '/html') . ' 2>/dev/null | wc -l'));
 ok((int) $stubs >= 1, "the placeholders stand until their slices ship: $stubs controllers name their slice");
-ok(str_contains(page($jMember, '/channels/')['body'], 'slice 4 builds this screen') && str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/proposals/')['body'], 'slice 7 builds this screen'), 'each placeholder names its slice (channels 4, trash 9, proposals 7)');
-ok(req('POST', '/channels/', ['jar' => $jMember, 'form' => ['csrf_token' => page_csrf($jMember)]])['code'] === 501, 'a POST to a placeholder: 501');
+ok(str_contains(page($jMember, '/search')['body'], 'slice 6 builds this screen') && str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/proposals/')['body'], 'slice 7 builds this screen'), 'each placeholder names its slice (search 6, trash 9, proposals 7)');
+ok(req('POST', '/search', ['jar' => $jMember, 'form' => ['csrf_token' => page_csrf($jMember)]])['code'] === 501, 'a POST to a placeholder: 501');
 $menu = fn (string $j): array => (preg_match_all('/id="nav-([a-z-]+)"/', page($j, '/')['body'], $m) ? $m[1] : []);
 $groups = fn (string $j): array => (preg_match_all('/nxl-caption"><label>([^<]+)</', page($j, '/')['body'], $m) ? $m[1] : []);
 ok($groups($jMember) === ['Browse', 'Me'] && in_array('spaces', $menu($jMember), true) && in_array('dms', $menu($jMember), true) && in_array('trail', $menu($jMember), true) && !in_array('admin-settings', $menu($jMember), true), 'a Member sees Browse (Spaces, Pages, Channels, DMs) and Me: ' . implode(', ', $groups($jMember)));

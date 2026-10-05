@@ -1,5 +1,16 @@
 <?php
 declare(strict_types=1);
-/** /dm/ — my direct messages (screen `dm-list`) — built by its slice (NAV_SLICES); until then the shell's placeholder, 200 after the right (dm.write|spaces.guest). */
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-render_nav_stub('dms', NAV_SLICES['dms'], 'dm.write|spaces.guest');
+/** /dm/ — my DMs and group DMs as cards: the people (agents chipped), the last line, unread, when (screen `dm-list`). */
+require_once dirname(__DIR__, 2) . '/app/features/channels/handler.php';
+require_login();
+require_human();
+if (!has_right('dm.write') && !has_right('spaces.guest')) { require_right('dm.write'); }
+$pdo = db();
+$rows = my_dms($pdo);
+$may = ['new' => has_right('dm.write') || is_guest()];
+log_screen_view($pdo, 'dm-list');
+if (wants_json()) {
+    respond_screen(['dms' => array_map('present_dm', $rows), 'may' => $may]);
+}
+render_screen('Direct messages', view('dm/index.php', ['rows' => $rows, 'may' => $may, 'here' => here_url(), 'tz' => member_timezone(), 'notice' => sp_notice($_GET['notice'] ?? null, ['left' => ['success', 'You left the conversation.']])]),
+    ['activeNav' => 'dms', 'screen' => 'dm-list', 'entity' => 'channel']);

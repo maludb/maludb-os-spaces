@@ -170,7 +170,7 @@ function screen_controller(string $url): ?string
     $path = '/' . ltrim($path, '/');
     $path = preg_replace('/\{[a-z_]+\}/', '1', $path);          // /pages/{id} → /pages/1
     // The vhost's slug rewrites outside the canonical shape (deploy/apache-spaces.conf, tests/dev_router.php): a statement's and a report's name.
-    foreach (['/statements/1' => '/statements/statement.php', '/reports/1' => '/reports/report.php', '/pages/1/versions/1' => '/pages/versions/view.php'] as $slugUrl => $file) {
+    foreach (['/statements/1' => '/statements/statement.php', '/reports/1' => '/reports/report.php', '/pages/1/versions/1' => '/pages/versions/view.php', '/channels/1/threads/1' => '/channels/threads/view.php'] as $slugUrl => $file) {
         if ($path === $slugUrl) {
             return is_file(WEB_ROOT . $file) ? WEB_ROOT . $file : null;
         }

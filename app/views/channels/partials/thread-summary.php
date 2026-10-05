@@ -1,0 +1,2 @@
+<?php /** "N replies · last at …" under a thread's first message, opening the thread. Data: m, url, tz */ $id = (int) $m['message_id']; $n = (int) $m['reply_count']; ?>
+<div class="mt-1 fs-12" id="message-row-<?= $id ?>-thread-summary"><a href="<?= e($url) ?>" class="sp-open-thread fw-semibold" data-thread="<?= e($url) ?>"><i class="feather-message-circle me-1"></i><?= $n ?> repl<?= $n === 1 ? 'y' : 'ies' ?><?= $m['last_reply_at'] ? ' <span class="text-muted">· last ' . e(format_ts($m['last_reply_at'], $tz, 'M j, g:i A')) . '</span>' : '' ?></a></div>

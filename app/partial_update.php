@@ -13,6 +13,7 @@ declare(strict_types=1);
 const PARTIAL_UPDATE_TARGETS = [
     '/spaces/save.php' => ['spaces', 'space', 'mcp_spaces', 'space_id'],          // slice 1
     '/pages/save.php' => ['pages', 'page', 'mcp_pages', 'page_id'],               // slice 2 (a UUID id)
+    '/channels/save.php' => ['channels', 'channel', 'mcp_channels', 'channel_id'],   // slice 4
 ];
 
 function partial_update_prefill(PDO $pdo): void

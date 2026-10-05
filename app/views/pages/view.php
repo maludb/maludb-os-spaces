@@ -33,7 +33,7 @@
         </div>
         <?php if ($p['is_row']): ?><div class="alert alert-light border fs-12" id="page-row-note">A row of a database — its properties panel is slice 5's.</div><?php endif; ?>
         <?php if (!empty($editor)): ?><?= $bodyHtml ?><?php else: ?><div class="sp-body" id="page-body"><?= $bodyHtml !== '' ? $bodyHtml : '<p class="text-muted" id="page-body-empty">An empty page.</p>' ?></div><?php endif; ?>
-        <?php if (empty($editor) && $may['comment']): ?><link rel="stylesheet" href="/assets/css/editor.css"><script src="/assets/js/editor.js" defer></script><?php endif; ?>
+        <?php if (empty($editor) && $may['comment']): ?><link rel="stylesheet" href="/assets/css/editor.css"><script src="/assets/js/richtext.js" defer></script><script src="/assets/js/editor.js" defer></script><?php endif; ?>
         <div class="d-flex flex-wrap gap-2 align-items-center mt-3 fs-12" id="page-comments-bar">
             <?php if ($may['comment'] || $p['open_comment_count'] > 0): ?><button type="button" class="btn btn-light btn-sm btn-touch sp-open-comments" id="page-comments-btn" data-page="<?= e($pid) ?>"><i class="feather-message-square me-1"></i><?= (int) $p['open_comment_count'] ?> open discussion<?= $p['open_comment_count'] === 1 ? '' : 's' ?></button><?php endif; ?>
         </div>

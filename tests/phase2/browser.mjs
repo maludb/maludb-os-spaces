@@ -100,8 +100,8 @@ const smallControls = (page, scope) => page.evaluate((s) => [...document.querySe
   ok((await page.locator('#notice-banner').innerText()).includes('Your status is set') && (await page.locator('#status-current-text').innerText()) === 'On the road', 'setting a status lands back on the settings with the notice and the status shown');
   await page.click('#tab-channels');
   await page.waitForURL(BASE + '/channels/');
-  await page.waitForSelector('#channels-coming');
-  ok((await page.title()).startsWith('Channels'), 'the Channels tab opens its placeholder (slice 4), title "' + (await page.title()) + '"');
+  await page.waitForSelector('#channel-browse-content');
+  ok((await page.title()).startsWith('Channels'), 'the Channels tab opens the channel browse (slice 4), title "' + (await page.title()) + '"');
   await page.goto(BASE + '/trail', { waitUntil: 'networkidle' });
   ok((await overflow(page)).sw === 375, 'no sideways scroll on My trail');
   await page.goto(BASE + '/notifications', { waitUntil: 'networkidle' });

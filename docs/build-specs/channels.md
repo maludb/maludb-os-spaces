@@ -164,4 +164,41 @@ Product), `#launch` public, `#leads-only` private (Marco, Priya), the guest Ann 
   panes with the thread on the right; two browsers see each other's messages within 3 s; every control ≥ 44 px, `scrollWidth` = viewport, no console
   errors; JavaScript off posts through the textarea.
 
+## Built and proven (2026-10-05)
+Built exactly as the Files list says (one name follows the vhost: `/dm/new` is served by `html/dm/form.php`, the canonical form rewrite, not `new.php`):
+`app/features/channels/{queries,present,write,handler}.php` (`CHANNEL_SELECT` over `mcp_channels` with the space, my settings, the pin count, the
+others' names, the agent flag; `channel_from_request()`, `require_channel_member()`, `require_channel_owner()` — a space owner, `channel.manage` or the
+admin —, `channel_log()` stamping `channel_id` and `space_id`, `channel_path()`), `app/features/messages/{queries,present,write,handler}.php` (the SQL read
+functions decoded; `row_hashes()` — md5 of edited|deleted|reply_count|reactions|attachments|kind —; `message_body_from_request()`: the composer's `runs` or
+`markdown` through the converter, a person's `@channel/@here/@everyone` words as shout runs, an agent's stripped to words; `request_time()` in the member's
+zone), `app/features/reminders/{queries,write}.php`, the 44 controllers (`html/channels/*`, `members/*`, `pins/*`, `bookmarks/*`, `messages/*`, `threads/*`,
+`html/dm/*`, `html/reminders/*`, `html/saved.php`, `html/channels/mentions.php` the pickers), the views with their nine partials, `html/assets/js/richtext.js`
+(the run serializer and the caret helpers moved out of `editor.js`, shared with the composer), `html/assets/js/channel.js`, `channel.css`; `files/upload.php`
+learned `message=<channel>` (a pending slot, `record_id 0`, re-pointed by the post; the uploader alone sees it until then); the vhost, the dev router and the
+registry builder learned `/channels/{id}/threads/{message}` and its `/since`; `PARTIAL_UPDATE_TARGETS['/channels/save.php']`.
+**The poll as built:** `#messages` asks `/since` every 3 s while visible (20 s hidden) with `after` and the shown rows' hashes (`hx-vals="js:…"`); the server
+answers 204, or the new rows plus the changed rows as `hx-swap-oob` with `X-Message-Hashes`, `X-Running` (a dispatch the worker took) and `HX-Trigger
+readMoved`; the thread polls the same way. **A thread's copy of a row has its own id** (`thread-row-{id}`; the channel's `message-row-{id}`) — one message may
+show in both lists and an out-of-band swap finds the right one. **Decisions taken in the build:** `mark_read()` updates an existing row and only inserts for a
+follower without one (the DM guard refuses an upsert's INSERT); `notify_set` likewise; leaving the default space's `#general` is refused in the guard's words
+even for a follower without a row; a `running` dispatch is one the worker took (`run_id` set), so the thinking state waits for the worker; the thread link is a
+plain anchor the script sends to the right pane at 1280 and to the page below (an `hx-get` link would have swapped both); the JS-only composer controls
+start `hidden` and the script reveals them (a `<noscript><style>` parsed by HTMX's swap had hidden them everywhere); a quick-react row of five in the
+message menu; "Remind me…" inlines a small form under the row. **Proof** `tests/phase3/slice4/run.sh` — **238 checks green** (channels 45, messages 63,
+mentions 16, dms 20, agent 15, json 48, browser 31) plus the registry and approvals checks: every box above — `#smoke-launch` and `#smoke-leads-only`, the
+world with Seamus and the guest, a duplicate and a capitalised name refused, who sees what (Dana, Bea, the admin, Ann), the topic by a follower and the name
+by the owner only, retention, archive → readable and refused in words, unarchive, delete only archived and only by the admin, join/leave with the guard's
+words, notify/star/section and the sidebar, the rendered row and the poll (204 / the row / readMoved / 404 to an outsider), 60 messages paged back, the unread
+line above the first unread and the cursor never moving back, edit with its mark, the tombstone keeping the thread, the owner's delete, a changed row as a
+swap, threads one level with the database's words, also-to-channel, the pane fragment with `X-Pane-Title`, reactions (toggle, count, a non-member, letters),
+pins and bookmarks, saved, a scheduled message unseen until `sp_pass_scheduled()`, cancel and send-now, an attachment posted and served and refused, `@Priya`
+with the bell and the email row, `@Engineering`, `@channel` telling everyone but the author and the agent, mute and mentions-only, the agent's shout stripped
+and `channel_announce` explicit, the DM pair found again, a third refused, with oneself refused, the DM notifying, the admin's 404, a group found again by its
+members and left, the guest's reach, the dispatch row → `running` ("SMOKE Seamus is thinking…" in the thread and the channel) → `answered` (the reply as
+Seamus, the asker told, the swap), a DM to Seamus dispatching `dm`, every action under an action token answering the contract, `_partial=1`, the expert
+posting where it is and 404 where it is not, the browser at 1280 (Enter sends, the @ picker, a quick reaction, the thread in the right pane, a reply in it),
+two sessions (the unread line, a message and a thread reply seen within 3 s, the summary swapped), at 375 (cards, the composer in view, the Send button, the
+menu a popover, the thread as a page, the DM list) and JavaScript off posting through the textarea. The registry reads 38 screens and 90 actions built.
+Screenshots `/tmp/sp-shots-s4/`. Slices 1–3 and Phase 2 still green.
+
 ## Open questions

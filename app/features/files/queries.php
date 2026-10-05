@@ -6,7 +6,7 @@ declare(strict_types=1);
 function attachment_for(PDO $pdo, int $id): ?array
 {
     $st = $pdo->prepare('SELECT a.attachment_id, a.record_type, a.record_id, a.record_uuid::text AS record_uuid, a.filename, a.mime_type, a.byte_size, a.width, a.height, a.has_thumbnail, a.uploaded_by, a.created_at, b.storage_path, b.thumbnail_path
-                           FROM mcp_attachments a JOIN attachments b ON b.id = a.attachment_id WHERE a.attachment_id = :id');
+                           FROM attachments b JOIN LATERAL (SELECT * FROM mcp_attachments a WHERE a.attachment_id = b.id UNION ALL SELECT b.id, b.record_type, b.record_id, b.record_uuid, b.filename, b.mime_type, b.byte_size, b.width, b.height, b.thumbnail_path IS NOT NULL, b.uploaded_by, b.created_at WHERE b.record_type = \'message\' AND b.record_id = 0 AND b.uploaded_by = app_current_member_id() LIMIT 1) a ON true WHERE b.id = :id');
     $st->execute(['id' => $id]);
     $r = $st->fetch();
     if ($r === false) {

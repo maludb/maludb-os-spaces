@@ -22,6 +22,7 @@ elseif (preg_match('#^/p/([a-f0-9]{48})/files/([0-9]+)$#', $path, $m)) { $set(['
 elseif (preg_match('#^/p/([a-f0-9]{48})/(' . $UUID . ')$#', $path, $m)) { $set(['token' => $m[1], 'page' => $m[2]]); $target = '/p.php'; }
 elseif (preg_match('#^/files/([0-9]+)$#', $path, $m)) { $set(['id' => $m[1]]); $target = '/files.php'; }
 elseif (preg_match('#^/files/([0-9]+)/thumb$#', $path, $m)) { $set(['id' => $m[1], 'thumb' => '1']); $target = '/files.php'; }
+elseif (preg_match('#^/channels/([0-9]+)/threads/([0-9]+)(/since)?$#', $path, $m)) { $target = '/channels/threads/' . (isset($m[3]) && $m[3] !== '' ? 'since' : 'view') . '.php'; $set(['id' => $m[1], 'message' => $m[2]]); }
 elseif (preg_match('#^/(.+)/([0-9]+)/([a-z_-]+)$#', $path, $m) && is_file($root . '/' . $m[1] . '/' . $m[3] . '.php')) { $target = '/' . $m[1] . '/' . $m[3] . '.php'; $set(['id' => $m[2]]); }
 elseif (preg_match('#^/pages/(' . $UUID . ')/versions/([0-9]+)$#', $path, $m)) { $target = '/pages/versions/view.php'; $set(['id' => $m[1], 'version' => $m[2]]); }
 elseif (preg_match('#^/(pages|databases)/(' . $UUID . ')/([a-z_-]+)$#', $path, $m)) { $target = '/' . $m[1] . '/' . $m[3] . '.php'; $set(['id' => $m[2]]); }

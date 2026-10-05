@@ -1,0 +1,65 @@
+<?php
+/** Proof — mentions and notices (spec "Proof", 3): @Priya, @Engineering, @channel by a person, a muted member, the agent's shout stripped. */
+require __DIR__ . '/lib.php';
+$w = channel_world();
+$marco = as_member(27); $priya = as_member(26); $dana = as_member(30); $lee = as_member(31);
+$launch = $w['launch'];
+as_viewer(27);
+$eng = (int) one("SELECT department_id FROM mcp_departments WHERE name = 'Engineering'");
+pdo()->exec("UPDATE members SET last_seen_at = now() - interval '3 hours' WHERE id IN (26, 30, 31)");
+pdo()->exec("UPDATE channel_members SET notify = 'all', muted_until = NULL WHERE channel_id = $launch");
+
+echo "1. A mention tells\n";
+$n0 = last_note_id();
+[$c, $b] = post($marco, $launch, 'Hey @SMOKE Priya, look at this');
+$m = (int) $b['record_id'];
+$mentions = q('SELECT kind, principal_id FROM message_mentions WHERE message_id = :m', ['m' => $m]);
+ok($c === 200 && $mentions == [['kind' => 'member', 'principal_id' => 26]], 'the mention row for Priya');
+$nn = notes(26, 'mention', $n0);
+ok(count($nn) === 1 && str_contains($nn[0]['title'], 'SMOKE Marco mentioned you in #smoke-launch') && (int) $nn[0]['message_id'] === $m, 'Priya\'s bell row');
+ok((int) one("SELECT count(*) FROM notification_outbox WHERE member_id = 26 AND kind = 'mention' AND channel = 'email' AND record_id = :m", ['m' => $m]) === 1, 'an email row since she is away');
+ok(str_contains((string) $b['html'], 'rt-mention-member') && str_contains((string) $b['html'], '@SMOKE Priya'), 'the row renders the mention chip');
+$r = page($priya, '/channels/' . $launch);
+ok(str_contains($r['body'], 'id="notifications-bell"') || str_contains($r['body'], 'bell'), 'the bell is on her shell');
+[$c, $d] = screen($priya, '/channels/mentions.php?channel=' . $launch . '&q=');
+$kinds = array_column($d['candidates'], 'kind');
+ok($c === 200 && in_array('member', $kinds, true) && in_array('agent', $kinds, true) && in_array('channel', $kinds, true), 'the picker offers members, the agent and the shouts to a person');
+
+echo "2. A department and @channel\n";
+$n0 = last_note_id();
+[$c, $b] = post($marco, $launch, 'Engineers: @Engineering please read');
+ok($c === 200 && q('SELECT kind, principal_id FROM message_mentions WHERE message_id = :m', ['m' => (int) $b['record_id']]) == [['kind' => 'department', 'principal_id' => $eng]], '@Engineering is a department mention');
+$told = array_map('intval', array_column(q('SELECT DISTINCT member_id FROM notifications WHERE id > :n AND kind = \'mention\'', ['n' => $n0]), 'member_id'));
+ok(in_array(30, $told, true) && !in_array(28, $told, true), 'Dana (Engineering, in the channel) is told; Bea (not in the channel) is not');
+$n0 = last_note_id();
+[$c, $b] = post($marco, $launch, '@channel the launch is tomorrow');
+$mc = (int) $b['record_id'];
+ok($c === 200 && q('SELECT kind FROM message_mentions WHERE message_id = :m', ['m' => $mc]) == [['kind' => 'channel']] && str_contains((string) $b['html'], 'rt-mention-all'), '@channel typed by a person is a shout run');
+$told = array_map('intval', array_column(q('SELECT DISTINCT member_id FROM notifications WHERE id > :n AND kind = \'mention\'', ['n' => $n0]), 'member_id'));
+sort($told);
+ok(in_array(26, $told, true) && in_array(30, $told, true) && in_array(29, $told, true) && !in_array(27, $told, true) && !in_array(40, $told, true), 'everyone in the channel is told but the author; the agent is dispatched, not notified (' . implode(',', $told) . ')');
+act($dana, '/channels/notify.php', ['channel' => $launch, 'notify' => 'none']);
+$n0 = last_note_id();
+post($marco, $launch, '@SMOKE Dana are you muted?');
+ok(notes(30, 'mention', $n0) === [], 'a muted member (notify none) gets nothing');
+act($dana, '/channels/notify.php', ['channel' => $launch, 'notify' => 'mentions']);
+$n0 = last_note_id();
+post($marco, $launch, 'just talk');
+post($marco, $launch, '@SMOKE Dana now?');
+ok(count(notes(30, 'mention', $n0)) === 1, 'notify mentions: only the mention');
+act($dana, '/channels/notify.php', ['channel' => $launch, 'notify' => 'all']);
+
+echo "3. The agent's shout is stripped; announce is explicit\n";
+kernel_state(function ($s) { $s['facts']['701'] = ['valid' => true, 'is_agent' => true, 'member_id' => 40, 'run_id' => 701, 'request_id' => 'req-701', 'trigger' => 'chat', 'endpoints' => [['name' => 'Records MCP']]]; return $s; });
+$rt = run_token(40, 701);
+[$c, $b] = act_token('/channels/messages/post.php', ['channel' => $launch, 'markdown' => '@channel I am Seamus'], as_agent($rt));
+$ma = (int) ($b['record_id'] ?? 0);
+ok($c === 200 && $ma > 0 && q('SELECT count(*) FROM message_mentions WHERE message_id = :m', ['m' => $ma])[0]['count'] == 0 && message_db($ma)['plain_text'] === '@channel I am Seamus', 'the agent\'s @channel is plain words: no mention row');
+[$c, $b] = act_token('/channels/messages/announce.php', ['channel' => $launch, 'markdown' => 'Announcing', 'reach' => 'here'], as_agent($rt));
+ok($c === 200 && q('SELECT kind FROM message_mentions WHERE message_id = :m', ['m' => (int) $b['record_id']]) == [['kind' => 'here']], 'channel_announce is the explicit way (paused for an agent by the kernel: other in the registry)');
+[$c, $b] = act($marco, '/channels/messages/announce.php', ['channel' => $launch, 'markdown' => 'All hands', 'reach' => 'everyone']);
+ok($c === 200 && str_contains((string) $b['html'], '@everyone'), 'a person announces to @everyone');
+[$c, $b] = act($marco, '/channels/messages/announce.php', ['channel' => $launch, 'markdown' => 'x', 'reach' => 'loud']);
+ok($c === 422 && isset(fields($b)['reach']), 'a bad reach: 422');
+kernel_state(function ($s) { unset($s['facts']); return $s; });
+finish();

@@ -14,4 +14,5 @@
     <input type="file" id="editor-file-input" class="d-none" accept="image/*,.pdf,.txt,.csv,.md,.json,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,audio/*,video/*">
 </div>
 <link rel="stylesheet" href="/assets/css/editor.css">
+<script src="/assets/js/richtext.js" defer></script>
 <script src="/assets/js/editor.js" defer></script>

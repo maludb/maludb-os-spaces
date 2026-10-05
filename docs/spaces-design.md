@@ -682,7 +682,19 @@ spaces 41, membership 56, sections 27, visibility 40, browser 43); `db/018` fixe
 converter and the editor mode of the one renderer, per-block optimistic saves with the version and the stale box (D7), Enter/Backspace/Tab/drag, the slash menu and
 the pickers, uploads with thumbnails through the gated door (D14), synced blocks, tables, versions with the diff and restore, comments with one level of replies,
 presence by file cache, the 13 actions, 1 screen and 21 controllers, **232 checks green** (`tests/phase3/slice3/run.sh`: convert 37, save 25, structure 24, widgets 26,
-versions 19, comments 29, presence 12, json 27, browser 33). Next: slice 4, channels and messages — THE SECOND EXEMPLAR, then the handoff.
+versions 19, comments 29, presence 12, json 27, browser 33).
+**SLICE 4 — channels and messages, THE SECOND EXEMPLAR — BUILT and proven 2026-10-05** (`docs/build-specs/channels.md`, "Built and proven"): channels
+of four kinds, the composer on the shared serializer, polling without a socket (3 s, 204 or rows plus out-of-band swaps of what changed), threads in the
+right pane at 1280 and as a page at 375, reactions, pins, bookmarks, saved, scheduled, reminders, mentions and the notices, DMs and groups, the agent
+mention → dispatch → "thinking" → reply loop proven through the SQL functions as the worker will call them; 13 screens, 32 actions, 44 controllers,
+**238 checks green** (`tests/phase3/slice4/run.sh`: channels 45, messages 63, mentions 16, dms 20, agent 15, json 48, browser 31).
+
+**THE HANDOFF POINT (2026-10-05): exemplars built; slices 5–9 open to workers.** Slice 1 is the CRUD exemplar, slice 3 (the block editor) and
+slice 4 (channels and messages) the two novel surfaces; every later slice copies their pattern from its spec: `app/features/<f>/{queries,present,write,handler}.php`,
+the controllers under `html/<f>/`, the views with ids from the spec, `sp_handler_begin()` → the gate → `sp_guard()` → `log_activity()` with the record's ids →
+`sp_done()`, a proof under `tests/phase3/slice<n>/` on a scratch database with the spec's "Built and proven" and this section updated, one commit per
+slice. Slice 5 (databases) is next, then 6 (search and activity), 7 (agents in Spaces — the worker that calls the kernel's chat endpoint for the dispatches
+slice 4 proved by hand), 8 (notifications, exports, the worker's passes) and 9 (admin and home); then Phase 4 (the MCP servers) and Phase 5 with the owner.
 
 **Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 

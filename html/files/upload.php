@@ -17,8 +17,22 @@ if (!is_array($file)) { sp_refuse_fields(['file' => 'Send the file as multipart 
 $block = req_has('block') && (string) req_val('block') !== '' ? (string) req_val('block') : null;
 $page = req_has('page') && (string) req_val('page') !== '' ? (string) req_val('page') : null;
 $comment = req_has('comment') && (string) req_val('comment') !== '' ? (string) req_val('comment') : null;
-if (req_has('message') && (string) req_val('message') !== '') { refuse(422, 'A file on a message is slice 4\'s.'); }
+$message = req_has('message') && (string) req_val('message') !== '' ? request_integer('message') : null;
 if (req_has('row') && (string) req_val('row') !== '') { refuse(422, 'A file on a row\'s property is slice 5\'s.'); }
+if ($message !== null) {
+    // slice 4: a file for a message being composed in a channel — a pending slot (record_id 0) the post re-points to the message
+    require_once dirname(__DIR__, 2) . '/app/features/channels/queries.php';
+    $ch = find_channel($pdo, $message) ?? refuse(404, 'Channel not found.');
+    if ($ch['archived_at'] !== null || !can_post($message)) { refuse(403, 'You may not post in ' . $ch['label'] . '.'); }
+    $a = sp_guard($pdo, static function () use ($pdo, $me, $file, $ch): array {
+        $pdo->beginTransaction();
+        $a = store_attachment($pdo, $file, 'message', 0, $me);
+        log_activity($pdo, 'attachment.add', 'attachment', $a['id'], ['channel_id' => $ch['channel_id'], 'space_id' => $ch['space_id'], 'after' => ['attachment_id' => $a['id'], 'record_type' => 'message', 'filename' => $a['filename'], 'mime_type' => $a['mime_type'], 'byte_size' => $a['byte_size'], 'channel_id' => $ch['channel_id']]]);
+        $pdo->commit();
+        return $a;
+    });
+    sp_done('Attached ' . $a['filename'], (int) $a['id'], '/channels/' . $ch['channel_id'], 'blockChanged', ['attachment' => ['attachment_id' => (int) $a['id'], 'filename' => $a['filename'], 'mime_type' => $a['mime_type'], 'byte_size' => $a['byte_size'], 'url' => '/files/' . $a['id']], 'channel_id' => $ch['channel_id']]);
+}
 if ($block !== null) {
     [$b, $p] = block_for_write($pdo, $block);
     $kind = 'block';
