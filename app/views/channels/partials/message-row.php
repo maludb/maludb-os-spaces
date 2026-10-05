@@ -15,7 +15,7 @@ if ($pending): ?>
         <div class="min-w-0 flex-grow-1">
             <div class="d-flex flex-wrap align-items-baseline gap-2 fs-12">
                 <span class="fw-semibold text-dark" id="<?= $rid ?>-author"><?= e((string) ($m['author_name'] ?? 'someone')) ?></span>
-                <?php if (!empty($m['author_is_agent'])): ?><span class="badge bg-soft-info text-info">agent</span><?php endif; ?>
+                <?php if (!empty($m['author_is_agent'])): ?><span class="badge bg-soft-info text-info">agent</span><?php if (!empty($m['agent_run_id']) && ($osBase = rtrim((string) env('OS_LAUNCHER_URL', ''), '/')) !== '' && has_right('agents.settings')): ?><a href="<?= e($osBase . '/ai/runs/' . (int) $m['agent_run_id']) ?>" class="text-muted" id="<?= $rid ?>-run" title="The run in the OS"><i class="feather-activity"></i> run</a><?php endif; ?><?php endif; ?>
                 <span class="text-muted" title="<?= e(format_ts($m['sent_at'] ?? $m['created_at'], $tz)) ?>" id="<?= $rid ?>-time"><?= e(format_ts($m['sent_at'] ?? $m['created_at'], $tz, 'g:i A')) ?></span>
                 <?php if (($m['sent_at'] ?? null) === null && ($m['scheduled_for'] ?? null) !== null): ?><span class="badge bg-soft-warning text-warning" id="<?= $rid ?>-scheduled">scheduled for <?= e(format_ts($m['scheduled_for'], $tz, 'M j, g:i A')) ?></span><?php endif; ?>
                 <?php if (($m['edited_at'] ?? null) !== null && !$deleted): ?><span class="text-muted fst-italic" id="<?= $rid ?>-edited">edited</span><?php endif; ?>

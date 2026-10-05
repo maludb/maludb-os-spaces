@@ -17,7 +17,7 @@ $matrix = [
     '/settings/' => $all, '/settings/tokens/' => $all, '/notifications' => $all, '/trail' => $all,
     '/spaces/' => 'admin owner member',
     '/admin/settings' => 'admin', '/admin/spaces' => 'admin', '/admin/published' => 'admin', '/admin/retention' => 'admin', '/admin/trash' => 'admin',
-    '/admin/agents' => 'admin', '/admin/connections' => 'admin', '/exports/' => 'admin', '/proposals/' => 'admin',
+    '/admin/agents' => 'admin', '/admin/connections' => 'admin', '/exports/' => 'admin', '/proposals/' => 'admin owner member',   // slice 7: the proposals are every member's (the view hides what they may not see)
 ];
 [$jAdmin, ] = sign_on(1);
 [$jOwner, ] = sign_on(27);
@@ -40,7 +40,7 @@ ok(str_contains($r['body'], 'You may not change the workspace settings.'), 'a re
 ok(str_contains(page($jGuest, '/spaces/')['body'], 'You may not join spaces.'), 'a guest on Spaces: "You may not join spaces."');
 $stubs = trim((string) shell_exec('grep -rl "render_nav_stub(" ' . escapeshellarg(dirname(__DIR__, 2) . '/html') . ' 2>/dev/null | wc -l'));
 ok((int) $stubs >= 1, "the placeholders stand until their slices ship: $stubs controllers name their slice");
-ok(str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/proposals/')['body'], 'slice 7 builds this screen'), 'each placeholder names its slice (trash 9, proposals 7; search and activity are real since slice 6)');
+ok(str_contains(page($jAdmin, '/admin/trash')['body'], 'slice 9 builds this screen') && str_contains(page($jAdmin, '/exports/')['body'], 'slice 8 builds this screen'), 'each placeholder names its slice (trash 9, exports 8; proposals, agents and connections are real since slice 7; search and activity are real since slice 6)');
 ok(req('POST', '/admin/trash', ['jar' => $jAdmin, 'form' => ['csrf_token' => page_csrf($jAdmin)]])['code'] === 501, 'a POST to a placeholder: 501');
 $menu = fn (string $j): array => (preg_match_all('/id="nav-([a-z-]+)"/', page($j, '/')['body'], $m) ? $m[1] : []);
 $groups = fn (string $j): array => (preg_match_all('/nxl-caption"><label>([^<]+)</', page($j, '/')['body'], $m) ? $m[1] : []);

@@ -15,7 +15,7 @@ ok(page($j, '/settings/tokens/')['code'] === 200 && page($j, '/settings/tokens')
 ok(page($j, '/spaces/')['code'] === 200 && page($j, '/spaces')['code'] === 200, '/spaces/ and /spaces both reach spaces/index.php (the placeholder)');
 ok(page($j, '/channels/')['code'] === 200 && page($j, '/dm/')['code'] === 200 && page($j, '/pages/')['code'] === 200, '/channels/, /dm/ and /pages/ reach their screens');
 ok(page($j, '/trail')['code'] === 200 && page($j, '/saved')['code'] === 200 && page($j, '/search')['code'] === 200 && page($j, '/activity')['code'] === 200, '/trail, /saved, /search and /activity (all real now) resolve to their own files');
-ok(page($j, '/admin/settings')['code'] === 403 && page($j, '/exports/')['code'] === 403 && page($j, '/proposals/')['code'] === 403, '/admin/settings, /exports/ and /proposals/ resolve (403 for a Space owner, by the right)');
+ok(page($j, '/admin/settings')['code'] === 403 && page($j, '/exports/')['code'] === 403 && page($j, '/admin/agents')['code'] === 403, '/admin/settings, /exports/ and /admin/agents resolve (403 for a Space owner, by the right)');
 ok(page($j, '/channels/999999/members')['code'] === 404 && page($j, '/databases/0f3a5b7c-1111-4222-8333-444455556666')['code'] === 404, '/channels/999999/members (slice 4: an unseen channel) and /databases/{uuid} (slice 5, unbuilt) answer 404');
 ok(page($j, '/pages/new')['code'] === 200 && page($j, '/spaces/1')['code'] === 200, '/pages/new reaches pages/form.php and /spaces/1 spaces/view.php (slices 2 and 1)');
 ok(page($j, '/pages/' . '0f3a5b7c-1111-4222-8333-444455556666')['code'] === 404, 'a UUID record (/pages/{uuid}) is rewritten to pages/view.php: 404 for a page that is not there');

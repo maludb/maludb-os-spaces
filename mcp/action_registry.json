@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T22:31:35+00:00",
+    "generated_at": "2026-10-05T22:44:54+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -476,8 +476,8 @@
             "section": "Agents in Spaces (slice 7)",
             "when": "the agents that are members here, their spaces and channels, their last reply, their pending and failed dispatches — read-only; hiring and grants link to the kernel",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "dispatch-list": {
             "screen": "dispatch-list",
@@ -488,7 +488,7 @@
                 "status",
                 "agent"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "proposal-list": {
@@ -500,8 +500,8 @@
                 "status",
                 "kind"
             ],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "connection-list": {
             "screen": "connection-list",
@@ -509,8 +509,8 @@
             "section": "Agents in Spaces (slice 7)",
             "when": "which sibling applications read what of ours (the two shares) and when — the kernel's facts, read-only",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "import": {
             "screen": "import",
@@ -3791,7 +3791,7 @@
             "approval": null,
             "log_event": "librarian.propose",
             "who": "member",
-            "built": false
+            "built": true
         },
         "proposal_accept": {
             "action": "proposal_accept",
@@ -3810,7 +3810,7 @@
             "approval": null,
             "log_event": "librarian.accept",
             "who": "member with edit at the destination",
-            "built": false
+            "built": true
         },
         "proposal_dismiss": {
             "action": "proposal_dismiss",
@@ -3835,7 +3835,7 @@
             "approval": null,
             "log_event": "librarian.dismiss",
             "who": "member",
-            "built": false
+            "built": true
         },
         "dispatch_retry": {
             "action": "dispatch_retry",
@@ -3854,7 +3854,7 @@
             "approval": null,
             "log_event": "agent.dispatch",
             "who": "agents.settings",
-            "built": false
+            "built": true
         },
         "import_start": {
             "action": "import_start",

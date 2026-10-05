@@ -108,4 +108,41 @@ The world (`tests/phase3/slice7/lib.php` `agents_world()`): Seamus (agent, Membe
 - [ ] **Admin pages**: agents with their spaces, channels, last reply and counts; dispatches filtered by status and agent with the excerpts; connections showing the two shares and a `share.read` row the fixture wrote; a Member → 403 in words.
 - [ ] **375 × 740 and 1280 × 800**: the placeholder and the reply in the thread on the phone; the proposal cards; the admin tables as cards; every control ≥ 44 px, `scrollWidth` = viewport, no console errors.
 
+## Built and proven (2026-10-05)
+Built as the Files list says, on slice 4's ground: the thinking row, the `X-Running` header and the poll that swaps it existed; this slice added the worker's step and everything around it. `app/features/agents/{dispatch,queries,present}.php`
+(`dispatches_pass()` polls the runs going and then calls what `sp_dispatches_due()` offers; `dispatch_agent()` is one `POST /api/v1/agents/chat.php?agent=<id>` with `X-Acting-Member` = the asker, `wait` 25 and the spec's context sentence;
+`poll_running_dispatches()` GETs `?run=` for each run going and fails one after ten minutes; `reply_to_rich_text()` converts the Markdown as the AGENT sees people — set `app.member_id` to the agent for the conversion — and leaves
+`@channel`/`@here`/`@everyone` as plain words, slice 4's rule; the pages' reads `agents_here()`, `find_dispatches()`, `retry_dispatch()`, `declared_shares()`, `share_reads()`), `app/features/proposals/{queries,present,write,handler}.php`,
+`bin/worker.php` (`php bin/worker.php dispatches [--limit=10]`: one pass, advisory-locked, one JSON line of counts; `SP_WORKER_NOW` sets a proof's clock; slice 8 adds the other steps and the timer), `html/proposals/{index,save,accept,dismiss}.php`,
+`html/admin/{agents,dispatches,connections}.php`, `html/admin/dispatches/retry.php`, the views listed (`channels/partials/message-pending.php` is the inside of the placeholder: spinner, `aria-live="polite"`, `message-pending-{id}`, or
+"is waiting for a person's approval"; `pending-row.php` wraps it and asks `agent_dispatches` whether the dispatch awaits an approval), and in slice 4's message row a **run** link to the OS (`OS_LAUNCHER_URL` + `/ai/runs/<id>`) for a holder of
+`agents.settings`; the picker's `agent` hint is now a chip (`channel.js`). 4 screens made real (`proposal-list`, `agent-list`, `dispatch-list`, `connection-list`), 4 actions, the three NAV stubs removed. No rewrite was needed (every URL is canonical).
+**`db/021_proposal_decision_note.sql` — one schema defect the build found.** `proposal_dismiss` keeps "the reason", but `librarian_proposals` had no column for it (`reason` is the Librarian's own reason for proposing). One nullable column
+`decision_note` (500 characters) and `mcp_librarian_proposals` with it appended last.
+**`tests/fake_kernel.php` learned the chat endpoint's other states** (every earlier proof still reads it as before): `state.chat_mode` = `running` (202 with a run id; `GET ?run=` answers still-going while `state.run_pending`, then `state.run_reply`
+finished with a cost; `state.run_status` 404 forgets the run), `approval` (200, `status: pending_approval`, `approval_request_id` 77) or `error500`; `state.chat` may carry `run_id: "n"` (a fresh id per call) and `{agent}` in its reply; the `.chat` log
+now records the conversation id, the context, `wait` and the polls.
+**Decisions taken in the build:**
+- **Statuses of the kernel's answer**: 401 or any 5xx or no answer → `failed` (backoff); other 4xx → `refused` with the kernel's sentence; 200/202 with `status: pending_approval` (or an `approval_request_id` and not finished) → the
+  placeholder is born (`running`, then `awaiting_approval`) so the thread can say it waits; not finished and a run id → `running`; finished → `answered`, or `failed` when the run itself ended in a failure status.
+- **Retry keeps the attempts but never above five**: db/016 offers a dispatch only while `attempts <= 5`, and a dispatch that failed for good has 6 — a retry would never be due. `retry_dispatch()` sets `attempts = least(attempts, 5)`: one more try,
+  and failing again is final. Only a `failed` dispatch is retried (422 otherwise).
+- A thread_to_page proposal's destination is `parent` (a page id the acceptor may edit) or `space` (a space's root, `sp_level_rank(sp_space_level()) >= 4`); `accept_proposal()` takes it as `space:<id>` in its `$parentUuid`. The proposal screen
+  and the actions are open to every member (`sp_is_member_here()`), not only `agents.settings` (a space owner accepts what concerns their space); the view hides what the caller may not see; a guest is refused.
+- A proposal about a DM is refused (a DM is not proposed about); a reply names its thread's root; one open proposal per kind and subject — the pre-check and the unique index both say "That is already proposed."
+- The admin pages are all `agents.settings` (the spec's word; the nav item for Connections still shows by `settings.manage`). The agent list shows admitted agents only (`capability` set): the Watcher is not one.
+  `share.read` rows are read from `after->>'application'`, `'tool'` and `'rows'` (Phase 4's server writes them).
+- The failure notice (after the fifth attempt) is sent by the worker with `sp_notify()` and links to the asker's message; the placeholder is removed by `sp_dispatch_record()`.
+- `agent.dispatch` is logged with the asker as actor at the call; `agent.reply` and `agent.fail` with the agent as actor; all source `cron`; never the words.
+- Phase 2's `gates.php` now expects `/proposals/` open to an owner and a member (200) and the exports placeholder as its example of an unbuilt screen; `vhost.php` resolves `/admin/agents` (403 for a Space owner) in place of `/proposals/`.
+**Proven by `tests/phase3/slice7/run.sh` — PICKER, DISPATCH, FAILURES, PROPOSALS, ADMIN, JSON, BROWSER (223 checks green (picker 10, dispatch 37, failures 33, proposals 44, admin 32, json 23, browser 44); Phase 2 and slice 4 re-run green).**
+Every box of the checklist has at least one `ok()` line; the worker is run as a process (`php bin/worker.php dispatches`) against the fake kernel.
+
 ## Open questions
+1. **A DM's reply is a thread reply.** `sp_dispatch_record()` (db/016) puts the reply in `thread_root_id = COALESCE(thread_root, message)`, so in a DM the agent's answer sits under the person's message ("1 reply") rather than in the DM's main
+   view, and `conversation_id` (`spaces:thread:<message>`) makes every DM message its own conversation: the agent has no memory of the DM's earlier turns beyond that message. Should a DM's reply be inline and the conversation the DM
+   (`spaces:dm:<channel>`, the context the DM's last turns)? It would be a `db/022` redefining the trigger and the record function; nothing was changed.
+2. **An `awaiting_approval` dispatch has no way out.** `sp_dispatch_record()` clears `run_id` for it, `sp_dispatches_due()` never offers it, and `dispatch_retry` is for a failed one: when the person approves in the OS and the kernel's run goes on,
+   nothing here learns of it and no reply is posted. Should the worker keep the run id and poll an awaiting dispatch (as it polls a running one), or may Retry reset an awaiting one?
+3. **409 is a refusal for good.** The spec lists 403/409/422 as `refused`. The kernel answers 409 when the agent is busy with another turn (one run at a time), so a second mention while the agent works is refused permanently (and not retried
+   by the admin: Retry is for `failed`). Should a 409 be a `failed` with backoff instead?

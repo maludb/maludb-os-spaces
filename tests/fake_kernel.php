@@ -4,7 +4,7 @@
  * endpoints Spaces calls, from the JSON state file $FAKE_KERNEL_STATE (the proofs rewrite it between steps):
  *   GET  /api/v1/directory/changes.php  → state.feed (os.directory-changes/1); ?since= answers state.incremental when set, else an empty change
  *   POST /api/v1/runs/facts.php {token} → state.facts[<run id>] (the run token's third part), else {valid: false}
- *   POST /api/v1/agents/chat.php        → state.chat (a canned reply) or the refusal state.chat_status names, echoing the acting member it saw
+ *   POST|GET /api/v1/agents/chat.php → state.chat (a canned reply) or the refusal state.chat_status names, or the mode state.chat_mode scripts (slice 7: running, approval, error500; GET ?run= polls), echoing the acting member it saw
  *   GET  /api/v1/ledger/periods.php     → A5, from state.ledger: no ?period= answers os.ledger-periods/1 (state.ledger.periods — the months and their status); ?period=YYYY-MM answers
  *                                         state.ledger.docs[<period>] (an os.ledger-period/1 document, as the kernel sends it), a 422 for a month it has none of; state.ledger.mode = down answers 503;
  *                                         every request is appended to "<state file>.ledger" (the period asked, or "list")
@@ -50,12 +50,33 @@ switch ($path) {
         $run = $parts[2] ?? '';
         $out($state['facts'][$run] ?? ['valid' => false]);
     case '/api/v1/agents/chat.php':
-        file_put_contents((string) getenv('FAKE_KERNEL_STATE') . '.chat', json_encode(['agent' => $_GET['agent'] ?? null, 'acting' => $_SERVER['HTTP_X_ACTING_MEMBER'] ?? null, 'utterance' => $input['utterance'] ?? null]) . "\n", FILE_APPEND);
+        // slice 7: one turn of an agent (POST ?agent=) and a run polled (GET ?run=), as state.chat_mode scripts them:
+        //   absent / reply   → 200, finished, state.chat (or the canned reply; "{agent}" in a reply is the agent id asked)
+        //   running          → 202 {run_id, request_id, status: running, finished: false}; GET ?run= answers the same until state.run_pending is false, then state.run_reply finished
+        //   approval         → 200 {status: pending_approval, approval_request_id: 77, finished: false}
+        //   error500         → 500; state.chat_status (a refusal status, as before) wins over a mode
+        $log = (string) getenv('FAKE_KERNEL_STATE') . '.chat';
+        $isPoll = ($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'GET' && isset($_GET['run']);
+        file_put_contents($log, json_encode(['agent' => $_GET['agent'] ?? null, 'acting' => $_SERVER['HTTP_X_ACTING_MEMBER'] ?? null, 'utterance' => $input['utterance'] ?? null,
+            'conversation_id' => $input['conversation_id'] ?? null, 'context' => $input['context'] ?? null, 'wait' => $input['wait'] ?? null, 'poll' => $isPoll ? (int) $_GET['run'] : null]) . "\n", FILE_APPEND);
+        $n = substr_count((string) @file_get_contents($log), "\n");
+        $mode = $state['chat_mode'] ?? 'reply';
+        if ($isPoll) {
+            $run = (int) $_GET['run'];
+            if (isset($state['run_status']) && $state['run_status'] === 404) { $out(['error' => ['code' => 'not_found', 'message' => 'No such run.']], 404); }
+            if (!empty($state['run_pending'])) { $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'running', 'finished' => false, 'reply' => '']); }
+            $out(['run_id' => $run, 'request_id' => 'req-' . $run, 'status' => 'succeeded', 'finished' => true, 'reply' => $state['run_reply'] ?? 'The run finished.', 'actions' => [], 'cost' => 0.0123, 'currency' => 'USD']);
+        }
         if (isset($state['chat_status'])) {
             $messages = [403 => 'This person may not use the expert.', 404 => 'No expert for this application.', 409 => 'The expert is busy with another turn.'];
             $out(['error' => ['code' => 'refused', 'message' => $state['chat_message'] ?? ($messages[(int) $state['chat_status']] ?? 'Refused.')]], (int) $state['chat_status']);
         }
-        $out(($state['chat'] ?? ['run_id' => 1, 'status' => 'succeeded', 'finished' => true, 'reply' => 'Hello from the fake expert', 'actions' => []])
-            + ['seen_acting_member' => $_SERVER['HTTP_X_ACTING_MEMBER'] ?? null, 'seen_agent' => $_GET['agent'] ?? null, 'seen_utterance' => $input['utterance'] ?? null]);
+        if ($mode === 'error500') { $out(['error' => ['code' => 'server_error', 'message' => 'The kernel stumbled.']], 500); }
+        if ($mode === 'running') { $out(['run_id' => 9000 + $n, 'request_id' => 'req-' . (9000 + $n), 'status' => 'running', 'finished' => false, 'reply' => ''], 202); }
+        if ($mode === 'approval') { $out(['run_id' => 9000 + $n, 'request_id' => 'req-' . (9000 + $n), 'status' => 'pending_approval', 'finished' => false, 'reply' => '', 'approval_request_id' => 77]); }
+        $answer = $state['chat'] ?? ['run_id' => 1, 'status' => 'succeeded', 'finished' => true, 'reply' => 'Hello from the fake expert', 'actions' => []];
+        if (isset($answer['reply'])) { $answer['reply'] = str_replace('{agent}', (string) ($_GET['agent'] ?? ''), (string) $answer['reply']); }
+        if (($answer['run_id'] ?? null) === 'n') { $answer['run_id'] = 9000 + $n; $answer['request_id'] = 'req-' . (9000 + $n); }
+        $out($answer + ['seen_acting_member' => $_SERVER['HTTP_X_ACTING_MEMBER'] ?? null, 'seen_agent' => $_GET['agent'] ?? null, 'seen_utterance' => $input['utterance'] ?? null]);
 }
 $out(['error' => ['code' => 'not_found', 'message' => 'No such internal endpoint.']], 404);
