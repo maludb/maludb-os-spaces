@@ -1,6 +1,6 @@
 # Spaces — CLAUDE.md
 
-This repository is the **Spaces** application of the MaluDB Business OS (`github.com/maludb/maludb-os-spaces`; local clone and
+This repository is the **Spaces** application of the MaluDB Business OS (`github.com/maludb/maludb-os-spaces`, public; local clone and
 install path `/srv/apps/spaces`; catalog key `spaces`; DNS label `spaces`). The kernel is `/var/www` (`maludb-os-core`); read its
 CLAUDE.md first — the kernel owns identity, the directory, the agents and approvals; this application owns the business's
 **collaborative workspace**: spaces, pages built from blocks, wikis, databases with views, channels with threads, and the
@@ -12,7 +12,7 @@ OS's agents as members of all of it (Notion and Slack in one, for people and age
    the tables, the block and rich-text formats, the property types), the question inventory with every tool named (§7),
    the kernel's part and the application's doors (§8), the screens (§9), the build order (§10), Extended (§11), what the
    kernel and siblings owe (§12), **the decisions the owner is asked for (§13)**, ports and files (§14), the owner's
-   answers (§15, once given), the state (§16).
+   answers (§15, all sixteen given 2026-10-05 and recorded as D1–D16 — rules, not questions), the state (§16).
 2. The plugin `maludb-os-integration` (`~/maludb-os-integration`, skill `os-integration` and its references:
    `memory.md`, `mcp-and-api.md`, `sign-on-and-directory.md`, `agents.md`, `roles-and-rights.md`, `sms-and-reads.md`,
    `registration.md`, `php-sign-on-kit.md`, `testing-without-a-kernel.md`) — how it fits.
@@ -72,7 +72,7 @@ OS's agents as members of all of it (Notion and Slack in one, for people and age
   asks. Smokes and fixtures are named `SMOKE <run>`; proofs run on a scratch database and never touch the installed
   application; the installer's `plan` (`php /var/www/bin/app_install.php plan /srv/apps/spaces`) runs at the end of every phase.
 
-## Build order and the handoff (proposed — design §13.16, to be confirmed by the owner)
+## Build order and the handoff (decided 2026-10-05 — design D16)
 
 The division General Ledger and Consultant Tracking used: a **planning-class model** builds what the database enforces, the
 specs and the exemplars; a **worker model (Sonnet 5.5)** replicates every other slice from a spec, stopping and escalating on any
@@ -81,8 +81,8 @@ mid-slice.
 
 **Before the handoff (planning-class model):**
 1. **K20** in the kernel (`/var/www`): a migration seeding the `spaces` catalog row (Operations / `communication` /
-   `feather-layers` / `high`), on the pattern of db/168; **K21** adds `spaces` to `bin/install_default_applications.sh` if the
-   owner makes it a default (design §13.3).
+   `feather-layers` / `high`), on the pattern of db/168; **K21** adds `spaces` to `bin/install_default_applications.sh` — Spaces is
+   the fourth default install (D3).
 2. **Phase 0, second half**: `db/001`–`0NN` — the mirror and roles (copied from Consultant Tracking, prefix `sp_`), settings,
    spaces and membership, pages and the permission tree, blocks and versions, databases, properties and views, channels,
    messages, threads and reactions, comments, mentions and notifications, favorites and recents, files, search, agents and
@@ -112,7 +112,7 @@ root, the owner runs it —, DNS and TLS for `spaces.<domain>`, the MaluMail key
 of design §10).
 
 **A worker's rules:** read this file, design §3 (rights and the permission tree), §5 (what pauses), §6 (the tables and the two
-formats — never modify a migration, add one), §15 (the decisions) and the slice's spec before touching a file; reads through
+formats — never modify a migration, add one), §15 (D1–D16) and the slice's spec before touching a file; reads through
 `mcp_*` views and the read functions, writes to base tables after the gate; the database's refusal is shown as a field error,
 never re-implemented in PHP; a message body or page text never in a payload; a question the spec does not answer stops the
 slice and is written into the spec's "Open questions" for the owner — never guessed.

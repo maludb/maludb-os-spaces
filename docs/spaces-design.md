@@ -15,7 +15,7 @@ design keeps or overturns by name.
 > worker model builds from. **Checkpoint.** This document and the owner's answers (§13, recorded in §15) are Phase 0's
 > first half; the schema in `db/`, `maludb-os.json`, `os/`, `skills/` and `deploy/` complete it. Phase 1 adds
 > `docs/spaces-mcp-tool-surface.md`, `docs/spaces-action-manifest.md` and the slice specs in `docs/build-specs/`. **No
-> feature PHP is written until the owner approves them together.** The decisions this document needs from the owner are §13.
+> feature PHP is written until the owner approves them together.** The decisions this document needed from the owner are §13, answered in §15 (2026-10-05).
 
 ## 0. The research — Notion and Slack, feature by feature, and what this design does with each
 
@@ -577,12 +577,32 @@ first; K21 is one line and a README row.
 - Kernel files: `mcp/registries/spaces.json` (made by the installer), the K20 catalog seed migration, the K21 installer line.
 - Proof scratch ports: 8401–8407.
 
-## 15. The owner's answers
+## 15. The owner's answers (2026-10-05 — rules, not questions)
 
-*(Awaiting the owner — §13's sixteen questions. Recorded here as D1–D16 when given, rules not questions.)*
+Every recommendation of §13 was taken, in one sitting, the same day the plan was written.
+
+| # | Decision | Where it lives |
+|---|---|---|
+| D1 | **"Spaces", catalog key `spaces`**, repository `maludb-os-spaces`, clone and install path `/srv/apps/spaces`, DNS label `spaces`, database `<tenant>_spaces`, roles `spaces_rw` / `_records_ro` / `_activity_ro`, SQL prefix `sp_` | `maludb-os.json`; §14 |
+| D2 | **Four roles**: Guest (`guest`, read, nothing by default), Member (`user`), Space owner, Spaces admin (is_admin); **the admin sees private spaces, logged** `space.admin_view` | §3; `sp_roles`; `app_roles` |
+| D3 | **A default of every install** (the fourth, K21), installed with `--grant-standing-departments`; the repository **public** | §10; `bin/install_default_applications.sh`; the org |
+| D4 | **Scope none**; departments are principals and `@handles`; seeded: **General** (open, default, agents join on hire) and one closed space per standing department | §3; db seeds |
+| D5 | **Three space kinds** — open, closed (join on request, the owner approves), private; default member level **edit**, everyone-level **view** on open spaces | §6; `spaces.kind`, `member_level`, `everyone_level` |
+| D6 | **The block model is Notion's, verbatim** (§0.3): 32 types, their content objects, the rich-text runs, fractional positions, UUID ids; `heading_4`, `tab`, `meeting_notes`, `transcription` stored as `unsupported` on import | §6; `blocks`; `app/richtext/` |
+| D7 | **Per-block optimistic saves** with a version; a stale save refused and reloaded; presence and a "changed — reload" banner every 10 s; **no CRDT** in v1 | §6; `blocks.version`; slice 3 |
+| D8 | **Databases**: every property type but `formula`, `button`, `place`; relations two-way and rollups (eight functions); six layouts; filters, sorts, groups, sub-groups; templates; linked views; **one database, one schema** | §6; slice 5 |
+| D9 | **Channels**: public/private in a space, DM and group DM (≤ 9) outside; one-level threads with also-send-to-channel; Unicode reactions; author-only edits; tombstone deletes; scheduled; reminders; pins and bookmarks; **retention per channel, off by default**; **polling** 3 s visible / 20 s hidden, no socket | §6; §8; slice 4 |
+| D10 | **Agents as members**: a mention or a DM = one chat-endpoint turn **as that agent, under the asker's identity**, the thread the conversation, the reply in the thread, never shouting; expert and Librarian hired on install into General; **the super-admin alone grants other agents Member** (no auto-join) | §5; `agent_dispatches`; `agents[]` |
+| D11 | **What pauses for an agent**: `external_send` for publishing and guest shares; `other` (pause by default) for `@channel`/`@here`/`@everyone`; `deletion` for pages, databases, channels, others' messages, trash purge, version restore; `other` for retention, space kind, settings, templates | §5; `approvals[]` |
+| D12 | **The wiki**: a space may be a wiki; owner = creator until changed; verification expiry default **6 months**; the Librarian reports Mondays and nudges owners once; **nothing hidden on expiry**; stale = 90 days; unanswered = 24 h (settings) | §6; `pages.wiki_*`; `sp_settings` |
+| D13 | **The public page** `/p/<token>`: subpages optional, `noindex` default, images through the door, a database as a read-only table or gallery; the admin publishes; no comments, no forms | §4; `page_publications` |
+| D14 | **Files**: 25 MB default; images, PDF, Office, text, Markdown, CSV, audio and video as files; HTML, SVG and executables refused; image thumbnails | §6; `attachments` |
+| D15 | **K20 first** (the catalog seed), **K21** (the default installer line), K22, K23, HD1/P2 **Extended**, each in its own repository | §12 |
+| D16 | **Ports** `APP_INTERNAL_PORT=8186`, `MCP_RECORDS_PORT=8833`, `MCP_ACTIVITY_PORT=8834` pinned before `apply`; **the Consultant Tracking division**: the planning model builds K20/K21, Phase 0's second half, Phase 1 for approval, Phase 2, slices 1–2 and **the two exemplars (3 the block editor, 4 channels)**; Sonnet 5.5 builds slices 5–9, Phase 4 and Phase 5 | §14; `CLAUDE.md` "Build order and the handoff" |
 
 ## 16. State
 
-**2026-10-05 — the plan written.** Notion and Slack researched (§0); the repository `maludb/maludb-os-spaces` created
-**private** in the org and cloned to `/srv/apps/spaces`; this document, `CLAUDE.md` and `README.md` committed; nothing
-built. **Next: the owner's answers to §13**, then K20 (and K21 if a default) in the kernel, then Phase 0's second half.
+**2026-10-05 — the plan written and approved.** Notion and Slack researched (§0); the repository `maludb/maludb-os-spaces`
+created in the org and cloned to `/srv/apps/spaces`; this document, `CLAUDE.md` and `README.md` committed; **the owner answered
+all sixteen questions of §13 the same day, every recommendation taken (§15, D1–D16)**; the repository made **public** (D3).
+**Next: K20 and K21 in the kernel, then Phase 0's second half.**

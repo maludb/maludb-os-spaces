@@ -16,10 +16,10 @@ and drafts pages; the shipped **Librarian** keeps the wiki honest (stale, orphan
 threads that should become pages). Publishing to the web, sharing to a guest, @channel, deleting and exporting pause for
 an agent; a person is never paused.
 
-A collaboration application installed beside [maludb-os-core](https://github.com/maludb/maludb-os-core); proposed as a
-**default of every install**, granted to every insider. Built with `htmx-php-builder`, fitted to `maludb-os-integration`
+A collaboration application installed beside [maludb-os-core](https://github.com/maludb/maludb-os-core) — **a default of every
+install** (the fourth, with HR, Projects and Help Desk), granted to every insider. Built with `htmx-php-builder`, fitted to `maludb-os-integration`
 0.6.0, served as `spaces.<domain>`; catalog key `spaces`.
 
-- **The plan:** `docs/spaces-design.md` (Phase 0, 2026-10-05 — awaiting the owner's answers to §13).
+- **The plan:** `docs/spaces-design.md` (Phase 0, 2026-10-05 — **approved**; the owner's sixteen decisions are §15, D1–D16).
 - **The build:** `CLAUDE.md` — the order, the rules, the handoff to the worker model.
-- Status: plan written; nothing built.
+- Status: approved plan; nothing built yet (K20/K21 in the kernel next, then Phase 0's second half).
