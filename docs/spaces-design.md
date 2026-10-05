@@ -267,6 +267,32 @@ editor). Every text field is the one **rich text** JSON of §0.3; `plain_text` i
 | Agents | `agent_dispatches` (message or page, agent member id, kind mention/dm/duty_proposal, chat run id, status pending/running/replied/failed, attempts, reply message id), `librarian_proposals` (kind thread_to_page/verify/orphan/duplicate, subject, proposed page id, status proposed/accepted/dismissed, by) | §5 |
 | Tokens | `mcp_access_tokens` | the contract's; a person's own, read-only |
 
+### 6.1 Tables against the estate — read, reuse, new (the shared-schema rule, 2026-10-05)
+
+The estate has one data model in many databases (`maludb-os-integration` 0.7.0, `shared-schema.md`). Every table above
+was decided against the seven sibling applications' `db/*.sql` before it was written; the definition of every reused table
+lives in THIS repository's migrations, so the installer creates it whether or not the sibling is installed. Spaces is the
+first application designed under the rule.
+
+| Table(s) | Decision | Source and what differs |
+|---|---|---|
+| `members`, `departments`, `department_members`, `sso_nonces`, `member_sessions`, `directory_sync_state` | **reuse** | the kernel contract (Consultant Tracking `db/001`); `members` **appends** `status_text`, `status_emoji`, `status_until`, `last_seen_at` (Slack's status and presence) |
+| `activity_log`, `activity_ingest_state` | **reuse** | `memory.md` / CT `db/002`; **appends** the audit keys `space_id`, `channel_id`, `message_id` and `entity_uuid` (pages, blocks, databases, views and comments are UUID-keyed — D6; `entity_id` stays for the bigint records) |
+| `mcp_access_tokens` | **reuse** | CT `db/003`, verbatim |
+| `sp_rights`, `sp_roles`, `sp_role_rights`, `mcp_app_roles` | **reuse** (shape) | CT `db/004` (`ct_` → `sp_`); the four roles of §3 |
+| `sp_settings` | **reuse** (skeleton) | the `app_settings` singleton skeleton (Help Desk `db/005`, txtSchedules `db/005`); the columns are this application's |
+| `attachments` | **reuse** | **GL `db/009` canonical** (`record_type`/`record_id`, `filename`, `mime_type`, `byte_size`, `sha256`, `storage_path`, `uploaded_by`); **appends** `record_uuid` (a block, page, comment or row — UUID records), `width`, `height`, `thumbnail_path`; **one deviation recorded**: `record_id` becomes nullable with `CHECK ((record_id IS NULL) <> (record_uuid IS NULL))`, because the canonical assumes bigint records — proposed as an appended optional key for the catalogue |
+| `notifications`, `notification_prefs`, `notification_outbox` | **reuse** | **GL `db/014` canonical**; `kind` lists are this application's; `notification_prefs` **appends** `digest` (Help Desk's) and `away_minutes`; **the outbox has no external-party column** — every recipient here is a member (a guest is a member), so `member_id` is NOT NULL and the pair CHECK is dropped; recorded as the substitution |
+| `agent_dispatches` | **reuse** | **GL `db/014` = CT `db/013` canonical**; `kind` widened to `mention`, `dm`, `duty_proposal`, `ask`; **appends** `record_uuid` (a page), `conversation_id` (the thread root), `reply_message_id` |
+| `comments` | **new** (recorded) | Projects' `comments` (bigint, on an issue, Markdown body) and Help Desk's `messages` (on a ticket) were compared: a Spaces comment is on a page or a block (UUID), threaded, with the one rich-text body — a different concept; the name is kept because every sibling's `comments` means "a comment on one of my records" and the shape is the record key + author + body + edited/deleted, as Projects' |
+| `messages` | **new** (recorded) | Help Desk's `messages` are a ticket's correspondence (public reply / internal note, email ids); a Spaces message is a channel message with a thread root. Same name, same family (author + body + edited_at + deleted_at + kind), different record key — recorded as a known sibling, not a reuse |
+| `search_index` | **new** | no sibling keeps one (Projects and the kernel index in place with `tsvector` columns); Spaces searches four entity kinds at once — it becomes canonical for a cross-entity index |
+| `pages`, `page_*`, `blocks`, `databases`, `database_views`, `row_relations`, `unique_id_sequences`, `channels`, `channel_*`, `dm_pairs`, `message_*`, `saved_messages`, `reminders`, `spaces`, `space_*`, `imports`, `exports`, `librarian_proposals`, `emoji_shortcodes` | **new** | nothing close in the estate (Help Desk's `articles`/`kb_sections` are its knowledge base — **read**, below; the kernel's retired `documents` is gone) — these become the canonical tables for pages, blocks and conversations |
+| Help Desk's `articles` and `kb_sections`, Projects' `issues`, Consultant Tracking's `engagements`, HR's employment, the ledger's parties | **read** | another application's data: reached through K7 when a sibling shares it (HD1/P2 `ticket_card`/`task_card` are Extended); Spaces never copies a row of them |
+
+**Owed to the catalogue** (`shared-schema.md` §4): `attachments` gains the optional `record_uuid` key; `messages` and `comments` are
+recorded as two shapes under one family; `search_index`, `pages`/`blocks` and `channels`/`messages` are Spaces' canonical tables.
+
 **Views**: `mcp_*` over every table above with `security_barrier`, the caller's visible sets (`sp_visible_page_ids()`,
 `sp_visible_channel_ids()`, `sp_visible_member_ids()`) computed once per statement; the reads that matter are **SQL
 functions** — `sp_page_tree(page)` (the block tree in order, children nested, one query — recursive CTE over `position`),
@@ -601,6 +627,31 @@ Every recommendation of §13 was taken, in one sitting, the same day the plan wa
 | D16 | **Ports** `APP_INTERNAL_PORT=8186`, `MCP_RECORDS_PORT=8833`, `MCP_ACTIVITY_PORT=8834` pinned before `apply`; **the Consultant Tracking division**: the planning model builds K20/K21, Phase 0's second half, Phase 1 for approval, Phase 2, slices 1–2 and **the two exemplars (3 the block editor, 4 channels)**; Sonnet 5.5 builds slices 5–9, Phase 4 and Phase 5 | §14; `CLAUDE.md` "Build order and the handoff" |
 
 ## 16. State
+
+**PHASE 0, SECOND HALF — BUILT and proven 2026-10-05.** The schema `db/001`–`017` (the kernel contract copied from Consultant Tracking
+with Spaces' appended columns; roles and rights; settings and the vocabularies; spaces with the department seeds; pages and the
+permission tree — sharing additive, restricting explicit, the admin full everywhere; blocks with fractional positions, optimistic
+versions, the structural rules, synced blocks, the child-page edges; databases with eighteen property types, two-way relations and
+computed rollups; channels, messages, threads, DMs, reactions, pins, reminders; comments; notifications, the outbox, files and
+agent dispatches on the estate's canonical shapes; the one search index; the read functions — tree, Markdown, rows, history,
+unread, feed, sidebar, the wiki and the Librarian's questions; templates, versions, imports, exports and the worker's passes; the
+`mcp_*` views) and `db/proof/phase0_proof.sql`: **281 checks green** on a scratch database — every actor of §2, the three space
+kinds, a page tree resolved for seven actors with inherited, restricted and private permissions, blocks between/nested/moved/
+split/merged, a stale save refused, a synced block read through its copy, every adopted block type rendered to Markdown, a
+database with every property type, a relation and four rollups, a view's filter/sort/group, four channel kinds, a thread, reactions,
+pins, unread, a tombstone, a mention dispatch and the agent's reply loop, comments resolved, snapshots and a restore, the trash and
+its purge, retention, the wiki's expiry, search with every modifier, templates, favorites, the public door, notifications and the
+outbox, files, and the views as the read roles. **The kit** copied from Consultant Tracking (`app/`, `html/`, `bin/`, `tests/`,
+`deploy/`, `mcp/`; `ct_` → `sp_`; the gates rewritten to the permission tree) is proven without a kernel by `tests/phase0/run.sh`:
+**18 checks green** (the fixture, a hand-off, replay, audience, unknown member, tampering, the refusals logged, the session listed,
+the guest, General's membership, the department spaces, the sign-out notice). `maludb-os.json` (five endpoints, two shares, two
+agents hired on install, 30 approval categories), `os/{expert,librarian}.md`, eight skills (four runbooks), `deploy/` templates and
+`ROOT_STEPS.sh`; **the installer's `plan` reads the repository clean** (32 steps, 8 notes; the catalog row K20 found; every approval
+covered). The shared-schema rule (§6.1) applied: every table marked read / reuse / new. Found on the way: the estate's
+`attachments` needs an optional UUID record key (proposed to the catalogue); PostgreSQL evaluates an uncorrelated subquery
+before a function beside it, so a proof that runs a pass and inspects it must do so in two statements.
+**Next: Phase 1 — `docs/spaces-mcp-tool-surface.md`, `docs/spaces-action-manifest.md`, `mcp/action_registry.json` and the slice
+specs, for the owner's checkpoint.**
 
 **2026-10-05 — the plan written and approved.** Notion and Slack researched (§0); the repository `maludb/maludb-os-spaces`
 created in the org and cloned to `/srv/apps/spaces`; this document, `CLAUDE.md` and `README.md` committed; **the owner answered

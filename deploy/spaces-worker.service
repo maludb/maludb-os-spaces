@@ -1,0 +1,10 @@
+[Unit]
+Description=Spaces worker: scheduled messages, reminders, the outbox (email, texts through the kernel) and digests, dispatches to agents, page snapshots, retention, trash purge, export expiry, the search index's catch-up (one pass)
+After=network.target postgresql.service
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory={{APP_DIR}}
+ExecStart=/usr/bin/php {{APP_DIR}}/bin/worker.php

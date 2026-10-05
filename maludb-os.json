@@ -1,0 +1,339 @@
+{
+  "schema": "maludb-os.application/1",
+  "catalog_key": "spaces",
+  "name": "Spaces",
+  "description": "The business's collaborative workspace — Notion and Slack in one, for people and for the OS's agents as members of the same rooms: spaces holding pages built from blocks, a wiki with owners and verification, databases with typed properties and six views (relations and rollups included), and channels with threads, reactions, pins, saved items, scheduled messages and reminders; direct and group messages; one search across all of it; page history; comments; a public page door; Markdown and Notion imports, Markdown/HTML/CSV exports. Agents are @mentioned and DM'd and answer in the thread through the kernel's chat endpoint; the Librarian keeps the wiki honest. A default of every install.",
+  "business_area": "Operations",
+  "category": "communication",
+  "icon": "feather-layers",
+  "version": "0.1.0",
+  "criticality": "high",
+  "vhost": {
+    "label": "spaces",
+    "document_root": "html",
+    "internal_port_env": "APP_INTERNAL_PORT"
+  },
+  "database": {
+    "suffix": "spaces",
+    "migrations": "db",
+    "roles": {
+      "rw": "spaces_rw",
+      "records_ro": "spaces_records_ro",
+      "activity_ro": "spaces_activity_ro"
+    }
+  },
+  "env": {
+    "required": [
+      "APP_NAME",
+      "APP_URL",
+      "DB_HOST",
+      "DB_PORT",
+      "DB_NAME",
+      "DB_USER",
+      "DB_PASSWORD",
+      "MCP_RECORDS_DB_USER",
+      "MCP_RECORDS_DB_PASSWORD",
+      "MCP_ACTIVITY_DB_USER",
+      "MCP_ACTIVITY_DB_PASSWORD",
+      "APP_INTERNAL_PORT",
+      "MCP_RECORDS_PORT",
+      "MCP_ACTIVITY_PORT",
+      "ACTION_TOKEN_KEY",
+      "ACTIONS_RELAY_KEY",
+      "OS_APPLICATION_TOKEN",
+      "OS_INTERNAL_URL",
+      "OS_LAUNCHER_URL",
+      "APP_KEY",
+      "MALUDB_API_URL",
+      "MALUDB_API_TOKEN"
+    ],
+    "optional": [
+      "MALUMAIL_API_KEY",
+      "MALUMAIL_API_URL",
+      "MAIL_FROM",
+      "MAIL_FROM_NAME",
+      "ATTACHMENT_MAX_BYTES",
+      "SP_PUBLIC_BASE_URL",
+      "SP_EMBED_HOSTS",
+      "API_CORS_ORIGINS"
+    ]
+  },
+  "services": [
+    "deploy/spaces-records-mcp.service",
+    "deploy/spaces-activity-mcp.service",
+    "deploy/spaces-activity-ingest.service",
+    "deploy/spaces-activity-ingest.timer",
+    "deploy/spaces-directory-sync.service",
+    "deploy/spaces-directory-sync.timer",
+    "deploy/spaces-worker.service",
+    "deploy/spaces-worker.timer"
+  ],
+  "endpoints": [
+    {
+      "name": "Web UI",
+      "kind": "ui",
+      "path": "/",
+      "auth_kind": "none",
+      "agent_reachable": false
+    },
+    {
+      "name": "Health",
+      "kind": "http_api",
+      "path": "/api/v1/health",
+      "auth_kind": "none",
+      "agent_reachable": false
+    },
+    {
+      "name": "Public page",
+      "kind": "ui",
+      "path": "/p/",
+      "auth_kind": "token",
+      "agent_reachable": false
+    },
+    {
+      "name": "Records MCP",
+      "kind": "mcp",
+      "path": "/mcp/records",
+      "auth_kind": "bearer",
+      "agent_reachable": true
+    },
+    {
+      "name": "Activity MCP",
+      "kind": "mcp",
+      "path": "/mcp/activity",
+      "auth_kind": "bearer",
+      "agent_reachable": true
+    }
+  ],
+  "actions": {
+    "manifest": "docs/spaces-action-manifest.md",
+    "registry": "mcp/action_registry.json",
+    "base_url_env": "APP_INTERNAL_PORT"
+  },
+  "skills": [
+    "skills/spaces-basics",
+    "skills/writing-pages",
+    "skills/talking-in-channels",
+    "skills/keeping-the-wiki",
+    "skills/monday-wiki-report",
+    "skills/thread-to-page",
+    "skills/answer-from-the-wiki",
+    "skills/summarise-a-channel"
+  ],
+  "sso": {
+    "path": "/sso",
+    "logout_path": "/sso/logout"
+  },
+  "directory": {
+    "reads": true,
+    "writes": false
+  },
+  "assistant": {
+    "command_bar": true,
+    "agent": "expert"
+  },
+  "shares": [
+    {
+      "tool": "pages_index",
+      "description": "The pages the requesting application's expert agent may see: id, title, space, path, last edited, verification; a search by title (os.spaces-pages/1)",
+      "scoped": false
+    },
+    {
+      "tool": "page_markdown",
+      "description": "One page as Markdown with its properties, as the requesting application's expert agent may see it (os.spaces-page/1)",
+      "scoped": false
+    }
+  ],
+  "reads": [],
+  "agents": [
+    {
+      "key": "expert",
+      "job_description": "os/expert.md",
+      "access_capability": "write",
+      "hired_on_install": true,
+      "roles": [
+        "user"
+      ],
+      "tool_grants": {
+        "Records MCP": [
+          "find_spaces",
+          "get_space",
+          "space_members",
+          "find_members",
+          "find_departments",
+          "get_settings",
+          "find_templates",
+          "page_tree",
+          "find_pages",
+          "page_read",
+          "get_page",
+          "backlinks",
+          "pages_changed_since",
+          "page_permissions",
+          "page_versions",
+          "page_version_read",
+          "page_diff",
+          "wiki_status",
+          "stale_pages",
+          "orphan_pages",
+          "duplicate_titles",
+          "broken_links",
+          "my_favorites",
+          "my_recents",
+          "trash",
+          "find_databases",
+          "get_database",
+          "database_rows",
+          "database_query",
+          "row_read",
+          "my_rows",
+          "rows_due",
+          "row_relations",
+          "find_channels",
+          "get_channel",
+          "channel_history",
+          "thread_read",
+          "my_unread",
+          "my_activity",
+          "my_saved",
+          "my_reminders",
+          "channel_pins",
+          "unanswered_questions",
+          "thread_candidates",
+          "my_scheduled",
+          "my_dms",
+          "search",
+          "page_comments",
+          "my_open_discussions",
+          "agents_here",
+          "librarian_proposals",
+          "records_search"
+        ],
+        "Activity MCP": [
+          "record_history",
+          "actor_timeline",
+          "recent_activity",
+          "who_touched",
+          "activity_search"
+        ],
+        "Actions MCP": [
+          "page_create",
+          "page_update",
+          "block_append",
+          "block_update",
+          "block_move",
+          "page_move",
+          "database_create",
+          "row_create",
+          "row_update",
+          "message_post",
+          "thread_reply",
+          "reaction_add",
+          "comment_add",
+          "comment_resolve",
+          "template_apply",
+          "page_favorite",
+          "reminder_set",
+          "page_publish",
+          "share_guest"
+        ]
+      },
+      "skills": [
+        "skills/spaces-basics",
+        "skills/writing-pages",
+        "skills/talking-in-channels",
+        "skills/answer-from-the-wiki",
+        "skills/summarise-a-channel"
+      ]
+    },
+    {
+      "key": "librarian",
+      "job_description": "os/librarian.md",
+      "access_capability": "write",
+      "hired_on_install": true,
+      "roles": [
+        "user"
+      ],
+      "duty": {
+        "name": "The Monday wiki report",
+        "schedule_cron": "30 6 * * 1"
+      },
+      "tool_grants": {
+        "Records MCP": [
+          "wiki_status",
+          "stale_pages",
+          "orphan_pages",
+          "duplicate_titles",
+          "broken_links",
+          "unanswered_questions",
+          "thread_candidates",
+          "get_page",
+          "page_read",
+          "backlinks",
+          "thread_read",
+          "channel_history",
+          "find_pages",
+          "find_spaces",
+          "find_channels",
+          "find_members",
+          "find_databases",
+          "database_rows",
+          "librarian_proposals",
+          "get_settings",
+          "records_search"
+        ],
+        "Activity MCP": [
+          "record_history",
+          "recent_activity"
+        ],
+        "Actions MCP": [
+          "page_create",
+          "block_append",
+          "message_post",
+          "thread_reply",
+          "comment_add",
+          "proposal_make",
+          "dm_open"
+        ]
+      },
+      "skills": [
+        "skills/spaces-basics",
+        "skills/keeping-the-wiki",
+        "skills/monday-wiki-report",
+        "skills/thread-to-page"
+      ]
+    }
+  ],
+  "approvals": [
+    {"action": "page_publish", "category": "external_send"},
+    {"action": "page_publish_rotate", "category": "external_send"},
+    {"action": "page_unpublish", "category": "external_send"},
+    {"action": "share_guest", "category": "external_send"},
+    {"action": "channel_guest_add", "category": "external_send"},
+    {"action": "export_space", "category": "external_send"},
+    {"action": "export_channel", "category": "external_send"},
+    {"action": "export_all", "category": "external_send"},
+    {"action": "channel_announce", "category": "other"},
+    {"action": "page_delete", "category": "deletion"},
+    {"action": "page_trash", "category": "deletion"},
+    {"action": "block_delete", "category": "deletion"},
+    {"action": "database_delete", "category": "deletion"},
+    {"action": "channel_archive", "category": "deletion"},
+    {"action": "channel_delete", "category": "deletion"},
+    {"action": "message_delete", "category": "deletion"},
+    {"action": "comment_delete", "category": "deletion"},
+    {"action": "trash_purge", "category": "deletion"},
+    {"action": "version_restore", "category": "deletion"},
+    {"action": "attachment_delete", "category": "deletion"},
+    {"action": "retention_set", "category": "other"},
+    {"action": "space_delete", "category": "other"},
+    {"action": "space_archive", "category": "other"},
+    {"action": "space_kind_set", "category": "other"},
+    {"action": "settings_save", "category": "other"},
+    {"action": "template_publish", "category": "other"},
+    {"action": "space_member_remove", "category": "other"},
+    {"action": "page_lock", "category": "other"},
+    {"action": "database_schema_save", "category": "other"},
+    {"action": "database_property_remove", "category": "other"}
+  ]
+}
