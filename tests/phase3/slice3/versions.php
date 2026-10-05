@@ -1,0 +1,60 @@
+<?php
+/** Proof — versions (spec "Proof", 5): v1 by hand, the history, the version page and its diff, restore snapshots the present then writes v3 = v1. */
+require __DIR__ . '/lib.php';
+$w = editor_world();
+$marco = as_member(27); $priya = as_member(26); $ann = as_member(29); $bea = as_member(28);
+[, $b] = act($marco, '/pages/save.php', ['title' => 'SMOKE Versioned', 'space' => $w['product'], 'markdown' => 'the first line']);
+$vp = (string) $b['record_id'];
+act($marco, '/blocks/append.php', ['page' => $vp, 'markdown' => "second line\n\nthird line"]);
+act($marco, '/pages/share-guest.php', ['page' => $vp, 'guest' => 29, 'level' => 'view']);
+
+echo "1. Save a version\n";
+$since = last_activity_id();
+[$c, $b] = act($marco, '/pages/versions/save.php', ['page' => $vp]);
+$v1 = (int) ($b['version_id'] ?? 0);
+ok($c === 200 && ($b['version_no'] ?? 0) === 1 && $v1 > 0 && ($b['did'] ?? '') === 'Saved version 1', 'version_save: v1');
+$log = activity('page.version_save', $since);
+ok(count($log) === 1 && json_decode((string) $log[0]['after'], true) == ['version_no' => 1, 'reason' => 'manual'] && $log[0]['entity_uuid'] === $vp, 'page.version_save logged (version_no, reason manual)');
+[$c, $b] = act($ann, '/pages/versions/save.php', ['page' => $vp]);
+ok($c === 403, 'Ann (view): 403');
+$blocks = root_blocks($vp);
+act($marco, '/blocks/update.php', ['block' => $blocks[1]['id'], 'version' => 1, 'content' => para('second line, changed')]);
+act($marco, '/blocks/delete.php', ['block' => $blocks[2]['id']]);
+act($marco, '/blocks/append.php', ['page' => $vp, 'markdown' => 'a fourth line']);
+
+echo "2. History and the version page\n";
+[$c, $d] = screen($marco, '/pages/' . $vp . '/history');
+ok($c === 200 && count($d['versions'] ?? []) === 1 && ($d['versions'][0]['version_no'] ?? 0) === 1, 'History lists v1');
+$r = page($marco, '/pages/' . $vp . '/history');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="version-save-btn"') && str_contains($r['body'], '/pages/' . $vp . '/versions/1') && str_contains($r['body'], 'Compare'), 'the history screen: Save a version, Open, Compare');
+$r = page($marco, '/pages/' . $vp . '/versions/1');
+ok($r['code'] === 200 && str_contains($r['body'], 'id="version-rendered"') && str_contains($r['body'], 'third line') && str_contains($r['body'], 'second line') && !str_contains(strip_tags(preg_replace('/<pre.*<\/pre>/s', '', $r['body'])), 'changed'), 'the version page renders the page as it was (the third line present, nothing of the change)');
+ok(str_contains($r['body'], 'sp-diff-del') && str_contains($r['body'], 'sp-diff-add') && preg_match('/id="version-changed">(\d+) lines differ/', $r['body'], $m) && (int) $m[1] >= 3, 'the diff marks the deleted and the added lines (' . ($m[1] ?? '?') . ' differ)');
+[$c, $d] = screen($marco, '/pages/' . $vp . '/versions/1');
+ok($c === 200 && ($d['version']['version_no'] ?? 0) === 1 && is_array($d['diff'] ?? null) && str_contains((string) $d['markdown'], 'third line') && ($d['against'] ?? '') === 'the present' && ($d['may']['restore'] ?? false) === true, 'the version screen as JSON: markdown, diff, may.restore');
+$r = page($marco, '/pages/' . $vp . '/versions/9');
+ok($r['code'] === 404, 'an unknown version: 404');
+$r = page($ann, '/pages/' . $vp . '/versions/1');
+ok($r['code'] === 200 && !str_contains($r['body'], 'id="version-restore-btn"'), 'Ann reads a version, with no Restore');
+$r = page($bea, '/pages/' . $vp . '/versions/1');
+ok($r['code'] === 404, 'Bea: 404');
+
+echo "3. Restore\n";
+$since = last_activity_id();
+[$c, $b] = act($priya, '/pages/versions/restore.php', ['version' => $v1]);
+ok($c === 403, 'Priya (edit, not full): 403');
+[$c, $b] = act($marco, '/pages/versions/restore.php', ['version' => $v1]);
+ok($c === 200 && ($b['version_no'] ?? 0) === 3 && ($b['did'] ?? '') === 'Restored version 1 as version 3', 'version_restore by the owner (full): v3');
+$vs = q('SELECT version_no, reason FROM page_versions WHERE page_id = CAST(:p AS uuid) ORDER BY version_no', ['p' => $vp]);
+ok(count($vs) === 3 && $vs[1]['reason'] === 'before_restore' && $vs[2]['reason'] === 'restore', 'v2 = before_restore (the present), v3 = restore');
+ok(array_column(root_blocks($vp), 'plain_text') === ['the first line', 'second line', 'third line'], 'the page is as v1 was');
+$v1md = (string) one('SELECT sp_version_markdown(:v)', ['v' => $v1]);
+$v3 = (int) one('SELECT id FROM page_versions WHERE page_id = CAST(:p AS uuid) AND version_no = 3', ['p' => $vp]);
+ok($v1md === (string) one('SELECT sp_version_markdown(:v)', ['v' => $v3]), 'v3 equals v1');
+$log = activity('page.version_restore', $since);
+ok(count($log) === 1 && json_decode((string) $log[0]['after'], true) == ['from_version' => 1, 'version_no' => 3], 'page.version_restore logged (from_version, version_no)');
+$r = page($marco, '/pages/' . $vp . '/versions/2?against=1');
+ok($r['code'] === 200 && str_contains($r['body'], 'compared with <strong>version 1</strong>'), '?against= compares two versions');
+$reg = json_decode(file_get_contents(dirname(__DIR__, 3) . '/mcp/action_registry.json'), true);
+ok(($reg['actions']['version_restore']['approval'] ?? '') === 'deletion' && ($reg['actions']['block_delete']['approval'] ?? '') === 'deletion' && ($reg['actions']['comment_delete']['approval'] ?? '') === 'deletion' && ($reg['actions']['attachment_delete']['approval'] ?? '') === 'deletion', 'the registry marks version_restore, block_delete, comment_delete and attachment_delete as deletion');
+finish();

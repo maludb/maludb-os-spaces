@@ -23,6 +23,7 @@ elseif (preg_match('#^/p/([a-f0-9]{48})/(' . $UUID . ')$#', $path, $m)) { $set([
 elseif (preg_match('#^/files/([0-9]+)$#', $path, $m)) { $set(['id' => $m[1]]); $target = '/files.php'; }
 elseif (preg_match('#^/files/([0-9]+)/thumb$#', $path, $m)) { $set(['id' => $m[1], 'thumb' => '1']); $target = '/files.php'; }
 elseif (preg_match('#^/(.+)/([0-9]+)/([a-z_-]+)$#', $path, $m) && is_file($root . '/' . $m[1] . '/' . $m[3] . '.php')) { $target = '/' . $m[1] . '/' . $m[3] . '.php'; $set(['id' => $m[2]]); }
+elseif (preg_match('#^/pages/(' . $UUID . ')/versions/([0-9]+)$#', $path, $m)) { $target = '/pages/versions/view.php'; $set(['id' => $m[1], 'version' => $m[2]]); }
 elseif (preg_match('#^/(pages|databases)/(' . $UUID . ')/([a-z_-]+)$#', $path, $m)) { $target = '/' . $m[1] . '/' . $m[3] . '.php'; $set(['id' => $m[2]]); }
 elseif (preg_match('#^/(pages|databases)/(' . $UUID . ')$#', $path, $m)) { $target = '/' . $m[1] . '/view.php'; $set(['id' => $m[2]]); }
 elseif (isset($map[$rel])) { $target = $map[$rel]; }

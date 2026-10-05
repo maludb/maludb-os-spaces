@@ -46,7 +46,7 @@ mkblock($eb, 'unsupported', ['original_type' => 'whiteboard']);
 $child = (string) $b['record_id'];
 
 echo "1. The reader renders every block type\n";
-$r = page($marco, '/pages/' . $eb);
+$r = page($marco, '/pages/' . $eb . '?reader=1');   // since slice 3 an editor gets the editor; ?reader=1 asks for the reader
 $h = $r['body'];
 ok($r['code'] === 200 && str_contains($h, 'id="page-body"') && str_contains($h, 'id="page-title">SMOKE Every block<'), 'the page renders with its title');
 ok(preg_match('/<h2[^>]*id="h-' . $h1 . '"[^>]*>Heading one<\/h2>/', $h) === 1 && str_contains($h, '<details') && str_contains($h, 'Heading two'), 'headings (a toggleable one as details)');

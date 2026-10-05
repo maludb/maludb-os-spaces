@@ -1,0 +1,87 @@
+<?php
+/** Proof — widgets (spec "Proof", 4): uploads (thumbnail, nosniff, the gate), refused types and sizes, synced blocks, tables gaining a column. */
+require __DIR__ . '/lib.php';
+$w = editor_world();
+$marco = as_member(27); $ann = as_member(29); $priya = as_member(26); $bea = as_member(28);
+[, $b] = act($marco, '/pages/save.php', ['title' => 'SMOKE Widgets', 'space' => $w['product']]);
+$sp = (string) $b['record_id'];
+act($marco, '/pages/share-guest.php', ['page' => $sp, 'guest' => 29, 'level' => 'view']);
+pdo()->exec("SELECT set_config('app.member_id', '27', false)");   // the proof's own reads through the MCP views are Marco's
+
+echo "1. An image uploaded\n";
+[, $b] = act($marco, '/blocks/insert.php', ['page' => $sp, 'type' => 'image']);
+$img = (string) $b['record_id'];
+$since = last_activity_id();
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('pic.png', png_bytes(40, 30)), 'My Picture.png', 'image/png');
+$aid = (int) ($b['attachment']['attachment_id'] ?? 0);
+ok($c === 200 && $aid > 0 && ($b['attachment']['width'] ?? 0) === 40 && ($b['attachment']['height'] ?? 0) === 30 && ($b['attachment']['has_thumbnail'] ?? false) === true && ($b['attachment']['mime_type'] ?? '') === 'image/png', 'file_upload on an image block: width 40, height 30, a thumbnail');
+$content = json_decode(block_row($img)['content'], true);
+ok(($content['attachment_id'] ?? 0) === $aid && ($content['url'] ?? '') === '/files/' . $aid && str_contains((string) $b['html'], 'src="/files/' . $aid . '"'), 'the block\'s content gained attachment_id and url; the HTML shows it');
+$row = q('SELECT storage_path, thumbnail_path, sha256, filename FROM attachments WHERE id = :id', ['id' => $aid])[0];
+ok(is_file(dirname(__DIR__, 3) . '/storage/' . $row['storage_path']) && is_file(dirname(__DIR__, 3) . '/storage/' . $row['thumbnail_path']) && $row['sha256'] === hash('sha256', png_bytes(40, 30)) && $row['filename'] === 'My Picture.png', 'the file and its thumbnail are on disk under storage/attachments; the sha256 matches');
+$log = activity('attachment.add', $since);
+$after = json_decode((string) $log[0]['after'], true);
+ok(count($log) === 1 && $after['attachment_id'] === $aid && $after['record_type'] === 'block' && $after['mime_type'] === 'image/png' && $log[0]['entity_uuid'] === $img, 'attachment.add logged with the facts');
+$r = page($marco, '/files/' . $aid);
+ok($r['code'] === 200 && str_contains($r['headers'] ?? '', 'X-Content-Type-Options: nosniff') && str_contains($r['headers'] ?? '', 'Content-Type: image/png') && str_contains($r['headers'] ?? '', 'inline') && strlen($r['body']) === strlen(png_bytes(40, 30)), 'served through /files/{id}: nosniff, image/png inline, the bytes');
+$r = page($marco, '/files/' . $aid . '/thumb');
+ok($r['code'] === 200 && str_contains($r['headers'] ?? '', 'Content-Type: image/jpeg'), '/files/{id}/thumb is a JPEG');
+$r = page($ann, '/files/' . $aid);
+ok($r['code'] === 200, 'Ann (view) may see it');
+act($marco, '/pages/unshare.php', ['page' => $sp, 'guest' => 29]);
+$r = page($ann, '/files/' . $aid);
+ok($r['code'] === 404, 'and not once she loses view: 404');
+$r = req('GET', '/files/' . $aid);
+ok($r['code'] === 401, 'anonymous: 401, never a redirect');
+
+echo "2. Refused files\n";
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('bad.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'), 'bad.svg', 'image/svg+xml');
+ok($c === 422 && str_contains(msg($b), 'HTML, SVG and programs are not accepted'), 'an SVG: 422 in words');
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('run.exe', "MZ\x90\x00" . str_repeat("\0", 64)), 'run.exe', 'application/octet-stream');
+ok($c === 422 && str_contains(msg($b), 'not accepted'), 'an .exe: 422');
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('page.html', '<html><body>x</body></html>'), 'page.html', 'text/html');
+ok($c === 422, 'HTML: 422');
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('fake.png', '<html><body>x</body></html>'), 'fake.png', 'image/png');
+ok($c === 422, 'HTML named .png (finfo decides): 422');
+pdo()->exec("UPDATE sp_settings SET max_attachment_bytes = 1048576 WHERE id = 1");
+[$c, $b] = upload($marco, '/files/upload.php', ['block' => $img], proof_file('big.txt', str_repeat('a', 1048577)), 'big.txt', 'text/plain');
+ok($c === 422 && msg($b) === 'A file is at most 1 MB.', 'over the workspace\'s limit: 422 in words');
+pdo()->exec("UPDATE sp_settings SET max_attachment_bytes = 26214400 WHERE id = 1");
+[$c, $b] = upload($ann, '/files/upload.php', ['block' => $img], proof_file('pic2.png', png_bytes()), 'pic2.png', 'image/png');
+ok($c === 404, 'Ann (no view now): 404');
+[$c, $b] = upload($priya, '/files/upload.php', ['page' => $sp], proof_file('cover.png', png_bytes(100, 20)), 'cover.png', 'image/png');
+$cover = (int) ($b['attachment']['attachment_id'] ?? 0);
+ok($c === 200 && (int) one('SELECT cover_attachment_id FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $sp]) === $cover, 'a cover on the page (Priya, edit)');
+[$c, $b] = act($marco, '/files/delete.php', ['attachment' => $cover]);
+ok($c === 200 && one('SELECT cover_attachment_id FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $sp]) === null && one('SELECT count(*) FROM attachments WHERE id = :a', ['a' => $cover]) == 0, 'attachment_delete removes the cover and the row');
+[$c, $b] = act($marco, '/files/delete.php', ['attachment' => $aid]);
+ok($c === 200 && !isset(json_decode(block_row($img)['content'], true)['attachment_id']) && !is_file(dirname(__DIR__, 3) . '/storage/' . $row['storage_path']), 'deleting the image\'s file clears the block and removes the file');
+
+echo "3. Synced blocks\n";
+[, $b] = act($marco, '/blocks/insert.php', ['page' => $sp, 'type' => 'synced_block']);
+$orig = (string) $b['record_id'];
+act($marco, '/blocks/append.php', ['page' => $sp, 'markdown' => "synced one\n\nsynced two", 'parent' => $orig]);
+[, $b] = act($marco, '/pages/save.php', ['title' => 'SMOKE Synced target', 'space' => $w['general']]);
+$tg = (string) $b['record_id'];
+[$c, $b] = act($marco, '/blocks/insert.php', ['page' => $tg, 'type' => 'synced_block', 'synced_from' => $orig]);
+$copy = (string) ($b['record_id'] ?? '');
+ok($c === 200 && block_row($copy)['synced_from'] === $orig && str_contains((string) $b['html'], 'synced one') && str_contains((string) $b['html'], 'synced two'), 'a synced copy on a General page renders the original\'s children');
+$r = page($bea, '/pages/' . $tg);
+ok($r['code'] === 200 && str_contains($r['body'], 'A synced block you cannot see') && !str_contains($r['body'], 'synced one'), 'Bea (not in Product) sees "cannot see" for the copy');
+[$c, $b] = act($marco, '/blocks/insert.php', ['page' => $tg, 'type' => 'synced_block', 'synced_from' => $copy]);
+ok($c === 422 && msg($b) === 'A synced block copies an original synced block', 'a copy of a copy: the sentence');
+ok(str_contains(page_md($tg), 'synced one'), 'the Markdown of the target page carries the synced words');
+
+echo "4. A table gains a column on every row\n";
+[, $b] = act($marco, '/blocks/append.php', ['page' => $sp, 'markdown' => "| a | b |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |"]);
+$tbl = (string) $b['block_ids'][0];
+[$c, $b] = act($marco, '/blocks/table-column.php', ['block' => $tbl, 'at' => 1]);
+$rows = children_of($tbl);
+$cells = array_map(fn ($r) => count(json_decode(block_row($r['id'])['content'], true)['cells']), $rows);
+ok($c === 200 && ($b['rows'] ?? 0) === 3 && $cells === [3, 3, 3] && json_decode(block_row($tbl)['content'], true)['table_width'] === 3, 'three rows, each three cells, table_width 3');
+ok(json_decode(block_row($rows[0]['id'])['content'], true)['cells'][1] === [] && json_decode(block_row($rows[0]['id'])['content'], true)['cells'][2][0]['plain_text'] === 'b', 'the new cell sits at index 1');
+[$c, $b] = act($marco, '/blocks/table-column.php', ['block' => $orig]);
+ok($c === 422 && msg($b) === 'Only a table gains a column.', 'not on a synced block');
+[$c, $b] = act($marco, '/blocks/update.php', ['block' => $rows[0]['id'], 'version' => block_row($rows[0]['id'])['version'], 'content' => json_encode(['cells' => [rt('A'), rt('B'), rt('C')]])]);
+ok($c === 200 && str_contains((string) $b['html'], 'data-cell="2"'), 'a row saved with three cells renders editable cells');
+finish();

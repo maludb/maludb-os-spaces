@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T17:27:28+00:00",
+    "generated_at": "2026-10-05T18:04:12+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -265,7 +265,7 @@
             "params": [
                 "against"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "channel-browse": {
@@ -1919,7 +1919,7 @@
             "approval": null,
             "log_event": "block.append",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "block_insert": {
             "action": "block_insert",
@@ -1968,7 +1968,7 @@
             "approval": null,
             "log_event": "block.insert",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "block_update": {
             "action": "block_update",
@@ -2011,7 +2011,7 @@
             "approval": null,
             "log_event": "block.update",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "block_move": {
             "action": "block_move",
@@ -2042,7 +2042,7 @@
             "approval": null,
             "log_event": "block.move",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "block_delete": {
             "action": "block_delete",
@@ -2061,7 +2061,7 @@
             "approval": "deletion",
             "log_event": "block.delete",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "version_save": {
             "action": "version_save",
@@ -2080,7 +2080,7 @@
             "approval": null,
             "log_event": "page.version_save",
             "who": "edit",
-            "built": false
+            "built": true
         },
         "version_restore": {
             "action": "version_restore",
@@ -2099,7 +2099,7 @@
             "approval": "deletion",
             "log_event": "page.version_restore",
             "who": "full",
-            "built": false
+            "built": true
         },
         "comment_add": {
             "action": "comment_add",
@@ -2136,7 +2136,7 @@
             "approval": null,
             "log_event": "comment.add",
             "who": "comment",
-            "built": false
+            "built": true
         },
         "comment_edit": {
             "action": "comment_edit",
@@ -2161,7 +2161,7 @@
             "approval": null,
             "log_event": "comment.edit",
             "who": "own",
-            "built": false
+            "built": true
         },
         "comment_resolve": {
             "action": "comment_resolve",
@@ -2186,7 +2186,7 @@
             "approval": null,
             "log_event": "comment.resolve",
             "who": "comment",
-            "built": false
+            "built": true
         },
         "comment_delete": {
             "action": "comment_delete",
@@ -2205,7 +2205,7 @@
             "approval": "deletion",
             "log_event": "comment.delete",
             "who": "own or full",
-            "built": false
+            "built": true
         },
         "file_upload": {
             "action": "file_upload",
@@ -2260,7 +2260,7 @@
             "approval": null,
             "log_event": "attachment.add",
             "who": "edit on the page or channel on the message",
-            "built": false
+            "built": true
         },
         "attachment_delete": {
             "action": "attachment_delete",
@@ -2279,7 +2279,7 @@
             "approval": "deletion",
             "log_event": "attachment.delete",
             "who": "edit on the page or own message",
-            "built": false
+            "built": true
         },
         "channel_create": {
             "action": "channel_create",

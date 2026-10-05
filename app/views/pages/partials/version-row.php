@@ -5,5 +5,5 @@
     <td><span class="badge bg-soft-secondary text-secondary"><?= e(str_replace('_', ' ', (string) $v['reason'])) ?></span></td>
     <td class="d-none d-md-table-cell fs-12 text-muted"><?= e($v['saved_by_name'] ?? 'the worker') ?></td>
     <td class="d-none d-md-table-cell fs-12 text-muted"><?= (int) $v['text_length'] ?> chars</td>
-    <td class="text-end fs-12 text-muted">open · restore <span class="fs-11">(slice 3)</span></td>
+    <td class="text-end text-nowrap"><?= hx_link('/pages/' . (string) $p['page_id'] . '/versions/' . (int) $v['version_no'], 'Open', 'btn btn-light btn-sm btn-touch', 'id="version-' . (int) $v['version_no'] . '-open-btn"') ?> <?= hx_link('/pages/' . (string) $p['page_id'] . '/versions/' . (int) $v['version_no'] . '?against=' . max(1, (int) $v['version_no'] - 1), 'Compare', 'btn btn-light btn-sm btn-touch', 'id="version-' . (int) $v['version_no'] . '-compare-btn"') ?></td>
 </tr>

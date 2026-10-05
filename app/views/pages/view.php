@@ -5,7 +5,7 @@
     </div>
     <div class="page-header-right ms-auto d-flex align-items-center gap-2">
         <?php if ($may['edit']): ?><?= hx_link(with_back('/pages/' . $pid . '/edit', $here), '<i class="feather-edit-2 me-1"></i>Edit title', 'btn btn-light btn-touch d-none d-sm-inline-flex', 'id="page-view-edit-btn"') ?><?php endif; ?>
-        <?= view('pages/partials/page-menu.php', ['p' => $p, 'may' => $may, 'pub' => $pub, 'here' => $here]) ?>
+        <?= view('pages/partials/page-menu.php', ['p' => $p, 'may' => $may, 'pub' => $pub, 'here' => $here, 'editor' => !empty($editor)]) ?>
     </div>
 </div>
 <?php if (($b = back_link()) !== null): ?><div class="px-3 pb-2"><?= hx_link($b[0], '<i class="feather-arrow-left me-1"></i>Back to ' . e($b[1]), 'fs-12 fw-semibold', 'id="page-view-back"') ?></div><?php endif; ?>
@@ -32,7 +32,10 @@
             <span class="text-muted ms-auto" id="page-edited">edited <?= e(format_ts($p['last_edited_at'], $tz, 'M j, g:i A')) ?><?= $p['editor_name'] ? ' by ' . e($p['editor_name']) : '' ?></span>
         </div>
         <?php if ($p['is_row']): ?><div class="alert alert-light border fs-12" id="page-row-note">A row of a database — its properties panel is slice 5's.</div><?php endif; ?>
-        <div class="sp-body" id="page-body"><?= $bodyHtml !== '' ? $bodyHtml : '<p class="text-muted" id="page-body-empty">An empty page' . ($may['edit'] ? ' — the editor is slice 3; until then, a page starts from its form' : '') . '.</p>' ?></div>
-        <?php if ($p['open_comment_count'] > 0): ?><div class="fs-12 text-muted mt-3" id="page-comments-count"><i class="feather-message-square me-1"></i><?= (int) $p['open_comment_count'] ?> open discussion<?= $p['open_comment_count'] === 1 ? '' : 's' ?> (slice 3 shows them)</div><?php endif; ?>
+        <?php if (!empty($editor)): ?><?= $bodyHtml ?><?php else: ?><div class="sp-body" id="page-body"><?= $bodyHtml !== '' ? $bodyHtml : '<p class="text-muted" id="page-body-empty">An empty page.</p>' ?></div><?php endif; ?>
+        <?php if (empty($editor) && $may['comment']): ?><link rel="stylesheet" href="/assets/css/editor.css"><script src="/assets/js/editor.js" defer></script><?php endif; ?>
+        <div class="d-flex flex-wrap gap-2 align-items-center mt-3 fs-12" id="page-comments-bar">
+            <?php if ($may['comment'] || $p['open_comment_count'] > 0): ?><button type="button" class="btn btn-light btn-sm btn-touch sp-open-comments" id="page-comments-btn" data-page="<?= e($pid) ?>"><i class="feather-message-square me-1"></i><?= (int) $p['open_comment_count'] ?> open discussion<?= $p['open_comment_count'] === 1 ? '' : 's' ?></button><?php endif; ?>
+        </div>
     </div></article>
 </div>

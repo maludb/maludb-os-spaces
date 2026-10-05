@@ -178,4 +178,32 @@ page "Runbook" with every block type (the Phase 0 proof's list); a private page 
   (the handle menu replaces drag), the pane as a full page; every control ≥ 44 px, `scrollWidth` = viewport, no console errors; JavaScript off → the reader
   and the notice.
 
+## Built and proven (2026-10-05)
+Built exactly as the Files list says: `app/richtext/markdown.php` (`markdown_to_blocks()`, `markdown_inline_runs()` — every adopted type in, `[[Page]]` and `@Name`
+resolved through the caller's views, a bare URL an embed on an allowed host else a bookmark, `<details>` a toggle, `> [!NOTE]` a callout, a pipe table a table with
+rows, nesting by indentation), `app/richtext/diff.php` (`line_diff()`, LCS), the renderer's editor mode (`render_blocks(['editor' => true])`: every block carries
+`data-type/version/parent/position/synced-from`, every text region is a `contenteditable` span of `<span data-run>` runs with mentions and equations atomic, a code
+block's `<code>` and a table's cells editable, **list items as blocks of their own** — no `<ul>` in the editor, the bullet and the number by CSS counters — so a swap
+never changes the tree), `app/features/blocks/{handler,queries,write}.php` (`StaleBlock` → 409 `{error: {code: stale, version, html}}`; `block_html()` renders a
+row as its table), `app/features/comments/{queries,write}.php`, `app/features/files/{store,queries}.php` (finfo decides, the allow-list, the workspace limit, sha256,
+a GD thumbnail, nosniff), the 21 controllers (`html/blocks/*`, `html/pages/versions/*`, `html/pages/comments/*` + the pane, `mentions.php`, `presence.php`,
+`html/files/*` + the door), the views (the editor branch of `page-view`, the slash menu, the mention picker, the stale box, presence, the comment pane and one
+discussion, `version.php` with `diff.php`), `html/assets/js/editor.js` (635 lines, vanilla + SortableJS with `forceFallback` so a phone and a proof drag alike),
+`editor.css`; the vhost and the dev router learned `/pages/{id}/versions/{n}`; the registry builder learned that URL. **Decisions taken in the build:** one request at
+a time per block in the editor (a per-block promise chain — a debounced save never overtakes the type change that followed it); Backspace into a block that holds no
+children (a plain heading) lands the children right after it at its level, else under it; Enter on an empty list item leaves the list; `?reader=1` shows an editor the
+reader ("Read as a reader" in the page menu — printing, proofs); a `table_row`'s reply is its table's HTML (the editor finds the `<tr>`); a comment notifies with kind
+`comment` (the mention row is what makes it reach the mentioned); `presence.php` also sets `last_seen_at`; `block_insert` takes `synced_from` for a copy. **Proof**
+`tests/phase3/slice3/run.sh` — **232 checks green** (convert 37, save 25, structure 24, widgets 26, versions 19, comments 29, presence 12, json 27, browser 33) plus
+the registry and approvals checks: every box above — the every-type Runbook round-trips byte for byte, mentions and embeds and tables from Markdown, the version
+with every save and 409 `stale` with the current HTML, locked and trashed in words, a reader 403, `edit_content` on a row but not its database, split/merge/
+nest/un-nest/the database's sentences/drag positions/append after a block/delete with the count, an image with its thumbnail through `/files/{id}` with nosniff and
+refused to Ann once she loses view, SVG/.exe/HTML/mis-named refused in words, the workspace's limit, a cover, a synced copy on another page and "cannot see" for Bea,
+a table gaining a column on every row, v1 → History → the version page and its diff → restore (v2 `before_restore`, v3 = v1), the deletion category in the registry,
+an inline comment with a mention telling Marco, one level, resolve and reopen, the author's edit, own and `full` deletes, the pane and its JSON, two sessions seeing
+each other and a save as "changed by", the stale box in the browser, every action under an action token answering the contract, the expert appending and refused in
+words, the editor at 1280 (typing saves with the version, the slash menu, a Markdown shortcut, the @ picker, Enter, Backspace, Tab, drag, the comment pane) and at 375
+(the handle menu moving a block, comments as a card, the version page), JavaScript off the reader and the notice. The registry reads 25 screens and 58 actions built.
+Screenshots `/tmp/sp-shots-s3/`. Slice 2's read proof asks for `?reader=1`.
+
 ## Open questions

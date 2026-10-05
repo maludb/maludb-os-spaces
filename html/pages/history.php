@@ -13,4 +13,5 @@ log_screen_view($pdo, 'page-history');
 if (wants_json()) {
     respond_screen(['page' => present_page($p), 'versions' => array_map('present_version', $rows)]);
 }
-render_screen('History of ' . ($p['plain_title'] ?: 'the page'), view('pages/history.php', ['p' => $p, 'rows' => $rows, 'here' => here_url(), 'tz' => member_timezone()]), ['activeNav' => 'pages', 'screen' => 'page-history', 'entity' => 'page', 'recordId' => $id]);
+$maySave = PAGE_LEVELS[$p['my_level']] >= PAGE_LEVELS[$p['parent_database_id'] !== null ? 'edit_content' : 'edit'] && $p['archived_at'] === null;
+render_screen('History of ' . ($p['plain_title'] ?: 'the page'), view('pages/history.php', ['p' => $p, 'rows' => $rows, 'maySave' => $maySave, 'here' => here_url(), 'tz' => member_timezone(), 'notice' => sp_notice($_GET['notice'] ?? null, ['saved' => ['success', 'Saved a version.'], 'restored' => ['success', 'Restored.']])]), ['activeNav' => 'pages', 'screen' => 'page-history', 'entity' => 'page', 'recordId' => $id]);

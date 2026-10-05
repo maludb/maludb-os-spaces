@@ -1,0 +1,44 @@
+/* editor.css — the block editor (slice 3, the first exemplar): loaded by the editor view only. */
+.sp-editor-body .rt-block { position: relative; }
+.sp-editor-body .ed-text, .sp-editor-body .ed-cell, .sp-editor-body [data-ed-code] { outline: none; min-height: 1.4em; display: block; }
+.sp-editor-body .ed-inline { display: inline-block; min-width: 2ch; }
+.sp-editor-body .ed-text:focus, .sp-editor-body .ed-cell:focus, .sp-editor-body [data-ed-code]:focus { background: rgba(52,84,209,.04); border-radius: .25rem; }
+.sp-editor-body .ed-text:empty::before, .sp-editor-body .ed-text[data-empty]::before { content: attr(data-placeholder); color: #adb5bd; }
+.sp-editor-body .ed-bold { font-weight: 700; } .sp-editor-body .ed-italic { font-style: italic; } .sp-editor-body .ed-underline { text-decoration: underline; } .sp-editor-body .ed-strikethrough { text-decoration: line-through; } .sp-editor-body .ed-code { font-family: ui-monospace, monospace; background: #f1f1ef; border-radius: .2rem; padding: 0 .2rem; }
+.sp-editor-body .ed-link { color: var(--bs-primary, #3454d1); text-decoration: underline; }
+.sp-editor-body .ed-mention { cursor: default; user-select: all; }
+.sp-block-tools { position: absolute; left: -3.25rem; top: .1rem; display: none; gap: .1rem; }
+.sp-editor-body .rt-block:hover > .sp-block-tools, .sp-editor-body .rt-block.sp-focused > .sp-block-tools { display: flex; }
+.sp-block-tools button { width: 1.5rem; height: 1.5rem; border: 0; background: transparent; color: #adb5bd; border-radius: .25rem; font-size: .9rem; line-height: 1; padding: 0; cursor: grab; }
+.sp-block-tools button:hover { background: #eef0f3; color: #495057; }
+.sp-block-tools .sp-add-btn { cursor: pointer; }
+.sp-editor { padding-left: 3.25rem; }
+@media (max-width: 767.98px) { .sp-editor { padding-left: 0; } .sp-block-tools { position: static; display: flex; margin-top: .25rem; } .sp-block-tools button { width: 2.75rem; height: 2.75rem; font-size: 1.1rem; background: #f1f1ef; } .sp-editor-body .rt-block { margin-bottom: .75rem; } }
+.sp-slash-menu, .sp-mention-picker, .sp-handle-menu { position: absolute; z-index: 1050; min-width: 16rem; max-width: 90vw; max-height: 18rem; overflow-y: auto; }
+.sp-slash-item, .sp-mention-item { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+.sp-slash-item.active, .sp-mention-item.active { background: rgba(52,84,209,.08); }
+.sp-stale-box textarea { font-size: .85rem; }
+.sp-presence .avatar-sm { width: 1.75rem; height: 1.75rem; font-size: .7rem; }
+.sp-comment-marker { position: absolute; right: -2.25rem; top: .1rem; width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 0; background: #fbf3db; color: #b28900; font-size: .7rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+@media (max-width: 767.98px) { .sp-comment-marker { position: static; margin-left: .5rem; } }
+.sp-editor-body .rt-block.sp-drag-ghost { opacity: .4; }
+.sp-editor-body .ed-children:empty { min-height: .25rem; }
+.sp-editor-tail { margin-top: .5rem; }
+.sp-editor-body .rt-columns .rt-column-box { min-height: 3rem; border: 1px dashed rgba(0,0,0,.08); border-radius: .375rem; padding: .25rem; }
+.sp-editor-body figure.rt-image.ed-empty, .sp-editor-body .rt-file.ed-empty { border: 1px dashed #ced4da; border-radius: .375rem; padding: 1rem; text-align: center; color: #6c757d; }
+.sp-widget-tools { display: flex; gap: .5rem; margin-top: .25rem; }
+.sp-diff { font-size: .8rem; line-height: 1.5; overflow-x: auto; max-height: 70vh; }
+.sp-diff-line { padding: 0 .75rem; white-space: pre-wrap; }
+.sp-diff-add { background: #e6f4ea; } .sp-diff-del { background: #fdecea; text-decoration: line-through; color: #8a1c1c; }
+.sp-diff-op { display: inline-block; width: 1.25rem; color: #adb5bd; }
+.sp-comment { padding: .25rem 0; } .sp-comment-reply { margin-left: 2rem; } .sp-resolved { opacity: .7; }
+.sp-handle-menu .list-group-item { min-height: 44px; display: flex; align-items: center; cursor: pointer; }
+/* list items in the editor are blocks of their own: the bullet and the number by CSS */
+.sp-editor-body .ed-item { position: relative; padding-left: 1.5rem; }
+.sp-editor-body .ed-item.rt-bulleted_list_item::before { content: "•"; position: absolute; left: .45rem; top: 0; }
+.sp-editor-body .rt-block:not(.rt-numbered_list_item) + .ed-item.rt-numbered_list_item, .sp-editor-body .ed-item.rt-numbered_list_item:first-child { counter-reset: sp-num; }
+.sp-editor-body .ed-item.rt-numbered_list_item { counter-increment: sp-num; }
+.sp-editor-body .ed-item.rt-numbered_list_item::before { content: counter(sp-num) "."; position: absolute; left: .2rem; top: 0; }
+.sp-editor-body .ed-item.rt-todo { padding-left: 0; } .sp-editor-body .ed-item.rt-todo label { display: flex; gap: .4rem; align-items: baseline; margin: 0; }
+.sp-editor-body .ed-item.rt-done .ed-text { text-decoration: line-through; color: #6c757d; }
+.sp-editor-body .ed-item > .ed-children { margin-left: 0; }

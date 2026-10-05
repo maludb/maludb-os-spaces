@@ -677,7 +677,12 @@ sync 33, ingest 12, kernel_compat 9, vhost 29, browser 63), the registry and app
 spaces 41, membership 56, sections 27, visibility 40, browser 43); `db/018` fixes the member guard on a space's delete cascade.
 **SLICE 2 — pages: the tree, sharing, the wiki, the trash, templates, the public page — BUILT and proven 2026-10-05** (`docs/build-specs/pages-tree.md`,
 "Built and proven"): the reader (`app/richtext/render.php`, every adopted block type), 12 screens, 22 actions, the public door `/p/{token}`, **271 checks green**
-(`tests/phase3/slice2/run.sh`: make 20, read 30, move 28, trash 19, share 35, publish 28, wiki 29, json 44, browser 38). Next: slice 3, the block editor — THE FIRST EXEMPLAR.
+(`tests/phase3/slice2/run.sh`: make 20, read 30, move 28, trash 19, share 35, publish 28, wiki 29, json 44, browser 38).
+**SLICE 3 — the block editor, THE FIRST EXEMPLAR — BUILT and proven 2026-10-05** (`docs/build-specs/block-editor.md`, "Built and proven"): the Markdown
+converter and the editor mode of the one renderer, per-block optimistic saves with the version and the stale box (D7), Enter/Backspace/Tab/drag, the slash menu and
+the pickers, uploads with thumbnails through the gated door (D14), synced blocks, tables, versions with the diff and restore, comments with one level of replies,
+presence by file cache, the 13 actions, 1 screen and 21 controllers, **232 checks green** (`tests/phase3/slice3/run.sh`: convert 37, save 25, structure 24, widgets 26,
+versions 19, comments 29, presence 12, json 27, browser 33). Next: slice 4, channels and messages — THE SECOND EXEMPLAR, then the handoff.
 
 **Next: the owner's checkpoint; then Phase 2 (`sso-shell`), slices 1–2, the two exemplars (3, 4), the handoff.**
 
