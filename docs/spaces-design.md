@@ -416,7 +416,7 @@ the reads are the same SQL functions the screens call. Records tools: about 48; 
   versioned document:
   | Tool | For | Document | Content |
   |---|---|---|---|
-  | `pages_index` | every sibling (Help Desk's knowledge base "see also", Projects' "project page", Consultant Tracking's engagement notes) | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the share runs as that agent: the consumer names its kernel member id in `as_agent` — the kernel passes a provider no identity of its own, Phase 4, `docs/build-specs/mcp-servers.md`): id, title, space, path, last edited, verification; a search by title |
+  | `pages_index` | every sibling (Help Desk's knowledge base "see also", Projects' "project page", Consultant Tracking's engagement notes) | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the share runs as that agent: the kernel names its member id in the header `X-OS-Consumer-Agent` — K26, built 2026-10-06; Phase 4, `docs/build-specs/mcp-servers.md`): id, title, space, path, last edited, verification; a search by title |
   | `page_markdown` | the same | `os.spaces-page/1` | one page as Markdown with its properties |
   | `channel_post_card` | *(not a share — reads only; see §11)* | — | — |
   Reads (`reads[]`): none in v1. **Posting into a channel from a sibling** ("ticket HD-1042 escalated" into `#support`) is a

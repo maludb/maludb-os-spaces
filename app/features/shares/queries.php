@@ -6,9 +6,9 @@ declare(strict_types=1);
  * documents, they ask the internal door (html/api/v1/shares/read.php) to call these functions — which read through the mcp_* views and sp_page_markdown() AS A MEMBER, exactly as a screen would.
  *
  * Who the member is. A person (or an agent) calling the tool with their own token reads as themselves. The KERNEL's token — a sibling application reading through K7 — has no member: the share runs as the
- * requesting application's expert agent, which the consumer names in `as_agent` (the agent's kernel member id). The kernel passes the consumer no identity of its own (application_read() sends the arguments
- * and nothing else), so `as_agent` is the consumer's claim, bounded here: it must be an active AGENT the directory admitted — never a person — and it sees only what an agent member sees (a space it is in, a
- * page shared with it). No `as_agent` → the index is empty and a page is refused; nothing is guessed. The documents are people-free: no author, no id of a person but the acting agent's own.
+ * requesting application's expert agent, which the KERNEL names in the header X-OS-Consumer-Agent (K26, kernel db/173, 2026-10-06; the records server relays it to this door as `consumer_agent_id`) — never an argument of
+ * the consumer's: it must be an active AGENT the directory admitted — never a person — and it sees only what an agent member sees (a space it is in, a
+ * page shared with it). No agent named (the consumer has no expert) → the index is empty and a page is refused; nothing is guessed. The documents are people-free: no author, no id of a person but the acting agent's own.
  */
 
 const SHARE_APPLICATION = 'spaces';
@@ -25,7 +25,7 @@ function share_agent(PDO $pdo, mixed $given): ?int
         return null;
     }
     if (!is_int($given) && !(is_string($given) && ctype_digit($given))) {
-        throw new DomainException('as_agent is the kernel member id of one of your application\'s agents.');
+        throw new DomainException('The consumer agent the kernel named is not a member id.');
     }
     $id = (int) $given;
     if (!db_bool($pdo, "SELECT EXISTS (SELECT 1 FROM members WHERE id = :m AND member_kind = 'agent' AND status = 'active' AND capability IS NOT NULL)", ['m' => $id])) {

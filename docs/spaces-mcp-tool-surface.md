@@ -128,7 +128,7 @@ the 21 rights, from `mcp_app_roles` (db/004).
 ### The shares — for the kernel's token alone (K7, design §8)
 | Tool | Document | Answers |
 |---|---|---|
-| `pages_index` | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the share runs as that agent: the consumer names its kernel member id in `as_agent` — the kernel passes a provider no identity of its own, see `docs/build-specs/mcp-servers.md`): `page_id`, `title`, `space`, `path` (the breadcrumb), `kind`, `last_edited_at`, `verification_state`; `q?` searches titles; paged |
+| `pages_index` | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the share runs as that agent: the kernel names its member id in the header `X-OS-Consumer-Agent` — K26, 2026-10-06; see `docs/build-specs/mcp-servers.md`): `page_id`, `title`, `space`, `path` (the breadcrumb), `kind`, `last_edited_at`, `verification_state`; `q?` searches titles; paged |
 | `page_markdown` | `os.spaces-page/1` | one page as Markdown with its properties and breadcrumb, as that agent may see it; `page` |
 
 Both are people-free (no member identity crosses: authors are names, never ids beyond the acting agent's own view). An application
@@ -219,5 +219,5 @@ same views and functions the screens read.
 - Every resolve tool answers the plain list for `q` alone; a **UUID given as `q`** is an id lookup (`find_pages` — trash included —, `find_databases`, `get_database` for views, `find_templates`); `page_versions` and `channel_history` and
   `get_database` resolve versions, messages and views from `q` alone; the resolve block now names 12 entities (proposal, version and export added).
 - `get_settings`, `find_departments`, `agents_here` and `librarian_proposals` refuse a guest in words; everything else answers a guest her smaller world.
-- The shares take `as_agent` (the kernel's call only); without it the index is empty and `page_markdown` is refused.
+- The shares run as the agent the kernel names in `X-OS-Consumer-Agent` (K26; the kernel's call only — never an argument); with none the index is empty and `page_markdown` is refused.
 - `records_search` takes words and `kinds[]`, never SQL; every list tool pages with `limit` (and `cursor` where the surface says).

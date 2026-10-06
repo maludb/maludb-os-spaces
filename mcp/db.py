@@ -27,6 +27,10 @@ request_member_id: contextvars.ContextVar[int | None] = contextvars.ContextVar("
 request_role: contextvars.ContextVar[str] = contextvars.ContextVar("role", default="anon")
 # True while the kernel itself is calling (a kernel token): only app_roles is listed or callable.
 request_is_kernel: contextvars.ContextVar[bool] = contextvars.ContextVar("is_kernel", default=False)
+# K26 (kernel db/173, 2026-10-06): on the kernel's K7 call, who is asking — the consuming application's key and its expert agent's
+# member id — from the headers X-OS-Consumer / X-OS-Consumer-Agent, read beside the token; never from the arguments.
+request_consumer: contextvars.ContextVar[str | None] = contextvars.ContextVar("consumer", default=None)
+request_consumer_agent: contextvars.ContextVar[int | None] = contextvars.ContextVar("consumer_agent", default=None)
 # The agent run a request belongs to, when its bearer is an agent RUN token (else None).
 request_run_id: contextvars.ContextVar[int | None] = contextvars.ContextVar("run_id", default=None)
 # The raw bearer the caller presented (a run token is shown to the kernel's run-facts call).

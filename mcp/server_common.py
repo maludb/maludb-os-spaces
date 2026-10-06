@@ -8,6 +8,7 @@ the kernel does not vouch for lists and calls nothing — fail closed. An evalua
 """
 from __future__ import annotations
 
+import re
 import json
 import logging
 import time
@@ -92,7 +93,7 @@ def install_grants(mcp: FastMCP, endpoint_name: str) -> None:
             if name not in KERNEL_TOOLS:
                 raise ToolError(f"The kernel's token reaches {', '.join(sorted(KERNEL_TOOLS))} only.")
             if name != "app_roles" and "params" not in arguments:
-                arguments = {"params": arguments}      # the kernel sends a share's arguments flat (q, page, as_agent …)
+                arguments = {"params": arguments}      # the kernel sends a share's arguments flat (q, page, cursor …)
             return await mcp.call_tool(name, arguments)
         if name in KERNEL_ONLY:
             raise ToolError(f"'{name}' is for the Business OS kernel's own token only.")
@@ -125,6 +126,11 @@ def make_app(mcp: FastMCP, db_user_key: str, db_pw_key: str, endpoint_name: str)
             db.request_role.set("anon")
             db.request_token.set(token)
             db.request_run_id.set(None)
+            # K26: the kernel says which application asks, and as which expert agent, in two headers (trusted with the token).
+            consumer = headers.get("x-os-consumer", "").strip()
+            agent = headers.get("x-os-consumer-agent", "").strip()
+            db.request_consumer.set(consumer if re.fullmatch(r"[a-z0-9_]{1,60}", consumer) else None)
+            db.request_consumer_agent.set(int(agent) if agent.isdigit() else None)
             return await inner(scope, receive, send)
         db.request_is_kernel.set(False)
         ctx = await db.resolve_token(pool, token) if token else None

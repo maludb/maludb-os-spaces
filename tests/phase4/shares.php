@@ -17,7 +17,13 @@ function php_share(string $fn, int $member, array $args): array
     return json_decode($line, true) ?? ['error' => 'no answer: ' . $out];
 }
 function bare(?array $doc): ?array { if ($doc === null) { return null; } unset($doc['generated_at']); return $doc; }
-function kcall(string $tool, array $args): array { return mcp_tool(REC, ktoken(), $tool, $args, true); }
+/** The kernel's call: an `as_agent` in $args is sent the way the kernel sends it since K26 — as the header X-OS-Consumer-Agent, with X-OS-Consumer naming a consumer. */
+function kcall(string $tool, array $args): array
+{
+    $headers = ['X-OS-Consumer: smoke_consumer'];
+    if (array_key_exists('as_agent', $args)) { $headers[] = 'X-OS-Consumer-Agent: ' . $args['as_agent']; unset($args['as_agent']); }
+    return mcp_tool(REC, ktoken(), $tool, $args, true, $headers);
+}
 function share_log_rows(int $since): array { return q("SELECT * FROM activity_log WHERE action = 'share.read' AND id > :s ORDER BY id", ['s' => $since]); }
 /** A request to the internal door, signed as the records server signs it (or not). */
 function door(array $body, bool $sign = true, ?int $time = null, string $method = 'POST'): array
@@ -66,7 +72,7 @@ foreach ([[26, 'a person'], [9999, 'a member that does not exist'], [41, null]] 
 }
 q("UPDATE members SET capability = 'write' WHERE id = 41");
 $r = kcall('pages_index', ['q' => 'x', 'as_agent' => 'abc']);
-ok($r['error'], 'as_agent that is not a member id: refused');
+ok(!$r['error'] && $r['data']['as_member'] === null && $r['data']['total'] === 0, 'an X-OS-Consumer-Agent that is not a member id is ignored by the gate: no agent, the index empty');
 ok(!has_key($all, 'author') && !has_key($all, 'author_member_id') && !has_key($all, 'email') && !has_key($all, 'last_edited_by') && !str_contains(json_encode($all), 'member_id'), 'people-free: no author, no editor, no id of a person (the only member id is the acting agent\'s own, as_member)');
 
 echo "3. As the kernel: page_markdown\n";

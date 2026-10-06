@@ -5,7 +5,7 @@ declare(strict_types=1);
  * POST /api/v1/shares/read.php — the records MCP server's door to the two shares (docs/build-specs/mcp-servers.md). INTERNAL PORT ONLY (the public vhost blocks /api). The server has already verified the bearer (the
  * kernel's token, or a person's or agent's own); it signs the request with ACTIONS_RELAY_KEY — HMAC-SHA256 over "share:<unix time>:<sha256 of the body>", headers X-Share-Time and X-Share-Signature, ±120 s — a key no agent
  * holds. Body: {"tool": pages_index|page_markdown, "caller": "kernel"|"person", "member_id": <the verified member, for a person>, "arguments": {...}}. The answer is the document itself (app/features/shares/queries.php);
- * a refusal is 403 {"error": <the sentence>}, a bad argument 422, a bad signature 401. A kernel call runs as the agent `arguments.as_agent` names (see that file); it logs `share.read`.
+ * a refusal is 403 {"error": <the sentence>}, a bad argument 422, a bad signature 401. A kernel call runs as the agent `consumer_agent_id` names — the kernel's X-OS-Consumer-Agent header, relayed by the records server (K26); it logs `share.read`.
  */
 require_once dirname(__DIR__, 4) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 4) . '/app/features/shares/queries.php';
@@ -47,11 +47,11 @@ try {
         }
         $agent = null;
     } else {
-        $agent = share_agent($pdo, $a['as_agent'] ?? null);
+        $agent = share_agent($pdo, $in['consumer_agent_id'] ?? null);
         $member = $agent;
     }
     $given = $a;
-    unset($given['as_agent']);
+    unset($given['as_agent']);                                      // K26: never an argument; the records server drops it too
     if ($in['tool'] === 'pages_index') {
         $offset = isset($a['cursor']) && ctype_digit((string) $a['cursor']) ? (int) $a['cursor'] : 0;
         $q = isset($a['q']) && $a['q'] !== '' ? mb_substr((string) $a['q'], 0, 200) : null;
@@ -62,7 +62,7 @@ try {
         $rows = count($doc['rows']);
     } else {
         if ($member === null) {
-            throw new ShareRefused('page_markdown reads as one of your application\'s expert agents: name it in as_agent.');
+            throw new ShareRefused('page_markdown reads as the asking application\'s expert agent: the kernel named none (the application has no expert).');
         }
         $doc = share_page_markdown($pdo, (int) $member, (string) ($a['page'] ?? ''));
         $rows = 1;
