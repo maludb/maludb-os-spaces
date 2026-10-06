@@ -16,6 +16,7 @@ $where = $i['kind'] === 'csv' ? ($i['database_title'] ?? 'a database') : ($i['pa
             <span><strong><?= (int) $i['blocks_made'] ?></strong> blocks</span><span><strong><?= (int) $i['unsupported'] ?></strong> unsupported</span>
         </div>
         <?php endif; ?>
+        <?php if (str_contains((string) ($i['log'] ?? ''), 'The uploaded file is gone')): ?><div class="fs-12 text-muted mt-2" id="import-file-gone-<?= (int) $i['import_id'] ?>">The uploaded file is gone.</div><?php endif; ?>
         <?php if (($i['log'] ?? '') !== ''): ?>
         <details class="mt-2"<?= !empty($open) || $s === 'failed' ? ' open' : '' ?>><summary class="fs-12 text-muted btn-touch d-flex align-items-center" id="import-log-toggle-<?= (int) $i['import_id'] ?>">The log</summary>
             <pre class="fs-12 mb-0 p-2 bg-soft-secondary rounded" style="white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto" id="import-log-<?= (int) $i['import_id'] ?>"><?= e($i['log']) ?></pre>

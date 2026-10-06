@@ -165,5 +165,18 @@ $admin = screen(as_member(1), '/import')[1];
 ok(count(array_filter($admin['imports'], fn ($x) => $x['created_by'] === 27)) > 0, 'the Spaces admin sees everyone\'s');
 $html = req('GET', '/import', ['jar' => $marco])['body'];
 ok(str_contains($html, 'id="import-form"') && str_contains($html, 'id="import-rows"') && str_contains($html, 'import-row-' . $id2), 'the screen: the form and the past imports with their logs');
+echo "9. An import's file is kept as long as an export\n";
+[$c, $b] = act_file($marco, '/import/start.php', ['space' => $product], $fx['md']);
+$fresh = (int) $b['record_id'];
+[$c, $b] = act_file($marco, '/import/start.php', ['space' => $product], $fx['md']);
+$oldI = (int) $b['record_id'];
+$ap = (string) one("SELECT storage_path FROM attachments WHERE record_type = 'import' AND record_id = :i", ['i' => $oldI]);
+pdo()->exec("UPDATE imports SET finished_at = now() - interval '8 days' WHERE id = $oldI");
+$r = step('exports', ['SP_WORKER_NOW' => '2026-10-13T03:20:00Z']);
+clearstatcache();
+ok(($r['import_files'] ?? 0) >= 1 && (int) one("SELECT count(*) FROM attachments WHERE record_type = 'import' AND record_id = :i", ['i' => $oldI]) === 0 && !is_file(dirname(__DIR__, 3) . '/storage/' . $ap), 'an import finished 8 days ago loses its uploaded file (counted in the step)');
+ok((int) one("SELECT count(*) FROM attachments WHERE record_type = 'import' AND record_id = :i", ['i' => $fresh]) === 1, 'a fresh import keeps its file');
+$h = req('GET', '/import', ['jar' => $marco]);
+ok($h['code'] === 200 && str_contains($h['body'], 'id="import-file-gone-' . $oldI . '"') && !str_contains($h['body'], 'id="import-file-gone-' . $fresh . '"') && import_row($oldI)['status'] === 'done', 'the screen still opens, its row and log stay, and it says the file is gone');
 finish();
 function page_exists(string $id): bool { return (int) one('SELECT count(*) FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $id]) === 1; }

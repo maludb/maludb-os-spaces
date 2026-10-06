@@ -110,6 +110,22 @@ function wiki_pass(PDO $pdo): array
 }
 
 /** Exports whose life is over: sp_pass_exports_expire() answers the paths, the files go, so does the attachment that served them; one `export.delete` (via expiry) each. */
+/** An import's uploaded file is kept as long as an export (7 days, exports.expires_at's own default) from the import's finish or failure; then the attachment and its files go and the log says so. Returns how many. */
+function import_files_expire(PDO $pdo): int
+{
+    $rows = $pdo->query("SELECT DISTINCT i.id AS import_id FROM imports i JOIN attachments a ON a.record_type = 'import' AND a.record_id = i.id
+                          WHERE i.status IN ('done', 'failed') AND i.finished_at < now() - interval '7 days'")->fetchAll(PDO::FETCH_COLUMN);
+    $n = 0;
+    foreach ($rows as $iid) {
+        $st = $pdo->prepare("SELECT id FROM attachments WHERE record_type = 'import' AND record_id = :i");
+        $st->execute(['i' => $iid]);
+        foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $aid) { delete_attachment($pdo, (int) $aid); $n++; }
+        $pdo->prepare("UPDATE imports SET log = COALESCE(log || E'\\n', '') || 'The uploaded file is gone (kept 7 days after the import finished).' WHERE id = :i")->execute(['i' => $iid]);
+        log_activity($pdo, 'import.file_expire', 'import', (int) $iid, ['actor_member_id' => null, 'after' => ['via' => 'expiry']]);
+    }
+    return $n;
+}
+
 function exports_pass(PDO $pdo): array
 {
     $due = $pdo->query('SELECT id, created_by, kind FROM exports WHERE storage_path IS NOT NULL AND expires_at < now()')->fetchAll();
@@ -122,8 +138,9 @@ function exports_pass(PDO $pdo): array
     }
     drop_attachments($pdo, $rows);
     $files = remove_attachment_files($paths);
+    $gone = import_files_expire($pdo);
     foreach ($due as $e) { log_activity($pdo, 'export.delete', 'export', (int) $e['id'], ['actor_member_id' => null, 'after' => ['via' => 'expiry', 'kind' => $e['kind']]]); }
-    return ['expired' => count($paths), 'files' => $files];
+    return ['expired' => count($paths), 'files' => $files, 'import_files' => $gone];
 }
 
 function exports_step(PDO $pdo, int $limit): array
