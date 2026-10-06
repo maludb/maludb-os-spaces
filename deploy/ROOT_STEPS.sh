@@ -59,3 +59,15 @@ echo "   - the vhost raises PHP's upload ceiling to 64 MB (deploy/apache-spaces.
 echo "     With php-fpm instead of mod_php, set upload_max_filesize = 64M and post_max_size = 72M in the pool."
 echo "   - MaluMail (MALUMAIL_API_KEY, MAIL_FROM, MAIL_FROM_NAME) makes the outbox send email; without a key every email row fails once and is never retried (at most once). Texts need the K6 sender (step 3)."
 echo "   - the digest hour and the retention days are the workspace's settings (Admin > Settings); channel retention is set on each channel (off by default)."
+
+# ------------------------------------------------------------------------------------------------------------------
+# 5. PHASE 4 (the two MCP servers, 2026-10-06) — nothing new to decide; what `apply` now does that it did not:
+echo "== 5. Phase 4"
+echo "   - mcp/venv exists (python3 -m venv mcp/venv && mcp/venv/bin/pip install -r mcp/requirements.txt — the installer's step 'venv' says done); the proofs use it. Root rebuilds it on the installed copy if the clone moves."
+echo "   - apply installs and starts spaces-records-mcp and spaces-activity-mcp on MCP_RECORDS_PORT (8833) and MCP_ACTIVITY_PORT (8834), pinned in step 0, reachable as https://spaces.<domain>/mcp/records and /mcp/activity"
+echo "   - the installer's step 'registry' writes $KERNEL/mcp/registries/spaces.json (118 actions, 12 resolved entities) and asks you to restart certstudy-actions-mcp: that is when the kernel's Actions MCP offers Spaces' actions"
+echo "   - the installer reads app_roles from the records server (the four roles, 21 rights) once it answers: run apply a second time, as step 2 says, so the kernel learns Guest, Member, Space owner and Spaces admin"
+echo "   - check:  curl -s -o /dev/null -w '%{http_code}\n' https://spaces.<domain>/mcp/records   -> 401 (no token) means the server answers behind the proxy"
+echo "   - the two shares (pages_index, page_markdown) answer a sibling only over a connection a super-admin approved (bin/app_connection.php, step 3), and only for as_agent: the expert agent the sibling names — the kernel passes the consumer"
+echo "     no identity of its own, so without as_agent the index is empty (K-owed: see docs/build-specs/mcp-servers.md, 'What the kernel owes'). The door they use is html/api/v1/shares/read.php on APP_INTERNAL_PORT (internal only, signed with ACTIONS_RELAY_KEY)."
+echo "   - the Librarian's duty (30 6 * * 1) is declared in maludb-os.json agents[].duty; until the installer reads it, create it in Agent HR as step 3 says. The duty needs no server of ours: it runs the Librarian with the tools it is granted."

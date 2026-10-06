@@ -2,16 +2,19 @@
   "schema": "maludb-os.registry/1",
   "app_key": "spaces",
   "name": "Spaces",
-  "note": "The installer (bin/app_install.php, step 'registry') writes mcp/registries/spaces.json in the kernel from this file's `resolve` block plus mcp/action_registry.json. Each resolve tool answers a plain LIST of rows carrying id_field and label_field when given `q` alone. The tools are the Phase 1 tool surface's names; Phase 4 builds them (mcp/records_server.py). Pages, databases and views are UUID-keyed: a resolver answers the UUID as the id. A repeated param (blocks, members) is a list of ids, never resolved by name.",
+  "note": "The installer (bin/app_install.php, step 'registry') writes mcp/registries/spaces.json in the kernel from this file's `resolve` block plus mcp/action_registry.json. Each resolve tool answers a plain LIST of rows carrying id_field and label_field when given `q` alone (the kernel's resolver sends nothing else). The tools are the Phase 1 tool surface's names, built in Phase 4 (mcp/records_server.py; tests/phase4/registry.php resolves every entity through the live server with the kernel's own loader and resolver). Pages, databases and views are UUID-keyed: a resolver answers the UUID as the id. `view` resolves through get_database with `q` alone (a view by name across the databases you may see), `message` through channel_history with `q` alone (words of a message). A repeated param (blocks, members) and these ids are never resolved by name: block, comment, attachment, bookmark, reminder, section, request, dispatch, token, notification, shortcode.",
   "resolve": {
-    "space":      {"tool": "find_spaces",      "query_param": "q", "id_field": "space_id",      "label_field": "name",         "params": ["space"]},
-    "page":       {"tool": "find_pages",       "query_param": "q", "id_field": "page_id",       "label_field": "title",        "params": ["page", "parent", "parent_page"]},
-    "database":   {"tool": "find_databases",   "query_param": "q", "id_field": "database_id",   "label_field": "title",        "params": ["database"]},
-    "channel":    {"tool": "find_channels",    "query_param": "q", "id_field": "channel_id",    "label_field": "name",         "params": ["channel"]},
-    "message":    {"tool": "channel_history",  "query_param": "q", "id_field": "message_id",    "label_field": "excerpt",      "params": ["message", "thread", "root"]},
-    "member":     {"tool": "find_members",     "query_param": "q", "id_field": "member_id",     "label_field": "display_name", "params": ["member", "to_member", "person", "owner", "agent"]},
-    "department": {"tool": "find_departments", "query_param": "q", "id_field": "department_id", "label_field": "name",         "params": ["department"]},
-    "template":   {"tool": "find_templates",   "query_param": "q", "id_field": "page_id",       "label_field": "title",        "params": ["template"]},
-    "view":       {"tool": "get_database",     "query_param": "q", "id_field": "view_id",       "label_field": "name",         "params": ["view"]}
+    "space":       {"tool": "find_spaces", "query_param": "q", "id_field": "space_id", "label_field": "name", "params": ["space"]},
+    "page":        {"tool": "find_pages", "query_param": "q", "id_field": "page_id", "label_field": "title", "params": ["page", "parent", "parent_page", "proposed_page"]},
+    "database":    {"tool": "find_databases", "query_param": "q", "id_field": "database_id", "label_field": "title", "params": ["database", "relation_database"]},
+    "channel":     {"tool": "find_channels", "query_param": "q", "id_field": "channel_id", "label_field": "name", "params": ["channel"]},
+    "message":     {"tool": "channel_history", "query_param": "q", "id_field": "message_id", "label_field": "excerpt", "params": ["message", "thread", "root"]},
+    "member":      {"tool": "find_members", "query_param": "q", "id_field": "member_id", "label_field": "display_name", "params": ["member", "to_member", "person", "owner", "agent", "guest"]},
+    "department":  {"tool": "find_departments", "query_param": "q", "id_field": "department_id", "label_field": "name", "params": ["department"]},
+    "template":    {"tool": "find_templates", "query_param": "q", "id_field": "page_id", "label_field": "title", "params": ["template"]},
+    "view":        {"tool": "get_database", "query_param": "q", "id_field": "view_id", "label_field": "name", "params": ["view"]},
+    "proposal":    {"tool": "librarian_proposals", "query_param": "q", "id_field": "proposal_id", "label_field": "title", "params": ["proposal"]},
+    "version":     {"tool": "page_versions", "query_param": "q", "id_field": "version_id", "label_field": "label", "params": ["version"]},
+    "export":      {"tool": "my_exports", "query_param": "q", "id_field": "export_id", "label_field": "label", "params": ["export"]}
   }
 }

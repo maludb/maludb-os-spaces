@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-06T00:59:18+00:00",
+    "generated_at": "2026-10-06T01:28:45+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -1433,12 +1433,10 @@
             "endpoint": "/pages/purge.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "page (one in the trash"
-                },
-                {
-                    "name": null,
-                    "note": "for good)"
+                    "name": "page",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "one in the trash — deleted for good"
                 }
             ],
             "undo": null,
@@ -2293,18 +2291,10 @@
                     "hint": ""
                 },
                 {
-                    "name": null,
-                    "note": "name (lowercase"
-                },
-                {
-                    "name": "digits",
-                    "required": false,
+                    "name": "name",
+                    "required": true,
                     "repeated": false,
-                    "hint": ""
-                },
-                {
-                    "name": null,
-                    "note": "dashes)"
+                    "hint": "lowercase letters and digits and dashes"
                 },
                 {
                     "name": "kind",
@@ -2351,9 +2341,9 @@
                 },
                 {
                     "required": false,
-                    "name": "digits",
+                    "name": "name",
                     "repeated": false,
-                    "hint": ""
+                    "hint": "lowercase letters and digits and dashes"
                 },
                 {
                     "required": false,
@@ -2388,12 +2378,10 @@
             "endpoint": "/channels/archive.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "channel (readable"
-                },
-                {
-                    "name": null,
-                    "note": "never writable afterwards)"
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "readable but never writable afterwards"
                 }
             ],
             "undo": "channel_unarchive",
@@ -2428,12 +2416,10 @@
             "endpoint": "/channels/delete.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "channel (an archived one"
-                },
-                {
-                    "name": null,
-                    "note": "for good)"
+                    "name": "channel",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "an archived one — deleted for good"
                 }
             ],
             "undo": null,
@@ -2493,8 +2479,10 @@
                     "hint": ""
                 },
                 {
-                    "name": null,
-                    "note": "a public one's follower)"
+                    "name": "member",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "a person or an agent — a private channel's member or a public one's follower"
                 }
             ],
             "undo": "channel_member_remove",
@@ -2795,12 +2783,10 @@
             "endpoint": "/channels/messages/reply.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "message (the thread's first"
-                },
-                {
-                    "name": null,
-                    "note": "or any in it)"
+                    "name": "message",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "the thread's first message or any in it"
                 },
                 {
                     "name": "markdown",
@@ -3314,16 +3300,10 @@
                     "hint": "a new display name: rename"
                 },
                 {
-                    "name": null,
-                    "note": "options[] (select"
-                },
-                {
-                    "name": null,
-                    "note": "multi-select"
-                },
-                {
-                    "name": null,
-                    "note": "status)"
+                    "name": "options",
+                    "required": false,
+                    "repeated": true,
+                    "hint": "for select or multi_select or status"
                 },
                 {
                     "name": "relation_database",
@@ -3412,12 +3392,10 @@
             "endpoint": "/databases/delete.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "database (to the trash"
-                },
-                {
-                    "name": null,
-                    "note": "rows and views with it)"
+                    "name": "database",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "to the trash — its rows and views go with it"
                 }
             ],
             "undo": "page_restore",
@@ -3445,12 +3423,10 @@
                     "hint": ""
                 },
                 {
-                    "name": null,
-                    "note": "properties (the values as JSON"
-                },
-                {
-                    "name": null,
-                    "note": "keyed by property name)"
+                    "name": "properties",
+                    "required": false,
+                    "repeated": false,
+                    "hint": "the values as JSON keyed by property name"
                 },
                 {
                     "name": "template",
@@ -3494,6 +3470,12 @@
                     "name": "title",
                     "repeated": false,
                     "hint": ""
+                },
+                {
+                    "required": false,
+                    "name": "properties",
+                    "repeated": false,
+                    "hint": "the values as JSON keyed by property name"
                 },
                 {
                     "required": false,
@@ -3862,8 +3844,10 @@
             "endpoint": "/import/start.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "file (multipart: .md"
+                    "name": "file",
+                    "required": true,
+                    "repeated": false,
+                    "hint": "multipart: .md or .zip or .csv"
                 },
                 {
                     "name": "kind",
@@ -4065,8 +4049,10 @@
             "endpoint": "/admin/settings.php",
             "params": [
                 {
-                    "name": null,
-                    "note": "any field of the settings (business_name"
+                    "name": "business_name",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
                 },
                 {
                     "name": "default_space_kind",
@@ -4183,8 +4169,10 @@
                     "hint": ""
                 },
                 {
-                    "name": null,
-                    "note": "agents_join_default_space)"
+                    "name": "agents_join_default_space",
+                    "required": false,
+                    "repeated": false,
+                    "hint": ""
                 }
             ],
             "undo": "restore prior",

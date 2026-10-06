@@ -135,12 +135,12 @@
   "shares": [
     {
       "tool": "pages_index",
-      "description": "The pages the requesting application's expert agent may see: id, title, space, path, last edited, verification; a search by title (os.spaces-pages/1)",
+      "description": "The pages the requesting application's expert agent may see (the consumer names it in as_agent): id, title, space, path, last edited, verification; a search by title (os.spaces-pages/1)",
       "scoped": false
     },
     {
       "tool": "page_markdown",
-      "description": "One page as Markdown with its properties, as the requesting application's expert agent may see it (os.spaces-page/1)",
+      "description": "One page as Markdown with its properties, as the requesting application's expert agent may see it (named in as_agent) (os.spaces-page/1)",
       "scoped": false
     }
   ],

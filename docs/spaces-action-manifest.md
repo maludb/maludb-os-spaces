@@ -156,7 +156,7 @@ Actions (base `/pages/`):
 | `page_duplicate` | `duplicate.php` | **page**, title, parent (where; beside the original by default) | page_trash | | | `page.duplicate` | view on the page and edit at the destination |
 | `page_trash` | `trash.php` | **page** (its subpages go with it) | page_restore | ✔ | deletion | `page.trash` | full |
 | `page_restore` | `restore.php` | **page** (from the trash; to the root when its parent is still trashed) | page_trash | | | `page.restore` | full |
-| `page_delete` | `purge.php` | **page** (one in the trash, for good) | — | ✔ | deletion | `page.delete` | full or trash.purge |
+| `page_delete` | `purge.php` | **page** (one in the trash — deleted for good) | — | ✔ | deletion | `page.delete` | full or trash.purge |
 | `trash_purge` | `trash-purge.php` | space (empty for everything I may purge) | — | ✔ | deletion | `trash.purge` | trash.purge |
 | `page_lock` | `lock.php` | **page**, locked (yes or no) | page_lock | | other | `page.lock` | full |
 | `page_share_member` | `share.php` | **page**, member (a person or an agent) or department, **level** | page_unshare | | | `page.share` | full |
@@ -223,14 +223,14 @@ Actions (base `/channels/`; direct messages and reminders name their files absol
 
 | Action | File | Params | Undo | Confirm | Agent approval | Log | Who |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `channel_create` | `save.php` | **space**, **name** (lowercase, digits, dashes), kind (public or private; public by default), topic, purpose | channel_archive | | | `channel.create` | member of the space with channels.create |
+| `channel_create` | `save.php` | **space**, **name** (lowercase letters and digits and dashes), kind (public or private; public by default), topic, purpose | channel_archive | | | `channel.create` | member of the space with channels.create |
 | `channel_update` | `save.php` | **channel**, any field of channel_create | restore prior | | | `channel.update` | channel for topic and purpose; owner or channel.manage for the rest |
-| `channel_archive` | `archive.php` | **channel** (readable, never writable afterwards) | channel_unarchive | ✔ | deletion | `channel.archive` | owner or channel.manage |
+| `channel_archive` | `archive.php` | **channel** (readable but never writable afterwards) | channel_unarchive | ✔ | deletion | `channel.archive` | owner or channel.manage |
 | `channel_unarchive` | `unarchive.php` | **channel** | channel_archive | | | `channel.unarchive` | owner or channel.manage |
-| `channel_delete` | `delete.php` | **channel** (an archived one, for good) | — | ✔ | deletion | `channel.delete` | admin |
+| `channel_delete` | `delete.php` | **channel** (an archived one — deleted for good) | — | ✔ | deletion | `channel.delete` | admin |
 | `channel_join` | `join.php` | **channel** (follow a public one; join a private one I was invited to) | channel_leave | | | `channel.join` | member of the space |
 | `channel_leave` | `leave.php` | **channel** (not a space's default) | channel_join | | | `channel.leave` | own |
-| `channel_member_add` | `members/add.php` | **channel**, **member** (a person or an agent; a private channel's member, a public one's follower) | channel_member_remove | | | `channel.member_add` | channel |
+| `channel_member_add` | `members/add.php` | **channel**, **member** (a person or an agent — a private channel's member or a public one's follower) | channel_member_remove | | | `channel.member_add` | channel |
 | `channel_guest_add` | `members/add-guest.php` | **channel**, **guest** (an external member holding Guest) | channel_member_remove | ✔ | external_send | `channel.guest_add` | owner and share.guest |
 | `channel_member_remove` | `members/remove.php` | **channel**, **member** | channel_member_add | ✔ | | `channel.member_remove` | owner or channel.manage |
 | `channel_notify_set` | `notify.php` | **channel**, notify (all or mentions or none), muted_until (a time; empty unmutes), starred (yes or no), section (my sidebar section) | restore prior | | | `channel.notify_set` | own |
@@ -240,7 +240,7 @@ Actions (base `/channels/`; direct messages and reminders name their files absol
 | `bookmark_save` | `bookmarks/save.php` | **channel**, **title**, url or page, emoji, bookmark (to change one) | bookmark_delete | | | `channel.bookmark_save` | channel |
 | `bookmark_delete` | `bookmarks/delete.php` | **bookmark** | — | | | `channel.bookmark_delete` | channel |
 | `message_post` | `messages/post.php` | **channel**, **markdown** (mentions as @Name; never @channel — see channel_announce), schedule_for (a time; sends later), attachments[] (attachment ids uploaded first) | message_delete_own | | | `message.post` | channel |
-| `thread_reply` | `messages/reply.php` | **message** (the thread's first, or any in it), **markdown**, also_to_channel (yes or no) | message_delete_own | | | `thread.reply` | channel |
+| `thread_reply` | `messages/reply.php` | **message** (the thread's first message or any in it), **markdown**, also_to_channel (yes or no) | message_delete_own | | | `thread.reply` | channel |
 | `channel_announce` | `messages/announce.php` | **channel**, **markdown**, reach (channel or here or everyone; channel by default) | message_delete_own | ✔ | other | `message.announce` | channel |
 | `message_edit` | `messages/edit.php` | **message**, **markdown** | restore prior | | | `message.edit` | own |
 | `message_delete_own` | `messages/delete-own.php` | **message** (my own; a tombstone stays) | — | ✔ | | `message.delete_own` | own |
@@ -276,10 +276,10 @@ Actions (base `/databases/`):
 | `database_create` | `save.php` | **title**, space or parent (a space's root or a parent page), inline (yes or no: shown inside the parent page), properties (the schema as JSON; a Name title by default), template (a database template to copy) | page_trash | | | `database.create` | edit on the parent or member of the space |
 | `database_update` | `save.php` | **database**, any field of database_create | restore prior | | | `database.update` | edit |
 | `database_schema_save` | `schema.php` | **database**, **properties** (the whole schema as JSON) | restore prior | ✔ | other | `database.schema_save` | edit |
-| `database_property_save` | `properties/save.php` | **database**, **key** (the property's key or name), **type**, name (a new display name: rename), options[] (select, multi-select, status), relation_database (a relation's target), two_way (yes or no), rollup_relation, rollup_property, rollup_function, prefix (a unique id), number_format | restore prior | | | `database.property_save` | edit |
+| `database_property_save` | `properties/save.php` | **database**, **key** (the property's key or name), **type**, name (a new display name: rename), options[] (for select or multi_select or status), relation_database (a relation's target), two_way (yes or no), rollup_relation, rollup_property, rollup_function, prefix (a unique id), number_format | restore prior | | | `database.property_save` | edit |
 | `database_property_remove` | `properties/remove.php` | **database**, **key**, purge_values (yes or no; no keeps the rows' values) | — | ✔ | other | `database.property_remove` | edit |
-| `database_delete` | `delete.php` | **database** (to the trash, rows and views with it) | page_restore | ✔ | deletion | `database.delete` | full |
-| `row_create` | `rows/save.php` | **database**, title, properties (the values as JSON, keyed by property name), template (a row template), markdown (the body) | row_delete | | | `row.create` | edit_content |
+| `database_delete` | `delete.php` | **database** (to the trash — its rows and views go with it) | page_restore | ✔ | deletion | `database.delete` | full |
+| `row_create` | `rows/save.php` | **database**, title, properties (the values as JSON keyed by property name), template (a row template), markdown (the body) | row_delete | | | `row.create` | edit_content |
 | `row_update` | `rows/save.php` | **row**, any field of row_create | restore prior | | | `row.update` | edit_content |
 | `row_delete` | `rows/delete.php` | **row** (to the trash) | page_restore | ✔ | deletion | `row.delete` | edit_content |
 | `row_relation_set` | `rows/relation.php` | **row**, **property** (a relation), targets[] (the related rows; the whole list) | restore prior | | | `row.relation_set` | edit_content |
@@ -335,7 +335,7 @@ Actions (base `/exports/`; the import names its file absolutely):
 
 | Action | File | Params | Undo | Confirm | Agent approval | Log | Who |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `import_start` | `/import/start.php` | **file** (multipart: .md, .zip or .csv), kind (markdown or markdown_zip or notion_zip or csv; from the file by default), space or parent (where pages land), database (a CSV's target) | — | ✔ | | `page.import` | edit at the destination |
+| `import_start` | `/import/start.php` | **file** (multipart: .md or .zip or .csv), kind (markdown or markdown_zip or notion_zip or csv; from the file by default), space or parent (where pages land), database (a CSV's target) | — | ✔ | | `page.import` | edit at the destination |
 | `export_page` | `page.php` | **page**, format (md or html; md by default), include_subpages (yes or no) | — | | | `page.export` | view and export.own |
 | `export_database` | `database.php` | **database**, format (csv or json), view (a view's filter and columns) | — | | | `page.export` | view and export.own |
 | `export_space` | `space.php` | **space**, format (zip of md or zip of html or json) | — | ✔ | external_send | `space.export` | owner and export.space |
@@ -359,7 +359,7 @@ Actions (base `/admin/`):
 
 | Action | File | Params | Undo | Confirm | Agent approval | Log | Who |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `settings_save` | `settings.php` | any field of the settings (business_name, default_space_kind, default_member_level, default_everyone_level, version_snapshot_minutes, version_retention_days, trash_retention_days, stale_page_days, unanswered_hours, wiki_default_verify_months, max_attachment_bytes, allowed_embed_hosts[], public_pages_noindex, public_base_url, digest_hour, week_start_dow, timezone, group_dm_max_members, away_minutes, admin_channel_name, agents_join_default_space) | restore prior | | other | `settings.save` | admin |
+| `settings_save` | `settings.php` | business_name, default_space_kind, default_member_level, default_everyone_level, version_snapshot_minutes, version_retention_days, trash_retention_days, stale_page_days, unanswered_hours, wiki_default_verify_months, max_attachment_bytes, allowed_embed_hosts[], public_pages_noindex, public_base_url, digest_hour, week_start_dow, timezone, group_dm_max_members, away_minutes, admin_channel_name, agents_join_default_space | restore prior | | other | `settings.save` | admin |
 | `emoji_save` | `emoji.php` | **shortcode**, **emoji**, keywords[] | emoji_delete | | | `emoji.save` | admin |
 | `emoji_delete` | `emoji-delete.php` | **shortcode** | — | | | `emoji.delete` | admin |
 

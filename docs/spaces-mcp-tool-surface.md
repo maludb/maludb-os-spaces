@@ -128,7 +128,7 @@ the 21 rights, from `mcp_app_roles` (db/004).
 ### The shares — for the kernel's token alone (K7, design §8)
 | Tool | Document | Answers |
 |---|---|---|
-| `pages_index` | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the kernel passes the agent's member id as `X-Acting-Member`; the share runs as it): `page_id`, `title`, `space`, `path` (the breadcrumb), `kind`, `last_edited_at`, `verification_state`; `q?` searches titles; paged |
+| `pages_index` | `os.spaces-pages/1` | the pages the **requesting application's expert agent** may see (the share runs as that agent: the consumer names its kernel member id in `as_agent` — the kernel passes a provider no identity of its own, see `docs/build-specs/mcp-servers.md`): `page_id`, `title`, `space`, `path` (the breadcrumb), `kind`, `last_edited_at`, `verification_state`; `q?` searches titles; paged |
 | `page_markdown` | `os.spaces-page/1` | one page as Markdown with its properties and breadcrumb, as that agent may see it; `page` |
 
 Both are people-free (no member identity crosses: authors are names, never ids beyond the acting agent's own view). An application
@@ -156,8 +156,8 @@ reads what one of its agents may read.
 | G1 | `agents_here` · G2 `agent_dispatches` · G3 `librarian_proposals` |
 | ACT1 | `record_history` · ACT2 `actor_timeline` · ACT3 `recent_activity` · ACT4 `who_touched`, `share_reads` · ACT5 `activity_search` |
 
-Every question is a named tool; the reads are the same SQL functions and views the screens call. **Records tools: 57** (including
-`app_roles`, `records_search` and the two shares); **activity tools: 6**.
+Every question is a named tool; the reads are the same SQL functions and views the screens call. **Records tools: 62** (including
+`app_roles`, `records_search` and the two shares; this table said 57 until Phase 4 counted its rows); **activity tools: 6**.
 
 ## What the log must carry for the activity tools (the manifest's log-payload rules)
 Every row: `actor_member_id`, `source` (`web` · `agent` · `assistant` · `cron` · `portal` · `mcp`), `action` (`entity.verb`),
@@ -211,6 +211,13 @@ Every share answers a versioned document: `{"schema": "os.spaces-<name>/1", "gen
 - Reads this application makes: none in v1 (`reads: []`). The sibling cards (HD1 `ticket_card`, P2 `task_card`) are Extended.
 
 ## Size
-57 records tools, 6 activity tools; the resolve block names 12 entities; the two shares. Phase 4 builds them (`mcp/records_server.py`
+62 records tools, 6 activity tools; the resolve block names 12 entities; the two shares. Phase 4 builds them (`mcp/records_server.py`
 with `sp_spaces`, `sp_pages`, `sp_databases`, `sp_channels`, `sp_search`, `sp_agents`, `sp_misc`; `mcp/activity_server.py`) over the
 same views and functions the screens read.
+
+## Phase 4 — what the built servers do beyond this table (2026-10-06; the record is `docs/build-specs/mcp-servers.md`)
+- Every resolve tool answers the plain list for `q` alone; a **UUID given as `q`** is an id lookup (`find_pages` — trash included —, `find_databases`, `get_database` for views, `find_templates`); `page_versions` and `channel_history` and
+  `get_database` resolve versions, messages and views from `q` alone; the resolve block now names 12 entities (proposal, version and export added).
+- `get_settings`, `find_departments`, `agents_here` and `librarian_proposals` refuse a guest in words; everything else answers a guest her smaller world.
+- The shares take `as_agent` (the kernel's call only); without it the index is empty and `page_markdown` is refused.
+- `records_search` takes words and `kinds[]`, never SQL; every list tool pages with `limit` (and `cursor` where the surface says).
