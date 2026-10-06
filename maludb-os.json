@@ -87,7 +87,7 @@
       "name": "Public page",
       "kind": "ui",
       "path": "/p/",
-      "auth_kind": "token",
+      "auth_kind": "none",
       "agent_reachable": false
     },
     {
