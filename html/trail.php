@@ -26,7 +26,7 @@ unset($r);
 $query = array_filter([($record[0] ?? 'x') => $record[1] ?? null, 'action' => $filters['action'], 'period' => $filters['since']], static fn ($v) => $v !== null && $v !== '');
 log_screen_view($pdo, 'trail');
 if (wants_json()) {
-    respond_screen(['rows' => array_map('present_activity_row', $rows), 'page' => $page, 'more' => $result['more'], 'filters' => $query]);
+    respond_screen(['rows' => array_map('present_trail_row', $rows), 'page' => $page, 'more' => $result['more'], 'filters' => $query]);
 }
 $data = ['rows' => $rows, 'page' => $page, 'more' => $result['more'], 'filters' => $filters, 'query' => $query, 'tz' => member_timezone(), 'record' => $record];
 $resultsHtml = view('trail/partials/rows.php', $data);

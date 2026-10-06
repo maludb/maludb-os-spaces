@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-06T00:00:02+00:00",
+    "generated_at": "2026-10-06T00:59:18+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -540,8 +540,8 @@
             "section": "Admin and settings (slice 9)",
             "when": "the workspace's settings: business name, default space kind and levels, snapshot interval, version and trash retention, stale days, unanswered hours, verification default, the attachment limit, embed hosts, public pages noindex, digest hour, week start, time zone, group DM size, away minutes, the admin channel",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "admin-spaces": {
             "screen": "admin-spaces",
@@ -549,8 +549,8 @@
             "section": "Admin and settings (slice 9)",
             "when": "every space, the private ones marked (opening one is logged `space.admin_view`); archive, restore, delete",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "admin-published": {
             "screen": "admin-published",
@@ -558,8 +558,8 @@
             "section": "Admin and settings (slice 9)",
             "when": "every published page, its views and last opened; rotate or unpublish",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "admin-retention": {
             "screen": "admin-retention",
@@ -567,8 +567,8 @@
             "section": "Admin and settings (slice 9)",
             "when": "every channel's retention and the version and trash retentions",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "admin-trash": {
             "screen": "admin-trash",
@@ -576,8 +576,8 @@
             "section": "Admin and settings (slice 9)",
             "when": "everyone's trash: restore, purge, purge all",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         }
     },
     "actions": {
@@ -4192,7 +4192,7 @@
             "approval": "other",
             "log_event": "settings.save",
             "who": "admin",
-            "built": false
+            "built": true
         },
         "emoji_save": {
             "action": "emoji_save",
@@ -4223,7 +4223,7 @@
             "approval": null,
             "log_event": "emoji.save",
             "who": "admin",
-            "built": false
+            "built": true
         },
         "emoji_delete": {
             "action": "emoji_delete",
@@ -4242,7 +4242,7 @@
             "approval": null,
             "log_event": "emoji.delete",
             "who": "admin",
-            "built": false
+            "built": true
         }
     }
 }

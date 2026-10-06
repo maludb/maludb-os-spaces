@@ -9,8 +9,9 @@ $pdo = db();
 $me = (int) current_member_id();
 $id = request_integer('id') ?? request_integer('space') ?? refuse(404, 'Space not found.');
 $s = find_space($pdo, $id) ?? refuse(404, 'Space not found.');
-if ($s['kind'] === 'private' && !$s['i_am_member'] && is_sp_admin()) {
+if ($s['kind'] === 'private' && !$s['i_am_member'] && is_sp_admin() && empty($_SESSION['admin_viewed'][$id])) {      // once per space per session
     space_log($pdo, 'space.admin_view', $id, ['after' => ['name' => $s['name']]]);
+    if (session_status() === PHP_SESSION_ACTIVE) { $_SESSION['admin_viewed'][$id] = true; }
 }
 $home = space_home($pdo, $id);
 $request = $s['i_am_member'] ? null : my_request($pdo, $id, $me);
@@ -22,7 +23,7 @@ $may = ['owner' => $s['i_am_owner'], 'join' => !$s['i_am_member'] && $s['kind'] 
 log_screen_view($pdo, 'space-view');
 if (wants_json()) {
     respond_screen(['space' => present_space($s), 'sections' => array_map('present_section', $home['sections']), 'pages' => array_map('present_root_page', $home['pages']), 'channels' => array_map('present_space_channel', $home['channels']),
-        'members' => array_map('present_space_member', $home['members']), 'wiki' => $home['wiki'], 'my_request' => $request, 'pending_requests' => $pendingCount, 'timeline' => array_map('present_activity_row', $timeline), 'may' => $may]);
+        'members' => array_map('present_space_member', $home['members']), 'wiki' => $home['wiki'], 'my_request' => $request, 'pending_requests' => $pendingCount, 'timeline' => array_map('present_trail_row', $timeline), 'may' => $may]);
 }
 render_screen($s['name'], view('spaces/view.php', ['s' => $s, 'home' => $home, 'request' => $request, 'pendingCount' => $pendingCount, 'timeline' => $timeline, 'may' => $may, 'here' => here_url(), 'tz' => member_timezone(),
     'notice' => sp_notice($_GET['notice'] ?? null, space_notices($s))]), ['activeNav' => 'spaces', 'screen' => 'space-view', 'entity' => 'space', 'recordId' => (string) $id]);

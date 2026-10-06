@@ -166,12 +166,12 @@ const smallControls = (page, scope) => page.evaluate((s) => [...document.querySe
   await page.keyboard.press('Escape');
   ok(!(await shown(page, '#right-pane')) && Math.round((await page.locator('#page-content').boundingBox()).width) === Math.round(beforeW), 'Escape closes it and the main pane takes the width back');
   await page.screenshot({ path: `${SHOTS}/desktop-home.png` });
-  await page.click('#nav-admin-trash .nxl-link');                 // a placeholder (slice 9) — HTMX navigation pushes its URL
+  await page.click('#nav-admin-trash .nxl-link');                 // a real screen since slice 9 — HTMX navigation pushes its URL
   await page.waitForURL(BASE + '/admin/trash');
-  await page.waitForSelector('#admin-trash-coming');
-  ok((await page.title()).startsWith('Trash'), 'HTMX navigation: /admin/trash pushed, title "' + (await page.title()) + '"');
+  await page.waitForSelector('#admin-trash-content');
+  ok((await page.title()).startsWith('Everyone'), 'HTMX navigation: /admin/trash pushed, title "' + (await page.title()) + '"');
   ok(await page.evaluate(() => document.querySelector('#nav-admin-trash .nxl-link').classList.contains('active') && !document.querySelector('#nav-home .nxl-link').classList.contains('active')), 'the sidebar highlights the screen, not Home');
-  await page.screenshot({ path: `${SHOTS}/desktop-placeholder.png` });
+  await page.screenshot({ path: `${SHOTS}/desktop-admin-trash.png` });
   await page.goBack();
   await page.waitForURL(BASE + '/');
   ok(true, 'the browser back button returns to /');

@@ -119,7 +119,11 @@ function restore_page(PDO $pdo, string $uuid, int $by): void
 /** Delete a trashed page and its subtree for good. Returns how many pages went. */
 function purge_page(PDO $pdo, string $uuid, int $by): int
 {
-    return (int) one_value($pdo, 'SELECT sp_page_purge(CAST(:id AS uuid))', ['id' => $uuid]);
+    require_once dirname(__DIR__) . '/channels/retention.php';
+    $files = subtree_attachment_ids($pdo, $uuid);                   // read before the pages go; the files follow them (db/008's purge leaves the rows)
+    $n = (int) one_value($pdo, 'SELECT sp_page_purge(CAST(:id AS uuid))', ['id' => $uuid]);
+    drop_gone_attachments($pdo, $files);
+    return $n;
 }
 
 /** Empty the trash the caller may see (or a space's). Returns how many pages went. */

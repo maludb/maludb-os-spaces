@@ -1,0 +1,76 @@
+<?php
+/** Proof — Admin spaces (spec "Proof", 3): every space including the private one marked; opening it logs space.admin_view once per session; a Member → 403; archive, restore, delete from the page (slice 1's actions). */
+require __DIR__ . '/lib.php';
+$w = home_world();
+$run = run_id();
+$owner = as_member(1); $marco = as_member(27); $priya = as_member(26); $ann = as_member(29);
+[, $b] = act($marco, '/spaces/save.php', ['name' => "SMOKE Secret $run", 'kind' => 'private', 'icon' => '🔒']);
+$secret = (int) $b['record_id'];
+[, $b] = act($marco, '/spaces/save.php', ['name' => "SMOKE Open $run", 'kind' => 'open']);
+$open = (int) $b['record_id'];
+[, $b] = act($marco, '/spaces/save.php', ['name' => "SMOKE Spare $run", 'kind' => 'closed']);
+$spare = (int) $b['record_id'];
+
+echo "1. Every space, the private ones marked\n";
+[$c, $d] = screen($owner, '/admin/spaces');
+$by = array_column($d['spaces'] ?? [], null, 'space_id');
+ok($c === 200 && isset($by[$secret], $by[$open], $by[$w['product']], $by[$w['general']]) && $by[$secret]['private'] === true && $by[$open]['private'] === false, 'the admin sees every space, the private one included and marked: ' . count($by));
+ok($by[$secret]['member_count'] === 1 && $by[$secret]['owners'] === 'SMOKE Marco' && $by[$w['product']]['page_count'] >= 1 && $by[$w['product']]['channel_count'] >= 1, 'with the counts and the owner');
+[$c, $dm] = screen($marco, '/spaces/');
+ok(isset(array_column(array_merge($dm['mine'], $dm['open'], $dm['closed']), null, 'space_id')[$secret]), 'Marco sees his own private space on the Spaces list');
+$page = req('GET', '/admin/spaces', ['jar' => $owner])['body'];
+ok(str_contains($page, 'id="admin-space-row-' . $secret . '-lock"') && str_contains($page, 'feather-lock') && !str_contains($page, 'id="admin-space-row-' . $open . '-lock"'), 'the screen marks the private one with feather-lock, not the open one');
+ok(str_contains($page, 'href="/spaces/' . $secret . '?back='), 'every name is a link to the space (with a way back)');
+[, $dp] = screen($owner, '/admin/spaces?kind=private');
+ok(count($dp['spaces']) >= 1 && array_filter($dp['spaces'], fn ($s) => $s['kind'] !== 'private') === [] && isset(array_column($dp['spaces'], null, 'space_id')[$secret]), 'the kind filter: private only');
+[, $do] = screen($owner, '/admin/spaces?kind=open');
+ok(array_filter($do['spaces'], fn ($s) => $s['kind'] !== 'open') === [] && isset(array_column($do['spaces'], null, 'space_id')[$open]), 'the kind filter: open only');
+
+echo "2. Opening a private space logs space.admin_view once per session\n";
+$j = jar(); [$j] = sign_on(1);
+$log0 = last_activity_id();
+$r1 = req('GET', '/spaces/' . $secret, ['jar' => $j]);
+$r2 = req('GET', '/spaces/' . $secret, ['jar' => $j]);
+$ev = activity_after('space.admin_view', $log0);
+ok($r1['code'] === 200 && $r2['code'] === 200 && count($ev) === 1 && (int) $ev[0]['space_id'] === $secret && (int) $ev[0]['actor_member_id'] === 1, 'opened twice in one session: one space.admin_view row, with the space id');
+$j2 = jar(); [$j2] = sign_on(1);
+req('GET', '/spaces/' . $secret, ['jar' => $j2]);
+ok(count(activity_after('space.admin_view', $log0)) === 2, 'a new session logs it again');
+req('GET', '/spaces/' . $open, ['jar' => $j2]);
+ok(count(activity_after('space.admin_view', $log0)) === 2, 'an open space is never logged');
+$trail = req('GET', '/trail?space=' . $secret . '&action=space.', ['jar' => $owner, 'headers' => JSONH]);
+$rows = json_decode($trail['body'], true)['data']['rows'] ?? [];
+ok(array_filter($rows, fn ($r) => $r['action'] === 'space.admin_view' && str_contains($r['sentence'], 'opened a private space as admin')) !== [], 'and the trail of that space says so in words');
+
+echo "3. Gates\n";
+[$c] = screen($priya, '/admin/spaces');
+ok($c === 403, 'a Member: 403');
+[$c] = screen($marco, '/admin/spaces');
+ok($c === 403, 'a space owner: 403');
+[$c] = screen($ann, '/admin/spaces');
+ok($c === 403, 'a guest: 403');
+$r = req('POST', '/admin/spaces', ['jar' => $owner, 'form' => ['csrf_token' => page_csrf($owner)]]);
+ok($r['code'] === 405, 'a POST to the screen: 405');
+ok(str_contains(req('GET', '/admin/spaces', ['jar' => $priya])['body'], 'You may not'), 'the refusal is in words');
+
+echo "4. Archive, restore and delete from the page\n";
+$log0 = last_activity_id();
+[$c, $b] = act($owner, '/spaces/archive.php', ['space' => $spare, 'return_to' => '/admin/spaces']);
+ok($c === 200 && $b['location'] === '/admin/spaces?notice=archived' && one('SELECT archived_at FROM spaces WHERE id = :s', ['s' => $spare]) !== null, 'Archive (slice 1\'s action) from the page lands back on the page');
+[, $d] = screen($owner, '/admin/spaces');
+ok(!isset(array_column($d['spaces'], null, 'space_id')[$spare]), 'an archived space leaves the default list');
+[, $d] = screen($owner, '/admin/spaces?archived=1');
+$a = array_column($d['spaces'], null, 'space_id')[$spare] ?? null;
+ok($a !== null && $a['archived'] === true, 'and is there with ?archived=1, marked archived');
+$page = req('GET', '/admin/spaces?archived=1', ['jar' => $owner])['body'];
+ok(str_contains($page, 'id="admin-space-row-' . $spare . '-restore-btn"') && str_contains($page, 'id="admin-space-row-' . $spare . '-delete-btn"') && str_contains($page, 'id="admin-space-row-' . $spare . '-archived"'), 'the card offers Restore and Delete');
+[$c, $b] = act($owner, '/spaces/restore.php', ['space' => $spare]);
+ok($c === 200 && one('SELECT archived_at FROM spaces WHERE id = :s', ['s' => $spare]) === null, 'Restore');
+act($owner, '/spaces/archive.php', ['space' => $spare]);
+[$c, $b] = act($owner, '/spaces/delete.php', ['space' => $spare]);
+ok($c === 200 && (int) one('SELECT count(*) FROM spaces WHERE id = :s', ['s' => $spare]) === 0, 'Delete (an archived space, for good)');
+$page = req('GET', '/admin/spaces', ['jar' => $owner])['body'];
+ok(str_contains($page, 'id="admin-space-row-' . $w['general'] . '"') && !str_contains($page, 'id="admin-space-row-' . $w['general'] . '-archive-btn"'), 'General has no Archive button');
+$n = (int) one("SELECT count(*) FROM activity_log WHERE action = 'screen.view' AND screen = 'admin-spaces'");
+ok($n >= 1, "the screen logs screen.view ($n)");
+finish();

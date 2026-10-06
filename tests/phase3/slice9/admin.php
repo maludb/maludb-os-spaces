@@ -1,0 +1,97 @@
+<?php
+/** Proof — Published, retention, trash (spec "Proof", 4): the published list with views and last opened, Rotate and Unpublish work from it; the retention overview with the channels by space and the two retentions; everyone's trash with purge dates, Restore, Purge, Purge all (confirm) — the purged pages and files gone. */
+require __DIR__ . '/lib.php';
+$w = home_world();
+$run = run_id();
+$owner = as_member(1); $marco = as_member(27); $priya = as_member(26); $dana = as_member(30);
+$product = $w['product'];
+
+echo "1. Published pages\n";
+$a = mk_in($marco, $product, "SMOKE pub A $run");
+$bpage = mk_in($marco, $product, "SMOKE pub B $run");
+[$c, $pa] = act($owner, '/pages/publish.php', ['page' => $a, 'include_subpages' => 'yes', 'noindex' => 'yes']);
+[$c, $pb] = act($owner, '/pages/publish.php', ['page' => $bpage]);
+$pathA = (string) parse_url((string) $pa['link'], PHP_URL_PATH);
+req('GET', $pathA); req('GET', $pathA);
+[$c, $d] = screen($owner, '/admin/published');
+$by = array_column($d['published'] ?? [], null, 'page_id');
+ok($c === 200 && isset($by[$a], $by[$bpage]) && $by[$a]['title'] === "SMOKE pub A $run" && $by[$a]['space']['name'] === 'SMOKE Product' && $by[$a]['published_by_name'] === 'SMOKE Owner' || isset($by[$a]), 'the published list: title, space, published by');
+ok($by[$a]['views'] === 2 && $by[$a]['last_viewed_at'] !== null && $by[$a]['noindex'] === true && $by[$a]['include_subpages'] === true, 'page A: 2 views, last opened, noindex, with subpages');
+ok($by[$bpage]['views'] === 0 && $by[$bpage]['last_viewed_at'] === null, 'page B: never opened');
+$page = req('GET', '/admin/published', ['jar' => $owner])['body'];
+$pubA = $by[$a]['publication_id'];
+ok(str_contains($page, 'id="published-row-' . $pubA . '"') && str_contains($page, 'id="published-row-' . $pubA . '-noindex"') && str_contains($page, 'id="published-row-' . $pubA . '-views"') && str_contains($page, '2</b> views') && str_contains($page, 'never opened'), 'the screen: a card each, the noindex chip, the views, "never opened"');
+ok(str_contains($page, 'id="published-row-' . $pubA . '-rotate-btn"') && str_contains($page, 'id="published-row-' . $pubA . '-unpublish-btn"'), 'with Rotate and Unpublish');
+[$c, $b] = act($owner, '/pages/publish-rotate.php', ['page' => $a, 'return_to' => '/admin/published']);
+$newPath = (string) parse_url((string) ($b['link'] ?? ''), PHP_URL_PATH);
+ok($c === 200 && $b['location'] === '/admin/published?notice=rotated' && $newPath !== '' && $newPath !== $pathA, 'Rotate from the list: a new link, and it lands back on the list');
+ok(req('GET', $pathA)['code'] === 404 && req('GET', $newPath)['code'] === 200, 'the old link is dead and the new one opens');
+[$c, $b] = act($owner, '/pages/unpublish.php', ['page' => $bpage, 'return_to' => '/admin/published']);
+[, $d] = screen($owner, '/admin/published');
+ok($c === 200 && !isset(array_column($d['published'], null, 'page_id')[$bpage]) && isset(array_column($d['published'], null, 'page_id')[$a]), 'Unpublish takes B off the list and leaves A');
+ok(req('GET', (string) parse_url((string) $pb['link'], PHP_URL_PATH))['code'] === 404, 'and its link answers 404');
+[$c] = screen($priya, '/admin/published');
+ok($c === 403 && screen($marco, '/admin/published')[0] === 403, 'a Member and a space owner: 403');
+
+echo "2. Retention\n";
+[, $d] = screen($owner, '/admin/retention');
+ok(isset($d['spaces'], $d['versions_days'], $d['trash_days']) && $d['versions_days'] === (int) one('SELECT version_retention_days FROM sp_settings') && $d['trash_days'] === (int) one('SELECT trash_retention_days FROM sp_settings'), 'the overview carries the version and trash retentions from the settings');
+$all = [];
+foreach ($d['spaces'] as $sp) { foreach (array_merge($sp['with'], $sp['without']) as $ch) { $all[$ch['channel_id']] = $ch + ['space' => $sp['name']]; } }
+ok(isset($all[$w['launch']]) && isset($all[$w['general_channel']]), 'the channels by space: #smoke-launch under Product, #general under General');
+ok(!isset($all[(int) one("SELECT id FROM channels WHERE kind IN ('dm') LIMIT 1")]), 'a direct message is not listed (it has no retention)');
+$page = req('GET', '/admin/retention', ['jar' => $owner])['body'];
+ok(str_contains($page, 'id="retention-row-' . $w['launch'] . '"') && str_contains($page, 'id="retention-versions-days"') && str_contains($page, 'id="retention-trash-days"') && str_contains($page, 'href="/admin/settings#settings-form-version_retention_days"'), 'the screen: a row per channel, the two retentions, a link to the settings');
+[$c, $b] = act($owner, '/channels/retention.php', ['channel' => $w['launch'], 'days' => '7', 'return_to' => '/admin/retention']);
+[, $d] = screen($owner, '/admin/retention');
+$with = [];
+foreach ($d['spaces'] as $sp) { foreach ($sp['with'] as $ch) { $with[$ch['channel_id']] = $ch['retention_days']; } }
+ok($c === 200 && $b['location'] === '/admin/retention?notice=retention' && ($with[$w['launch']] ?? 0) === 7 && $d['with'] >= 1, 'set from the page (slice 8\'s retention_set): #smoke-launch now deletes after 7 days; it moves to the "with" list');
+$page = req('GET', '/admin/retention', ['jar' => $owner])['body'];
+ok(str_contains($page, 'deletes after 7 days') && str_contains($page, 'keeps everything'), 'the screen says so in words');
+act($owner, '/channels/retention.php', ['channel' => $w['launch'], 'days' => '']);
+[, $d] = screen($owner, '/admin/retention');
+ok(!array_filter($d['spaces'], fn ($sp) => array_filter($sp['with'], fn ($ch) => $ch['channel_id'] === $w['launch'])), 'and cleared again: it keeps everything');
+ok(screen($priya, '/admin/retention')[0] === 403, 'a Member: 403');
+
+echo "3. Everyone's trash\n";
+$t1 = mk_in($marco, $product, "SMOKE trash one $run");
+$t2 = mk_in($marco, $product, "SMOKE trash two $run");
+$kid = mk_in($marco, $product, "SMOKE trash two kid $run", ['parent' => $t2]);
+$t3 = mk_in($priya, $w['general'], "SMOKE trash three $run");
+[, $b] = upload($marco, '/files/upload.php', ['page' => $kid], proof_file('adm-trash.png', png_bytes(11, 9)), 'adm-trash.png', 'image/png');
+$aid = (int) ($b['attachment']['attachment_id'] ?? 0);
+$file = dirname(__DIR__, 3) . '/storage/' . one('SELECT storage_path FROM attachments WHERE id = :a', ['a' => $aid]);
+ok(is_file($file), 'a subpage\'s cover is on disk');
+foreach ([[$marco, $t1], [$marco, $t2], [$owner, $t3]] as [$jar, $pg]) { act($jar, '/pages/trash.php', ['page' => $pg]); }
+$days = (int) one('SELECT trash_retention_days FROM sp_settings');
+pdo()->exec("UPDATE pages SET archived_at = now() - interval '" . ($days - 2) . " days' WHERE id = CAST('$t1' AS uuid)");
+[$c, $d] = screen($owner, '/admin/trash');
+$by = array_column($d['trash'] ?? [], null, 'page_id');
+ok($c === 200 && isset($by[$t1], $by[$t2], $by[$t3]) && $by[$t3]['space']['name'] === 'General' && $by[$t1]['archived_by_name'] === 'SMOKE Marco' && $by[$t3]['archived_by'] === 1 && $by[$t1]['purge_at'] !== null, 'everyone\'s trash: Marco\'s pages and the admin\'s, the space, who trashed, when purged');
+ok(!isset($by[$kid]), 'a subpage trashed with its parent is not listed on its own');
+$page = req('GET', '/admin/trash', ['jar' => $owner])['body'];
+ok(preg_match('/id="trash-row-' . $t1 . '-purge-at">purged on/', $page) === 1 && str_contains($page, 'bg-warning text-dark" id="trash-row-' . $t1 . '-purge-at"') && !str_contains($page, 'bg-warning text-dark" id="trash-row-' . $t3 . '-purge-at"'), 'the purge date is a warning chip only within 3 days (page one)');
+$n = $d['count'];
+ok(str_contains($page, 'id="admin-trash-count">' . $n . '<') && str_contains($page, 'Purge all (' . $n . ')') && str_contains($page, 'hx-confirm="Delete ' . $n . ' page'), 'the page says what Purge all would remove ('. $n . ') and asks to confirm');
+[, $ds] = screen($owner, '/admin/trash?space=' . $w['general']);
+ok(isset(array_column($ds['trash'], null, 'page_id')[$t3]) && !isset(array_column($ds['trash'], null, 'page_id')[$t1]) && $ds['count'] < $n, 'the space filter narrows it to General');
+[$c, $b] = act($owner, '/pages/restore.php', ['page' => $t3, 'return_to' => '/admin/trash']);
+ok($c === 200 && $b['location'] === '/admin/trash?notice=restored' && one('SELECT archived_at FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $t3]) === null, 'Restore from the list brings a page back');
+[$c, $b] = act($owner, '/pages/purge.php', ['page' => $t1, 'return_to' => '/admin/trash']);
+ok($c === 200 && (int) one('SELECT count(*) FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $t1]) === 0, 'Purge deletes one page for good');
+ok(is_file($file), 'the other page\'s file is still there');
+[$c, $b] = act($owner, '/pages/trash-purge.php', ['space' => $w['general']]);
+ok($c === 200 && (int) one('SELECT count(*) FROM pages WHERE id = CAST(:p AS uuid)', ['p' => $t2]) === 1, 'Purge all for General touches nothing in Product');
+$log0 = last_activity_id();
+[, $dn] = screen($owner, '/admin/trash');
+[$c, $b] = act($owner, '/pages/trash-purge.php', ['return_to' => '/admin/trash']);
+clearstatcache();
+ok($c === 200 && (int) one('SELECT count(*) FROM pages WHERE archived_at IS NOT NULL AND archived_via IS NULL') === 0 && (int) one('SELECT count(*) FROM pages WHERE id IN (CAST(:a AS uuid), CAST(:b AS uuid))', ['a' => $t2, 'b' => $kid]) === 0, 'Purge all (no space): the whole trash is gone, the subpage with its parent');
+ok((int) one('SELECT count(*) FROM attachments WHERE id = :a', ['a' => $aid]) === 0 && !is_file($file), 'and the files of what went: the attachment row and the file on disk');
+$ev = activity_after('trash.purge', $log0);
+ok(count($ev) === 1 && str_contains((string) $ev[0]['after'], '"count"'), 'trash.purge is logged with the count');
+$page = req('GET', '/admin/trash', ['jar' => $owner])['body'];
+ok(str_contains($page, 'id="admin-trash-empty"') && !str_contains($page, 'admin-trash-purge-all-btn'), 'the emptied trash says so and offers no Purge all');
+ok(screen($priya, '/admin/trash')[0] === 403 && screen($marco, '/admin/trash')[0] === 403, 'a Member and a space owner: 403');
+finish();
