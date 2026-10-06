@@ -17,7 +17,7 @@ if ($id !== null) {
 }
 $screen = $cur === null ? 'channel-add' : 'channel-edit';
 $spaces = spaces_for_channel_create($pdo);
-$may = ['manage' => $cur !== null && channel_owner($cur), 'retention' => $cur !== null && (has_right('retention.manage') || has_right('channel.manage') || is_sp_admin())];
+$may = ['manage' => $cur !== null && channel_owner($cur), 'retention' => $cur !== null && !in_array($cur['kind'], ['dm', 'group_dm'], true) && (has_right('retention.manage') || is_sp_admin() || (has_right('channel.manage') && !empty($cur['i_own_space'])))];
 log_screen_view($pdo, $screen);
 if (wants_json()) {
     respond_screen(['channel' => $cur === null ? null : present_channel($cur), 'spaces' => array_map(static fn (array $s): array => ['space_id' => (int) $s['space_id'], 'name' => $s['name']], $spaces), 'kinds' => ['public', 'private'], 'may' => $may]);

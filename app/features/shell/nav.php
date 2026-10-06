@@ -27,6 +27,8 @@ function nav_groups(): array
             ['notifications', '/notifications',    'feather-bell',     'Notifications', 'spaces.join|spaces.guest'],
             ['tokens',        '/settings/tokens/', 'feather-key',      'Tokens',        'spaces.join|spaces.guest'],
             ['trail',         '/trail',            'feather-list',     'My trail',      'spaces.join|spaces.guest'],
+            ['import',        '/import',           'feather-upload-cloud', 'Import',    'pages.write|databases.write'],
+            ['exports',       '/exports/',         'feather-download', 'Exports',       'export.own'],
         ],
         'Admin' => [
             ['admin-settings',    '/admin/settings',    'feather-sliders',        'Settings',            'settings.manage'],
@@ -181,7 +183,7 @@ function with_back(string $url, string $here): string
 
 /** The slice that builds each not-yet-built menu item, in words — the placeholders and the registry read it. */
 const NAV_SLICES = ['saved' => 'slice 4', 'search' => 'slice 6', 'spaces' => 'slice 1', 'pages' => 'slice 2', 'channels' => 'slice 4', 'dms' => 'slice 4', 'activity' => 'slice 6',
-    'admin-settings' => 'slice 9', 'admin-spaces' => 'slice 9', 'admin-published' => 'slice 9', 'admin-retention' => 'slice 9', 'admin-exports' => 'slice 8', 'admin-trash' => 'slice 9'];
+    'admin-settings' => 'slice 9', 'admin-spaces' => 'slice 9', 'admin-published' => 'slice 9', 'admin-retention' => 'slice 9', 'admin-trash' => 'slice 9'];
 
 /**
  * A screen of the manifest that its slice has not built yet (Phase 2): the shell, the page header, one card saying which

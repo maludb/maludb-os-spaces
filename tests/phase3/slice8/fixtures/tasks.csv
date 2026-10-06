@@ -1,0 +1,4 @@
+Task,Points,Kind,Impact,Urgent
+SMOKE Csv one,4,Bug,High,yes
+SMOKE Csv two,6,Feature,Low,no
+SMOKE Csv three,1,Feature,High,no

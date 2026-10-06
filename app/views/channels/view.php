@@ -26,6 +26,7 @@ $crumbs = $isDm ? [['Home', '/'], ['Direct messages', '/dm/'], [$title, null]] :
     <div class="fs-12 text-muted mb-2 d-flex flex-wrap gap-2 align-items-center" id="channel-view-head">
         <?php if ($isDm): ?><span><i class="feather-<?= $c['kind'] === 'dm' ? 'user' : 'users' ?> me-1"></i><?php foreach ($members as $mm): if ($mm['member_id'] === $me) { continue; } ?><span class="me-1"><?= e($mm['display_name']) ?><?= $mm['is_agent'] ? ' <span class="badge bg-soft-info text-info">agent</span>' : '' ?></span><?php endforeach; ?></span>
         <?php else: ?><?php if (($c['topic'] ?? '') !== ''): ?><span id="channel-view-topic"><?= e($c['topic']) ?></span><?php endif; ?><?php if (($c['purpose'] ?? '') !== ''): ?><span class="text-muted">· <?= e($c['purpose']) ?></span><?php endif; ?><?php endif; ?>
+        <?php if (!$isDm && ($c['retention_days'] ?? null) !== null): ?><span class="badge bg-soft-warning text-warning" id="channel-view-retention"><i class="feather-clock me-1"></i>Messages older than <?= (int) $c['retention_days'] ?> day<?= (int) $c['retention_days'] === 1 ? '' : 's' ?> are deleted</span><?php endif; ?>
         <?php if ($c['archived_at'] !== null): ?><span class="badge bg-dark" id="channel-view-archived">archived</span><?php endif; ?>
         <?php if ($c['starred']): ?><span class="text-warning">★</span><?php endif; ?>
         <?php if (($c['notify'] ?? 'all') === 'none'): ?><span class="badge bg-soft-secondary text-secondary" id="channel-view-muted">muted</span><?php endif; ?>

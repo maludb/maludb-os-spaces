@@ -48,3 +48,14 @@ echo "   - the first spaces beyond General and the standing departments' (Phase 
 echo "   - the Librarian's duty (30 6 * * 1) in Agent HR until the installer reads agents[].duty"
 echo "   - the connections a super-admin approves (bin/app_connection.php): Help Desk, Projects and Consultant Tracking reading pages_index and page_markdown;"
 echo "     HD1 (ticket_card) and P2 (task_card) for live previews in their own repositories (Extended)"
+
+# ------------------------------------------------------------------------------------------------------------------
+# 4. SLICE 8 — the worker, imports, exports and retention (written 2026-10-05; nothing here has been run).
+echo "== 4. The worker, imports and exports (slice 8)"
+echo "   - the installer installs deploy/spaces-worker.service and .timer (maludb-os.json services[]); the timer runs bin/worker.php once a minute as www-data. Check:"
+echo "       systemctl list-timers 'spaces-*' ; journalctl -u spaces-worker -n 5   (one JSON line a pass; exit 1 only when a step erred)"
+echo "   - storage/exports and storage/imports are made by the application under storage/ (www-data writes there already for attachments); exports are kept 7 days, then the worker removes the file."
+echo "   - the vhost raises PHP's upload ceiling to 64 MB (deploy/apache-spaces.conf, php_admin_value under mod_php): the WORKSPACE's own limit (Settings: attachment limit, 25 MB by default) is what the application enforces."
+echo "     With php-fpm instead of mod_php, set upload_max_filesize = 64M and post_max_size = 72M in the pool."
+echo "   - MaluMail (MALUMAIL_API_KEY, MAIL_FROM, MAIL_FROM_NAME) makes the outbox send email; without a key every email row fails once and is never retried (at most once). Texts need the K6 sender (step 3)."
+echo "   - the digest hour and the retention days are the workspace's settings (Admin > Settings); channel retention is set on each channel (off by default)."

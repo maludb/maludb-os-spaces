@@ -11,7 +11,7 @@ STATE=${SP_DEV_STATE:-/tmp/sp-dev2-state}
 mkdir -p "$STATE"
 stop() {
   for f in "$STATE"/*.pid; do [ -e "$f" ] && kill "$(cat "$f")" 2>/dev/null || true; rm -f "$f"; done
-  pkill -f 'php -S 127.0.0.1:840[1236]' 2>/dev/null || true       # the built-in server's forked workers outlive their parent
+  pkill -f 'php .*-S 127.0.0.1:840[1236]' 2>/dev/null || true       # the built-in server's forked workers outlive their parent
   [ -f "$STATE/apache/main.conf" ] && apache2 -f "$STATE/apache/main.conf" -k stop 2>/dev/null || true
   sleep 0.3
 }
@@ -42,7 +42,7 @@ open(out + '/main.conf', 'w').write('ServerRoot "/etc/apache2"\nDefaultRuntimeDi
 PY
       apache2 -f "$STATE/apache/main.conf" -k start
     else
-      ( cd "$ROOT" && PHP_CLI_SERVER_WORKERS=4 php -S 127.0.0.1:8401 -t html tests/dev_router.php >"$STATE/app.log" 2>&1 & echo $! > "$STATE/app.pid" )
+      ( cd "$ROOT" && PHP_CLI_SERVER_WORKERS=4 php -d upload_max_filesize=64M -d post_max_size=72M -S 127.0.0.1:8401 -t html tests/dev_router.php >"$STATE/app.log" 2>&1 & echo $! > "$STATE/app.pid" )
     fi
     for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8401/api/v1/health && break; sleep 0.2; done
     echo "servers up (app :8401 ${SP_APP:-php}, fake kernel :8402, fake MaluDB :8403, fake MaluMail :8406)" ;;

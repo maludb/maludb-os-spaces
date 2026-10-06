@@ -89,11 +89,6 @@ function set_channel_notify(PDO $pdo, int $id, int $memberId, array $f): void
     $pdo->prepare('UPDATE channel_members SET ' . implode(', ', $sets) . ' WHERE channel_id = :c AND member_id = :m')->execute($args);
 }
 
-function set_retention(PDO $pdo, int $id, ?int $days): void
-{
-    $pdo->prepare('UPDATE channels SET retention_days = :d WHERE id = :id')->execute(['d' => $days, 'id' => $id]);
-}
-
 function pin(PDO $pdo, int $channelId, ?int $messageId, ?string $pageId, int $by): int
 {
     $st = $pdo->prepare('INSERT INTO channel_pins (channel_id, message_id, page_id, pinned_by) VALUES (:c, :m, CAST(:p AS uuid), :by) ON CONFLICT DO NOTHING RETURNING id');

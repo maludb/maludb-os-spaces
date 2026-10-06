@@ -7,4 +7,8 @@ Type=oneshot
 User=www-data
 Group=www-data
 WorkingDirectory={{APP_DIR}}
+# One pass: the steps whose moment has come (bin/worker.php, slice 8). A pass that finds another still running exits at once (an advisory lock); a long one (a big import, a dispatch
+# waiting on an agent) is given ten minutes, and the timer's next tick waits for it (a oneshot service is never started twice).
+TimeoutStartSec=600
+SyslogIdentifier=spaces-worker
 ExecStart=/usr/bin/php {{APP_DIR}}/bin/worker.php

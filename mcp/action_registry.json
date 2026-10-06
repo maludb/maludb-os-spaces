@@ -1,6 +1,6 @@
 {
     "generated_from": "docs/spaces-action-manifest.md",
-    "generated_at": "2026-10-05T22:44:54+00:00",
+    "generated_at": "2026-10-06T00:00:02+00:00",
     "screens": {
         "home": {
             "screen": "home",
@@ -522,7 +522,7 @@
                 "parent",
                 "database"
             ],
-            "built": false,
+            "built": true,
             "stub": false
         },
         "export-list": {
@@ -531,8 +531,8 @@
             "section": "The worker, imports, exports and retention (slice 8)",
             "when": "my exports (the admin's: everyone's): make one, download one before it expires",
             "params": [],
-            "built": false,
-            "stub": true
+            "built": true,
+            "stub": false
         },
         "admin-settings": {
             "screen": "admin-settings",
@@ -3895,7 +3895,7 @@
             "approval": null,
             "log_event": "page.import",
             "who": "edit at the destination",
-            "built": false
+            "built": true
         },
         "export_page": {
             "action": "export_page",
@@ -3926,7 +3926,7 @@
             "approval": null,
             "log_event": "page.export",
             "who": "view and export.own",
-            "built": false
+            "built": true
         },
         "export_database": {
             "action": "export_database",
@@ -3957,7 +3957,7 @@
             "approval": null,
             "log_event": "page.export",
             "who": "view and export.own",
-            "built": false
+            "built": true
         },
         "export_space": {
             "action": "export_space",
@@ -3982,7 +3982,7 @@
             "approval": "external_send",
             "log_event": "space.export",
             "who": "owner and export.space",
-            "built": false
+            "built": true
         },
         "export_channel": {
             "action": "export_channel",
@@ -4019,7 +4019,7 @@
             "approval": "external_send",
             "log_event": "channel.export",
             "who": "owner and export.space",
-            "built": false
+            "built": true
         },
         "export_all": {
             "action": "export_all",
@@ -4038,7 +4038,7 @@
             "approval": "external_send",
             "log_event": "export.all",
             "who": "export.all",
-            "built": false
+            "built": true
         },
         "export_delete": {
             "action": "export_delete",
@@ -4057,7 +4057,7 @@
             "approval": null,
             "log_event": "export.delete",
             "who": "own",
-            "built": false
+            "built": true
         },
         "settings_save": {
             "action": "settings_save",

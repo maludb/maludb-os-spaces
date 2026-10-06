@@ -1,0 +1,98 @@
+<?php
+/** Proof — the worker itself (spec "Proof", 10): --only runs one step; the lock refuses a second pass; a step's error is in errors[] and the others ran; worker_passes has the counts; exit code 1 on an error; the schedule; housekeeping. */
+require __DIR__ . '/lib.php';
+$w = worker_world();
+pdo()->exec('DELETE FROM worker_passes');
+
+echo "1. --only\n";
+$passes0 = (int) one('SELECT count(*) FROM worker_passes');
+[$r, $code, $raw] = run_worker(['--only=search']);
+ok($code === 0 && ($r['worker'] ?? '') === 'pass' && array_keys($r['steps']) === ['search'] && $r['errors'] === [], '--only=search runs that step and no other: ' . $raw);
+[$r, $code] = run_worker(['--only=search,reminders,scheduled']);
+ok(array_keys($r['steps']) === ['scheduled', 'reminders', 'search'] && $code === 0, 'several steps by name run in the order of the schedule');
+[$r, $code, $raw] = run_worker(['--only=nonsense']);
+ok($code === 1 && $r === [], 'an unknown step name: exit 1, nothing run');
+[$r, $code] = run_worker(['--bogus']);
+ok($code === 1, 'an unknown argument: exit 1 with the usage');
+[$r, $code, $raw] = run_worker(['dispatches']);
+ok($code === 0 && ($r['step'] ?? '') === 'dispatches' && isset($r['called']) && isset($r['answered']), 'slice 7\'s form `bin/worker.php dispatches` still answers its counts: ' . $raw);
+
+echo "2. One worker at a time\n";
+$lockPdo = new PDO(sprintf('pgsql:host=%s;port=%s;dbname=%s', need('DB_HOST'), need('DB_PORT'), need('DB_NAME')), need('DB_USER'), need('DB_PASSWORD'), [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$got = (bool) $lockPdo->query("SELECT pg_try_advisory_lock(hashtext('sp_worker'))")->fetchColumn();
+$n = (int) one('SELECT count(*) FROM worker_passes');
+[$r, $code, $raw] = run_worker(['--only=search']);
+ok($got && $code === 0 && isset($r['skipped']) && str_contains($r['skipped'], 'lock') && !isset($r['steps']) && (int) one('SELECT count(*) FROM worker_passes') === $n, 'with the lock held a pass refuses to run and says so: ' . $raw);
+[$r, $code, $raw] = run_worker(['dispatches']);
+ok(isset($r['skipped']) && ($r['step'] ?? '') === 'dispatches', 'slice 7\'s form refuses too');
+$lockPdo->query("SELECT pg_advisory_unlock(hashtext('sp_worker'))");
+[$r, $code] = run_worker(['--only=search']);
+ok($code === 0 && isset($r['steps']['search']), 'released: the next pass runs');
+
+echo "3. A step that errs does not stop the others\n";
+as_postgres('REVOKE DELETE ON sso_nonces FROM spaces_rw');
+[$r, $code, $raw] = run_worker(['--only=housekeeping,search,reminders']);
+as_postgres('GRANT DELETE ON sso_nonces TO spaces_rw');
+ok($code === 1, 'the exit code is 1 when a step erred');
+ok(count($r['errors']) === 1 && $r['errors'][0][0] === 'housekeeping' && is_string($r['errors'][0][1]) && $r['errors'][0][1] !== '', 'the error is in errors[] with the step\'s name and a sentence: ' . json_encode($r['errors']));
+ok(!preg_match('/DELETE|sso_nonces|SQLSTATE|permission/i', $r['errors'][0][1]), 'the sentence carries no SQL and no table name');
+ok(isset($r['steps']['search']) && isset($r['steps']['reminders']) && !isset($r['steps']['housekeeping']['sessions']), 'the other steps ran (search, reminders)');
+$row = q('SELECT steps::text AS steps, error, finished_at FROM worker_passes ORDER BY id DESC LIMIT 1')[0];
+ok($row['error'] !== null && str_contains($row['error'], 'housekeeping') && $row['finished_at'] !== null, 'the worker_passes row holds the error');
+[$r, $code] = run_worker(['--only=housekeeping,search']);
+ok($code === 0 && $r['errors'] === [], 'granted again: clean, exit 0');
+
+echo "4. worker_passes and the log\n";
+$log0 = last_activity_id();
+[$r, $code, $raw] = run_worker(['--only=search,wiki,reminders']);
+$row = q('SELECT id, steps, started_at, finished_at FROM worker_passes ORDER BY id DESC LIMIT 1')[0];
+$steps = json_decode($row['steps'], true);
+ok($row['finished_at'] !== null && isset($steps['search']['indexed']) && isset($steps['wiki']['expired']) && isset($steps['reminders']['fired']) && isset($steps['search']['ran_at']), 'worker_passes: one row a pass, each step\'s counts and when it ran: ' . $row['steps']);
+$ev = activity_after('worker.pass', $log0);
+ok(count($ev) === 1 && $ev[0]['source'] === 'cron' && (int) $ev[0]['entity_id'] === (int) $row['id'] && str_contains((string) $ev[0]['after'], '"search"'), 'worker.pass logged by cron with the counts');
+
+echo "5. The schedule\n";
+pdo()->exec('DELETE FROM worker_passes');
+$at = fn (string $t) => ['SP_WORKER_NOW' => "2030-01-05T{$t}:00Z"];
+[$r, $code] = run_worker([], $at('03:05'));
+$ks = array_keys($r['steps']);
+ok($code === 0 && in_array('prune', $ks, true) && in_array('scheduled', $ks, true) && in_array('outbox', $ks, true) && in_array('search', $ks, true) && in_array('digest', $ks, true) && in_array('retention', $ks, true), 'a full pass at 03:05: the minute steps, search, retention, digest and the daily prune (03:00) are due: ' . implode(',', $ks));
+ok(!in_array('trash', $ks, true) && !in_array('wiki', $ks, true) && !in_array('housekeeping', $ks, true), '03:10, 06:00 and housekeeping are not due yet');
+[$r] = run_worker([], $at('03:06'));
+$ks = array_keys($r['steps']);
+ok(!in_array('prune', $ks, true) && !in_array('search', $ks, true) && !in_array('retention', $ks, true) && !in_array('digest', $ks, true) && in_array('outbox', $ks, true), 'a minute later: only the minute steps (prune once a day, search every 5 minutes, retention hourly, digest every 15)');
+[$r] = run_worker([], $at('03:12'));
+$ks = array_keys($r['steps']);
+ok(in_array('trash', $ks, true) && in_array('search', $ks, true) && !in_array('prune', $ks, true) && !in_array('housekeeping', $ks, true), '03:12: the trash (03:10) is due, search again (5 minutes on), the prune is not');
+[$r] = run_worker([], $at('03:35'));
+$ks = array_keys($r['steps']);
+ok(in_array('housekeeping', $ks, true) && in_array('digest', $ks, true) && !in_array('wiki', $ks, true), '03:35: housekeeping and digest');
+[$r] = run_worker([], $at('06:01'));
+ok(in_array('wiki', array_keys($r['steps']), true) && !in_array('trash', array_keys($r['steps']), true), '06:01: the wiki expiry (06:00)');
+[$r] = run_worker([], $at('06:02'));
+ok(!in_array('wiki', array_keys($r['steps']), true), 'and not twice');
+[$r] = run_worker([], ['SP_WORKER_NOW' => '2030-01-06T03:01:00Z']);
+ok(in_array('prune', array_keys($r['steps']), true) && !in_array('trash', array_keys($r['steps']), true), 'the next day at 03:01 the prune is due again, the trash (03:10) not yet');
+[$r] = run_worker(['--only=prune'], $at('03:02'));
+ok(isset($r['steps']['prune']), '--only forces a step whatever the schedule says');
+
+echo "6. Housekeeping\n";
+pdo()->exec("INSERT INTO sso_nonces (nonce, member_id, expires_at) VALUES ('smoke-old-nonce', 26, now() - interval '3 days'), ('smoke-new-nonce', 26, now() + interval '1 minute') ON CONFLICT DO NOTHING");
+pdo()->exec("INSERT INTO member_sessions (session_hash, member_id, created_at, last_seen_at, ended_at, ended_by) VALUES ('smoke-old-session', 26, now() - interval '200 days', now() - interval '200 days', now() - interval '100 days', 'expired') ON CONFLICT DO NOTHING");
+pdo()->exec("INSERT INTO notification_outbox (channel, member_id, kind, status, subject, body, body_html, to_email, sent_at, created_at) VALUES ('email', 26, 'mention', 'sent', 'SMOKE old subject', 'SMOKE old body', '<p>x</p>', 'priya@example.invalid', now() - interval '200 days', now() - interval '200 days')");
+$oldRow = (int) one("SELECT max(id) FROM notification_outbox");
+pdo()->exec("INSERT INTO worker_passes (started_at, finished_at) VALUES (now() - interval '100 days', now() - interval '100 days')");
+pdo()->exec("INSERT INTO page_recents (member_id, page_id, visited_at) SELECT 26, id, now() - (row_number() OVER ())::int * interval '1 minute' FROM pages WHERE archived_at IS NULL LIMIT 60 ON CONFLICT DO NOTHING");
+$have = (int) one('SELECT count(*) FROM page_recents WHERE member_id = 26');
+$prev = dirname(__DIR__, 3) . '/storage/imports/preview/26-0123456789abcdef';
+@mkdir($prev, 0750, true); file_put_contents($prev . '/x.zip', 'x'); touch($prev, time() - 3 * 86400);
+$r = step('housekeeping');
+clearstatcache();
+ok((int) one("SELECT count(*) FROM sso_nonces WHERE nonce = 'smoke-old-nonce'") === 0 && (int) one("SELECT count(*) FROM sso_nonces WHERE nonce = 'smoke-new-nonce'") === 1, 'an expired sign-on nonce is deleted, a live one stays');
+ok((int) one("SELECT count(*) FROM member_sessions WHERE session_hash = 'smoke-old-session'") === 0, 'a session ended 100 days ago is deleted');
+$o = q('SELECT body, body_html, subject, to_email, status FROM notification_outbox WHERE id = :i', ['i' => $oldRow])[0] ?? [];
+ok(($o['status'] ?? '') === 'sent' && $o['body'] === '' && $o['body_html'] === null && $o['subject'] === null && $o['to_email'] === null, 'an outbox row sent 200 days ago is kept with its body blanked');
+ok((int) one("SELECT count(*) FROM worker_passes WHERE started_at < now() - interval '90 days'") === 0, 'pass rows older than 90 days go');
+ok($have > 50 && (int) one('SELECT count(*) FROM page_recents WHERE member_id = 26') === 50, "a member keeps their 50 latest recents ($have → 50)");
+ok(!is_dir($prev), 'a preview older than a day is swept');
+finish();
