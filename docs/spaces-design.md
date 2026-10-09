@@ -432,7 +432,7 @@ the reads are the same SQL functions the screens call. Records tools: about 48; 
 
 ## 9. Screens (the nxl look; a channel and a page are read at 375 px first; the editor is designed at 1280 px and works at
 375; no modals — the slash menu, the mention picker, the emoji picker and the property editor are popovers inside the
-editor; cards for named things — spaces, pages in a list, the gallery view —, tables for the table view and admin lists;
+editor — except the record picker (2026-10-09, `docs/spaces-record-picker.md`), the one dialog, which only chooses and closes; cards for named things — spaces, pages in a list, the gallery view —, tables for the table view and admin lists;
 every name a link; every page a way back)
 
 **The shell**: a three-pane layout at 1280 (the sidebar: Home · Activity · Saved · Search, then **Favorites**, then each

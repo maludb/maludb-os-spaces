@@ -7,8 +7,9 @@ $back = $cur === null ? ['/channels/', 'Channels'] : ['/channels/' . (int) $id, 
         <?= csrf_field() ?><?php if ($id !== null): ?><input type="hidden" name="channel" value="<?= (int) $id ?>"><?php endif; ?>
         <div class="card mb-3"><div class="card-header"><h5 class="card-title mb-0">The channel</h5></div><div class="card-body">
             <?php if ($cur === null): ?>
-            <label class="form-label fs-12 text-muted" for="channel-form-field-space">Space</label>
-            <select name="space" id="channel-form-field-space" class="form-select btn-touch mb-3" required><?php foreach ($spaces as $s): ?><option value="<?= (int) $s['space_id'] ?>" <?= (int) $s['space_id'] === (int) $space ? 'selected' : '' ?>><?= e(($s['icon'] ?? '') !== '' ? $s['icon'] . ' ' : '') ?><?= e($s['name']) ?></option><?php endforeach; ?></select>
+            <label class="form-label fs-12 text-muted" for="channel-form-field-space-open">Space</label>
+            <?php $spaceIds = array_map('intval', array_column($spaces, 'space_id')); $spaceNow = in_array((int) $space, $spaceIds, true) ? (int) $space : ($spaceIds[0] ?? null); /* the select began on the first space; so does the picker */ ?>
+            <div class="mb-3"><?= picker_field(['id' => 'channel-form-field-space', 'name' => 'space', 'source' => 'space_member', 'value' => $spaceNow, 'required' => true, 'title' => 'Spaces', 'search' => 'Search spaces…']) ?></div>
             <?php else: ?><div class="fs-12 text-muted mb-3">In <strong><?= e($cur['space_name']) ?></strong> — a channel stays in its space.</div><?php endif; ?>
             <label class="form-label fs-12 text-muted" for="channel-form-field-name">Name</label>
             <div class="input-group mb-1"><span class="input-group-text">#</span><input type="text" name="name" id="channel-form-field-name" class="form-control btn-touch" maxlength="80" required pattern="[a-z0-9][a-z0-9_-]{0,79}" value="<?= e($cur['name'] ?? '') ?>" <?= !empty($cur['is_default']) ? 'readonly' : '' ?> placeholder="launch-plan"></div>

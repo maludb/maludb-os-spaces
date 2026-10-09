@@ -7,6 +7,15 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 const require = createRequire('/var/www/web/node_modules/');
 const { chromium } = require('playwright');
+
+// the record picker (docs/spaces-record-picker.md): choose a record the way a person does — open the field, search, tap the row
+async function pickRecord(page, id, query, value) {
+  await page.click(`#${id}-open`); await page.waitForSelector('#record-picker.show'); await page.waitForSelector('#record-picker .record-picker-row');
+  await page.fill('#record-picker-search', query); await page.waitForTimeout(700);
+  await page.click(value ? `#record-picker .record-picker-row[data-value="${value}"]` : '#record-picker .record-picker-row');
+  await page.waitForSelector('#record-picker', { state: 'hidden' });
+}
+
 const BASE = 'http://127.0.0.1:8401';
 const SHOTS = process.env.SHOTS || '/tmp/sp-shots-s1';
 const KEY = process.env.ACTION_TOKEN_KEY;
@@ -57,7 +66,8 @@ let productId = 0;
   await widthOK(page, 'New space', 375); await touch(page, 'New space');
   ok(!(await page.locator('#space-form-emoji-popover').isVisible()), 'the emoji popover is closed');
   await page.click('#space-form-emoji-summary');
-  ok(await page.locator('#space-form-emoji-popover').isVisible() && (await page.locator('.modal').count()) === 0, 'it opens inside the form — no modal');
+  // the record picker (docs/spaces-record-picker.md) is the one modal the shell holds — it only chooses and closes; every other .modal is still a defect
+  ok(await page.locator('#space-form-emoji-popover').isVisible() && (await page.locator('.modal:not(#record-picker)').count()) === 0, 'it opens inside the form — no modal');
   await page.click('.sp-emoji-btn[data-emoji="🎉"]');
   ok((await page.inputValue('#space-form-field-icon')) === '🎉' && !(await page.locator('#space-form-emoji-popover').isVisible()), 'picking an emoji fills the icon and closes the popover');
   await page.fill('#space-form-field-name', 'SMOKE Browser space');
@@ -81,7 +91,7 @@ let productId = 0;
   await go(page, `/spaces/${productId}/members`);
   ok(await page.locator('#space-members-table').count() === 1, 'the members screen renders');
   await widthOK(page, 'Members', 375); await touch(page, 'Members');
-  await page.selectOption('#member-add-field-member', '26');
+  await pickRecord(page, 'member-add-field-member', 'SMOKE Priya', '26');
   await page.click('#member-add-btn');
   await page.waitForSelector('#member-row-26');
   ok((await page.locator('#member-row-26').count()) === 1 && (await page.locator('#notice-banner').innerText()).includes('Saved the members'), 'Priya added through the form; the row appears with the notice');

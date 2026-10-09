@@ -23,6 +23,6 @@ log_screen_view($pdo, 'export-list');
 if (wants_json()) { respond_screen(['exports' => array_map('present_export', $rows), 'all' => $all]); }
 $page = request_string('page');
 $sel = ['page' => is_uuid($page) ? $page : null, 'database' => is_uuid(request_string('database')) ? request_string('database') : null, 'space' => request_integer('space'), 'channel' => request_integer('channel')];
-$picks = ['pages' => $may['own'] ? export_pick_pages($pdo, $sel['page']) : [], 'databases' => $may['own'] ? export_pick_databases($pdo) : [], 'spaces' => $may['space'] ? export_pick_spaces($pdo, $admin) : [], 'channels' => $may['space'] ? export_pick_channels($pdo, $admin) : []];
+$picks = ['spaces' => $may['space'] ? export_pick_spaces($pdo, $admin) : [], 'channels' => $may['space'] ? export_pick_channels($pdo, $admin) : []];
 render_screen('Exports', view('exports/index.php', ['rows' => $rows, 'tz' => member_timezone(), 'all' => $all, 'picks' => $picks, 'may' => $may, 'sel' => $sel, 'notice' => sp_notice($_GET['notice'] ?? null, export_notices())]),
     ['activeNav' => $admin && $may['all'] ? 'admin-exports' : 'exports', 'screen' => 'export-list']);

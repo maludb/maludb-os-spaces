@@ -1,4 +1,4 @@
-<?php /** Who sees the page and why (screen `page-share`). Data: p, rows, pub, picks, guests, departments, restricted, may (guest, publish), here, notice */ $pid = (string) $p['page_id']; ?>
+<?php /** Who sees the page and why (screen `page-share`). Data: p, rows, pub, guests, departments, restricted, may (guest, publish), here, notice */ $pid = (string) $p['page_id']; ?>
 <?= view('shared/header.php', ['id' => 'page-share', 'title' => 'Share ' . ($p['plain_title'] ?: 'the page'), 'crumbs' => [['Home', '/'], ['Pages', '/pages/'], [$p['plain_title'] ?: 'Untitled', '/pages/' . $pid], ['Share', null]], 'back' => back_link() ?? ['/pages/' . $pid, $p['plain_title'] ?: 'the page']]) ?>
 <div class="main-content" id="page-share-content">
     <?= view('shared/notice.php', ['notice' => $notice]) ?>
@@ -19,7 +19,7 @@
             <div class="card mb-3" id="page-share-add"><div class="card-header"><h5 class="card-title mb-0">Share with</h5></div><div class="card-body">
                 <form method="post" action="/pages/share.php" hx-post="/pages/share.php" hx-target="#flash" id="share-form" class="row g-2">
                     <?= csrf_field() ?><input type="hidden" name="page" value="<?= e($pid) ?>"><input type="hidden" name="return_to" value="/pages/<?= e($pid) ?>/share">
-                    <div class="col-12"><label class="form-label fs-12 text-muted" for="share-form-field-member">A person or an agent</label><select name="member" id="share-form-field-member" class="form-select btn-touch"><option value="">—</option><?php foreach ($picks as $m): ?><option value="<?= (int) $m['member_id'] ?>"><?= e($m['display_name']) ?><?= $m['member_kind'] === 'agent' ? ' (agent)' : '' ?></option><?php endforeach; ?></select></div>
+                    <div class="col-12"><label class="form-label fs-12 text-muted" for="share-form-field-member-open">A person or an agent</label><?= picker_field(['id' => 'share-form-field-member', 'name' => 'member', 'source' => 'member', 'value' => null, 'params' => ['page' => $pid], 'placeholder' => '—', 'title' => 'Share with', 'search' => 'Search people and agents…']) ?></div>
                     <div class="col-12"><label class="form-label fs-12 text-muted" for="share-form-field-department">or a department</label><select name="department" id="share-form-field-department" class="form-select btn-touch"><option value="">—</option><?php foreach ($departments as $d): ?><option value="<?= (int) $d['department_id'] ?>"><?= e($d['name']) ?></option><?php endforeach; ?></select></div>
                     <div class="col-7"><label class="form-label fs-12 text-muted" for="share-form-field-level">At</label><select name="level" id="share-form-field-level" class="form-select btn-touch"><?php foreach (PAGE_LEVEL_WORDS as $k => $w): ?><option value="<?= $k ?>" <?= $k === 'view' ? 'selected' : '' ?>><?= e($w) ?></option><?php endforeach; ?></select></div>
                     <div class="col-5 d-flex align-items-end"><button type="submit" class="btn btn-primary btn-touch w-100" id="share-form-btn">Share</button></div>
@@ -30,7 +30,7 @@
                 <?php if ($guests === []): ?><div class="fs-12 text-muted">No guest in the directory yet (an external member holding Guest).</div><?php else: ?>
                 <form method="post" action="/pages/share-guest.php" hx-post="/pages/share-guest.php" hx-target="#flash" hx-confirm="Share <?= e($p['plain_title'] ?: 'this page') ?> outside the business?" id="share-guest-form" class="row g-2">
                     <?= csrf_field() ?><input type="hidden" name="page" value="<?= e($pid) ?>"><input type="hidden" name="return_to" value="/pages/<?= e($pid) ?>/share">
-                    <div class="col-12"><select name="guest" id="share-guest-field-guest" class="form-select btn-touch" aria-label="Guest"><?php foreach ($guests as $g): ?><option value="<?= (int) $g['member_id'] ?>"><?= e($g['display_name']) ?></option><?php endforeach; ?></select></div>
+                    <div class="col-12"><?= picker_field(['id' => 'share-guest-field-guest', 'name' => 'guest', 'source' => 'guest', 'value' => null, 'params' => ['page' => $pid], 'required' => true, 'placeholder' => 'Choose a guest', 'title' => 'Guests', 'search' => 'Search guests…']) ?></div>
                     <div class="col-7"><select name="level" id="share-guest-field-level" class="form-select btn-touch" aria-label="Level"><?php foreach (GUEST_LEVELS as $k): ?><option value="<?= $k ?>"><?= e(PAGE_LEVEL_WORDS[$k]) ?></option><?php endforeach; ?></select></div>
                     <div class="col-5"><button type="submit" class="btn btn-outline-primary btn-touch w-100" id="share-guest-btn">Share</button></div>
                 </form>

@@ -5,6 +5,15 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 const require = createRequire('/var/www/web/node_modules/');
 const { chromium } = require('playwright');
+
+// the record picker (docs/spaces-record-picker.md): choose a record the way a person does — open the field, search, tap the row
+async function pickRecord(page, id, query, value) {
+  await page.click(`#${id}-open`); await page.waitForSelector('#record-picker.show'); await page.waitForSelector('#record-picker .record-picker-row');
+  await page.fill('#record-picker-search', query); await page.waitForTimeout(700);
+  await page.click(value ? `#record-picker .record-picker-row[data-value="${value}"]` : '#record-picker .record-picker-row');
+  await page.waitForSelector('#record-picker', { state: 'hidden' });
+}
+
 const BASE = 'http://127.0.0.1:8401';
 const SHOTS = process.env.SHOTS || '/tmp/sp-shots-s2';
 const KEY = process.env.ACTION_TOKEN_KEY;
@@ -53,7 +62,7 @@ let pageId = '';
   await widthOK(page, 'New page', 375); await touch(page, 'New page');
   await page.fill('#page-form-field-title', 'SMOKE Browser page');
   await page.check('#page-form-where-space');
-  await page.selectOption('#page-form-field-space', { label: '🚀 SMOKE Product' });
+  await pickRecord(page, 'page-form-field-space', 'SMOKE Product');
   await page.selectOption('#page-form-field-template', { label: '📝 Meeting notes' });
   await page.fill('#page-form-field-markdown', 'Made in the browser.');
   await page.click('#page-form-save-btn');
@@ -64,7 +73,8 @@ let pageId = '';
   await page.screenshot({ path: `${SHOTS}/phone-page.png` });
   ok(!(await page.locator('#page-menu-popover').isVisible()), 'the page menu is closed');
   await page.click('#page-menu > summary');
-  ok(await page.locator('#page-menu-popover').isVisible() && (await page.locator('.modal').count()) === 0 && (await page.locator('#page-menu-share').count()) === 1, 'it opens as a popover (no modal) with Share');
+  // the record picker (docs/spaces-record-picker.md) is the one modal the shell holds — it only chooses and closes; every other .modal is still a defect
+  ok(await page.locator('#page-menu-popover').isVisible() && (await page.locator('.modal:not(#record-picker)').count()) === 0 && (await page.locator('#page-menu-share').count()) === 1, 'it opens as a popover (no modal) with Share');
   await page.screenshot({ path: `${SHOTS}/phone-page-menu.png` });
   await page.click('#page-menu-share');
   await page.waitForSelector('#permission-table');
@@ -125,18 +135,21 @@ let link = '';
 {
   const { ctx, page } = await session(1, PHONE, { javaScriptEnabled: false });
   console.log('JavaScript off');
-  await go(page, '/pages/new');
+  // the record picker needs JavaScript (a hidden input is all a plain form has): without it a record is named by the link that opened the form
+  // (?space=N preselects the space) and a share goes to a department, which stays a <select>
+  await go(page, '/');
+  const generalHref = await page.locator('a[href^="/spaces/"]', { hasText: 'General' }).first().getAttribute('href');
+  await go(page, '/pages/new?space=' + generalHref.split('/')[2]);
   await page.fill('#page-form-field-title', 'SMOKE No-JS page');
-  await page.selectOption('#page-form-field-space', { label: '🏠 General' });
   await page.click('#page-form-save-btn');
   await page.waitForSelector('#page-view-content');
   const pid = await idOf(page);
-  ok((await page.locator('#notice-banner').innerText()).includes('Made SMOKE No-JS page'), 'a plain POST makes a page in General (the space select counts; the radio only disables the others with JS)');
+  ok((await page.locator('#notice-banner').innerText()).includes('Made SMOKE No-JS page'), 'a plain POST makes a page in General: the space comes preselected by the link');
   await go(page, `/pages/${pid}/share`);
-  await page.selectOption('#share-form-field-member', { label: 'SMOKE Priya' });
+  await page.selectOption('#share-form-field-department', { label: 'Engineering' });
   await page.click('#share-form-btn');
   await page.waitForSelector('#notice-banner');
-  ok((await page.locator('#permission-table').innerText()).includes('SMOKE Priya'), 'a plain POST shares');
+  ok((await page.locator('#permission-table').innerText()).includes('Engineering'), 'a plain POST shares (with a department: the person picker needs JavaScript)');
   await go(page, `/pages/${pid}/publish`);
   await page.click('#publish-btn');
   await page.waitForSelector('#publish-link-value');

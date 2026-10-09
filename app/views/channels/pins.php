@@ -30,13 +30,13 @@
                 <?= csrf_field() ?><input type="hidden" name="channel" value="<?= $cid ?>"><input type="hidden" name="return_to" value="/channels/<?= $cid ?>/pins">
                 <label class="form-label fs-12 text-muted" for="bookmark-form-field-title">Title</label><input type="text" name="title" id="bookmark-form-field-title" class="form-control btn-touch mb-2" maxlength="100" required>
                 <label class="form-label fs-12 text-muted" for="bookmark-form-field-url">Link</label><input type="url" name="url" id="bookmark-form-field-url" class="form-control btn-touch mb-2" placeholder="https://…">
-                <label class="form-label fs-12 text-muted" for="bookmark-form-field-page">or a page</label><select name="page" id="bookmark-form-field-page" class="form-select btn-touch mb-2"><option value="">—</option><?php foreach ($pages as $pg): ?><option value="<?= e($pg['page_id']) ?>"><?= e($pg['plain_title'] ?: 'Untitled') ?></option><?php endforeach; ?></select>
+                <label class="form-label fs-12 text-muted" for="bookmark-form-field-page-open">or a page</label><div class="mb-2"><?= picker_field(['id' => 'bookmark-form-field-page', 'name' => 'page', 'source' => 'page', 'value' => null, 'placeholder' => '—', 'title' => 'Pages', 'search' => 'Search pages…']) ?></div>
                 <label class="form-label fs-12 text-muted" for="bookmark-form-field-emoji">Emoji</label><input type="text" name="emoji" id="bookmark-form-field-emoji" class="form-control btn-touch mb-2" maxlength="16" placeholder="🔗">
                 <button type="submit" class="btn btn-primary btn-touch w-100" id="bookmark-form-save-btn">Add</button>
             </div></form>
             <form method="post" action="/channels/pins/add.php" hx-post="/channels/pins/add.php" hx-target="#flash" class="card" id="pin-page-form"><div class="card-header"><h5 class="card-title mb-0">Pin a page</h5></div><div class="card-body">
                 <?= csrf_field() ?><input type="hidden" name="channel" value="<?= $cid ?>"><input type="hidden" name="return_to" value="/channels/<?= $cid ?>/pins">
-                <select name="page" id="pin-page-field" class="form-select btn-touch mb-2" required><option value="">Choose a page…</option><?php foreach ($pages as $pg): ?><option value="<?= e($pg['page_id']) ?>"><?= e($pg['plain_title'] ?: 'Untitled') ?></option><?php endforeach; ?></select>
+                <div class="mb-2"><?= picker_field(['id' => 'pin-page-field', 'name' => 'page', 'source' => 'page', 'value' => null, 'required' => true, 'placeholder' => 'Choose a page…', 'title' => 'Pages', 'search' => 'Search pages…']) ?></div>
                 <button type="submit" class="btn btn-outline-primary btn-touch w-100" id="pin-page-btn">Pin the page</button>
             </div></form>
         </div>

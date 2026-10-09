@@ -51,8 +51,8 @@ $sel = static fn (array $opts, ?string $cur, string $none = '—'): string => '<
             <input type="hidden" name="wrap" value="no"><label class="d-flex align-items-center gap-2 border rounded px-3 btn-touch" for="view-form-field-wrap"><input type="checkbox" class="form-check-input mt-0" name="wrap" id="view-form-field-wrap" value="yes" <?= $v['wrap'] ? 'checked' : '' ?>>Wrap long text in the table</label>
         </div></div>
         <div class="card mb-3" id="view-form-linked"><div class="card-header"><h5 class="card-title mb-0">On another page</h5></div><div class="card-body">
-            <label class="form-label fs-12 text-muted" for="view-form-field-linked_from">Show this view on a page (read-only, as a linked view)</label>
-            <select name="linked_from" id="view-form-field-linked_from" class="form-select btn-touch"><option value="">Not on a page</option><?php foreach ($homes as $p): ?><option value="<?= e($p['page_id']) ?>" <?= ($v['linked_from_page_id'] ?? null) === $p['page_id'] ? 'selected' : '' ?>><?= e($p['plain_title'] ?: 'Untitled') ?></option><?php endforeach; ?></select>
+            <label class="form-label fs-12 text-muted" for="view-form-field-linked_from-open">Show this view on a page (read-only, as a linked view)</label>
+            <?= picker_field(['id' => 'view-form-field-linked_from', 'name' => 'linked_from', 'source' => 'page', 'value' => $v['linked_from_page_id'] ?? null, 'params' => ['editable' => 1, 'pages_only' => 1], 'placeholder' => 'Not on a page', 'title' => 'Pages', 'search' => 'Search pages…']) ?>
         </div></div>
         <button type="submit" class="btn btn-primary btn-touch w-100 mb-2" id="view-form-save-btn"><?= $cur === null ? 'Make the view' : 'Save the view' ?></button>
         <?= hx_link($back[0], 'Cancel', 'btn btn-light btn-touch w-100', 'id="view-form-cancel-link"') ?>

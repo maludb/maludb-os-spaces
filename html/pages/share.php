@@ -11,7 +11,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
     require_page_level($id, 'full');
     $rows = page_permissions($pdo, $id);
     $pub = publication($pdo, $id);
-    $picks = members_for_pick($pdo);
     $guests = has_right('share.guest') ? guests_for_pick($pdo) : [];
     $departments = find_live_departments($pdo);
     $restricted = $p['permission_root_id'] === $id && !db_bool($pdo, "SELECT EXISTS (SELECT 1 FROM mcp_page_permissions WHERE page_id = CAST(:id AS uuid) AND principal_kind IN ('everyone_in_space', 'everyone'))", ['id' => $id]) && $p['space_id'] !== null;
@@ -19,7 +18,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
     if (wants_json()) {
         respond_screen(['page' => present_page($p), 'permissions' => array_map('present_permission', $rows), 'restricted' => $restricted, 'publication' => present_publication($pub), 'may' => ['guest' => has_right('share.guest'), 'publish' => has_right('publish.web')]]);
     }
-    render_screen('Share ' . ($p['plain_title'] ?: 'the page'), view('pages/share.php', ['p' => $p, 'rows' => $rows, 'pub' => $pub, 'picks' => $picks, 'guests' => $guests, 'departments' => $departments, 'restricted' => $restricted,
+    render_screen('Share ' . ($p['plain_title'] ?: 'the page'), view('pages/share.php', ['p' => $p, 'rows' => $rows, 'pub' => $pub, 'guests' => $guests, 'departments' => $departments, 'restricted' => $restricted,
         'may' => ['guest' => has_right('share.guest'), 'publish' => has_right('publish.web')], 'here' => here_url(), 'notice' => sp_notice($_GET['notice'] ?? null, page_notices($p))]),
         ['activeNav' => 'pages', 'screen' => 'page-share', 'entity' => 'page', 'recordId' => $id]);
     exit;

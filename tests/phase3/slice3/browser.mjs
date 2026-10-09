@@ -6,6 +6,15 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 const require = createRequire('/var/www/web/node_modules/');
 const { chromium } = require('playwright');
+
+// the record picker (docs/spaces-record-picker.md): choose a record the way a person does — open the field, search, tap the row
+async function pickRecord(page, id, query, value) {
+  await page.click(`#${id}-open`); await page.waitForSelector('#record-picker.show'); await page.waitForSelector('#record-picker .record-picker-row');
+  await page.fill('#record-picker-search', query); await page.waitForTimeout(700);
+  await page.click(value ? `#record-picker .record-picker-row[data-value="${value}"]` : '#record-picker .record-picker-row');
+  await page.waitForSelector('#record-picker', { state: 'hidden' });
+}
+
 const BASE = 'http://127.0.0.1:8401';
 const SHOTS = process.env.SHOTS || '/tmp/sp-shots-s3';
 const KEY = process.env.ACTION_TOKEN_KEY;
@@ -59,7 +68,7 @@ let marcoPage = null, pid = '';
   await go(page, '/pages/new');
   await page.fill('#page-form-field-title', 'SMOKE Browser editor');
   await page.check('#page-form-where-space');
-  await page.selectOption('#page-form-field-space', { label: '🚀 SMOKE Product' });
+  await pickRecord(page, 'page-form-field-space', 'SMOKE Product');
   await page.fill('#page-form-field-markdown', 'the first paragraph');
   await page.click('#page-form-save-btn');
   await page.waitForSelector('#editor');

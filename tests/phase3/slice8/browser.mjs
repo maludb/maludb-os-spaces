@@ -5,6 +5,15 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 const require = createRequire('/var/www/web/node_modules/');
 const { chromium } = require('playwright');
+
+// the record picker (docs/spaces-record-picker.md): choose a record the way a person does — open the field, search, tap the row
+async function pickRecord(page, id, query, value) {
+  await page.click(`#${id}-open`); await page.waitForSelector('#record-picker.show'); await page.waitForSelector('#record-picker .record-picker-row');
+  await page.fill('#record-picker-search', query); await page.waitForTimeout(700);
+  await page.click(value ? `#record-picker .record-picker-row[data-value="${value}"]` : '#record-picker .record-picker-row');
+  await page.waitForSelector('#record-picker', { state: 'hidden' });
+}
+
 const { execSync } = require('node:child_process');
 const BASE = 'http://127.0.0.1:8401';
 const SHOTS = process.env.SHOTS || '/tmp/sp-shots-s8';
@@ -56,7 +65,7 @@ const xsOf = async (page, sel) => page.evaluate((s) => [...document.querySelecto
   await page.screenshot({ path: `${SHOTS}/import-375.png`, fullPage: true });
   // the browser path of a zip: choose it, preview, import
   await page.setInputFiles('#import-form-field-file', W.tree_zip);
-  await page.selectOption('#import-form-field-space', String(W.product));
+  await pickRecord(page, 'import-form-field-space', 'SMOKE Product', String(W.product));
   await Promise.all([page.waitForURL(/\/import\?preview=/), page.click('#import-form-preview-btn')]);
   await page.waitForLoadState('networkidle');
   ok(await page.locator('#import-preview').count() === 1 && (await page.locator('#import-preview-pages').innerText()) === '6' && (await page.locator('#import-preview-rows').innerText()) === '7' && (await page.locator('#import-preview-databases').innerText()) === '2', 'a zip chosen in the browser and previewed: 6 pages, 2 databases, 7 rows');

@@ -66,7 +66,9 @@ OS's agents as members of all of it (Notion and Slack in one, for people and age
   before `apply`** except that three-line port pin (`deploy/ROOT_STEPS.sh` step 0); proofs read `$SP_DEV_ENV`.
 - Phone first: a channel is read and answered at 375 px; a page is read at 375 px and edited at 1280 px first (the editor
   works on a phone, designed for a desktop); no modals (the slash menu and the mention picker are popovers inside the editor,
-  not modals); full-page create/edit for records; cards for named things (spaces, pages in a list, databases' gallery view),
+  not modals) **except the record picker** (2026-10-09, `docs/spaces-record-picker.md`): one `#record-picker` dialog in the shell where a form
+  chooses a RECORD — a person, a page, a database, a space, a channel — and which only chooses and closes (a form never lives in it;
+  enumerations and short configuration lists stay `<select>`s); full-page create/edit for records; cards for named things (spaces, pages in a list, databases' gallery view),
   tables for database table views and admin lists; every name a link, every page a way back.
 - Commit after every finished step on `main`, in the sibling repos' message style (`Spaces: …`); never push unless the owner
   asks. Smokes and fixtures are named `SMOKE <run>`; proofs run on a scratch database and never touch the installed

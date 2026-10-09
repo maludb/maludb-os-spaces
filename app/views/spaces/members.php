@@ -6,8 +6,8 @@
     <div class="card mb-3" id="space-members-add"><div class="card-header"><h5 class="card-title mb-0">Add to <?= e($s['name']) ?></h5></div><div class="card-body">
         <form method="post" action="/spaces/members/add.php" hx-post="/spaces/members/add.php" hx-target="#flash" id="member-add-form" class="row g-2 align-items-end">
             <?= csrf_field() ?><input type="hidden" name="space" value="<?= $id ?>"><input type="hidden" name="return_to" value="/spaces/<?= $id ?>/members">
-            <div class="col-12 col-md-5"><label class="form-label fs-12 text-muted" for="member-add-field-member">A person or an agent</label>
-                <select name="member" id="member-add-field-member" class="form-select btn-touch"><option value="">—</option><?php foreach ($picks as $p): ?><option value="<?= (int) $p['member_id'] ?>"><?= e($p['display_name']) ?><?= $p['member_kind'] === 'agent' ? ' (agent)' : '' ?></option><?php endforeach; ?></select></div>
+            <div class="col-12 col-md-5"><label class="form-label fs-12 text-muted" for="member-add-field-member-open">A person or an agent</label>
+                <?= picker_field(['id' => 'member-add-field-member', 'name' => 'member', 'source' => 'member', 'value' => null, 'params' => ['space' => $id], 'title' => 'Add to ' . $s['name'], 'placeholder' => '—', 'search' => 'Search people and agents…']) ?></div>
             <div class="col-12 col-md-3"><label class="form-label fs-12 text-muted" for="member-add-field-department">or a whole department</label>
                 <select name="department" id="member-add-field-department" class="form-select btn-touch"><option value="">—</option><?php foreach ($departments as $d): ?><option value="<?= (int) $d['department_id'] ?>"><?= e($d['name']) ?></option><?php endforeach; ?></select></div>
             <div class="col-6 col-md-2"><label class="form-label fs-12 text-muted" for="member-add-field-role">As</label><select name="role" id="member-add-field-role" class="form-select btn-touch"><option value="member">member</option><option value="owner">owner</option></select></div>

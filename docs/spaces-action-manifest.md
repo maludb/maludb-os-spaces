@@ -17,7 +17,12 @@
   `/{x}/{id}` → `view.php?id=`, `/{x}/{id}/{page}` → `{page}.php?id=`; a page, a database, a view and a comment are **UUIDs**
   (`/pages/{id}` carries one); a space, a channel, a message and everything administrative are integers. A channel and a page are
   read at 375 px first; the editor is designed at 1280 px and works at 375; no screen is a modal (the slash menu, the mention
-  picker, the emoji picker and the property editor are popovers inside the editor).
+  picker, the emoji picker and the property editor are popovers inside the editor) — and the **record picker**, the one exemption
+  (2026-10-09, `docs/spaces-record-picker.md`): a form that chooses a RECORD (a person or an agent, a page, a database, a space, a
+  channel) opens ONE `#record-picker` dialog in the shell that only chooses and closes. Its one read endpoint is **`GET /pick/`**
+  (`html/pick/index.php`, the registry `app/pickers.php`): `source`, `q`, `page`, `selected` and the source's declared params; a
+  fragment, never logged, **not an action and not a screen** — no row of this manifest, no tool; the hidden input of each field keeps the old
+  select's name and id, so every action below takes the same params as before.
 - **Prefill params** become query-string values the GET controller reads.
 - **Every screen partial stamps** `data-screen`, `data-entity`, `data-record-id` on `#page-content`, so "this page", "pin that" and
   "share it with Priya" resolve against the page the user is on.

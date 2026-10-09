@@ -14,7 +14,7 @@
             <?php if ($may['add']): ?>
             <form method="post" action="/channels/members/add.php" hx-post="/channels/members/add.php" hx-target="#flash" class="card mb-3" id="channel-member-add-form"><div class="card-header"><h5 class="card-title mb-0">Add a member or an agent</h5></div><div class="card-body">
                 <?= csrf_field() ?><input type="hidden" name="channel" value="<?= $cid ?>"><input type="hidden" name="return_to" value="/channels/<?= $cid ?>/members">
-                <select name="member" class="form-select btn-touch mb-2" id="channel-member-add-field" required><option value="">Choose…</option><?php foreach ($cands['members'] as $m): ?><option value="<?= (int) $m['member_id'] ?>"><?= e($m['display_name']) ?><?= $m['is_agent'] ? ' (agent)' : '' ?></option><?php endforeach; ?></select>
+                <div class="mb-2"><?= picker_field(['id' => 'channel-member-add-field', 'name' => 'member', 'source' => 'channel_member', 'value' => null, 'params' => ['channel' => $cid], 'required' => true, 'placeholder' => 'Choose…', 'title' => 'Add to ' . $c['label'], 'search' => 'Search people and agents…']) ?></div>
                 <button type="submit" class="btn btn-primary btn-touch w-100" id="channel-member-add-btn">Add</button>
                 <div class="fs-12 text-muted mt-2">Someone outside the space: the database says "Join the space first".</div>
             </div></form>
@@ -22,7 +22,7 @@
             <?php if ($may['guest']): ?>
             <form method="post" action="/channels/members/add-guest.php" hx-post="/channels/members/add-guest.php" hx-target="#flash" hx-confirm="Add a guest to <?= e($c['label']) ?>? They will read everything in it." class="card" id="channel-guest-add-form"><div class="card-header"><h5 class="card-title mb-0">Add a guest</h5></div><div class="card-body">
                 <?= csrf_field() ?><input type="hidden" name="channel" value="<?= $cid ?>"><input type="hidden" name="return_to" value="/channels/<?= $cid ?>/members">
-                <select name="guest" class="form-select btn-touch mb-2" id="channel-guest-add-field" required><option value="">Choose…</option><?php foreach ($cands['guests'] as $m): ?><option value="<?= (int) $m['member_id'] ?>"><?= e($m['display_name']) ?></option><?php endforeach; ?></select>
+                <div class="mb-2"><?= picker_field(['id' => 'channel-guest-add-field', 'name' => 'guest', 'source' => 'channel_guest', 'value' => null, 'params' => ['channel' => $cid], 'required' => true, 'placeholder' => 'Choose…', 'title' => 'Guests', 'search' => 'Search guests…']) ?></div>
                 <button type="submit" class="btn btn-outline-primary btn-touch w-100" id="channel-guest-add-btn">Add the guest</button>
             </div></form>
             <?php endif; ?>

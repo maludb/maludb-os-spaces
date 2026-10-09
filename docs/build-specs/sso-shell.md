@@ -94,7 +94,7 @@ as unbuilt (`render_nav_stub()` in `nav.php`).
   space owner's pending joins (1) and unanswered questions (6); the admin's dispatches, published pages, trash size (7, 2, 9).
 - **The bell**, **My settings** (prefs, status, time zone — `prefs_save`, `status_set`), **Tokens** (`token_mint`, `token_revoke`), **Trail**
   (`trail`: my own rows, or a record's by `space`/`channel`/`message`/`page`) are real in this phase.
-- Every screen: the page-header partial with Back (`?back=`), the flash region `#flash`, no modal anywhere; forms are pages; `hx-confirm` only on
+- Every screen: the page-header partial with Back (`?back=`), the flash region `#flash`, no modal anywhere — but the record picker (2026-10-09, `docs/spaces-record-picker.md`), the one dialog that only chooses and closes; forms are pages; `hx-confirm` only on
   destructive controls.
 
 ## Query functions (signatures fixed)

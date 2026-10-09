@@ -214,6 +214,33 @@ function members_for_pick(PDO $pdo): array
     return $pdo->query("SELECT m.id AS member_id, m.display_name, m.member_kind FROM members m WHERE m.status = 'active' AND m.capability IS NOT NULL ORDER BY m.member_kind, m.display_name")->fetchAll();
 }
 
+/**
+ * The members a person may name (the record picker's `member` source, app/pickers.php): the people and agents the directory admits, searched by
+ * name, e-mail or job title, people first. $notInSpace leaves out those already in that space. One page: {rows, total, page, page_size, pages}.
+ */
+function find_members_for_pick(PDO $pdo, string $q = '', ?int $notInSpace = null, int $page = 1, int $size = 25): array
+{
+    $where = ["m.status = 'active'", 'm.capability IS NOT NULL'];
+    $args = [];
+    if ($q !== '') {
+        $where[] = '(m.display_name ILIKE :q OR m.email::text ILIKE :q OR m.job_title ILIKE :q)';
+        $args['q'] = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+    }
+    if ($notInSpace !== null) {
+        $where[] = 'm.id NOT IN (SELECT sp_space_member_ids(:s))';
+        $args['s'] = $notInSpace;
+    }
+    $cond = implode(' AND ', $where);
+    $st = $pdo->prepare("SELECT count(*) FROM members m WHERE $cond");
+    $st->execute($args);
+    $total = (int) $st->fetchColumn();
+    $pages = max(1, (int) ceil($total / $size));
+    $page = min(max(1, $page), $pages);
+    $st = $pdo->prepare("SELECT m.id AS member_id, m.display_name, m.member_kind, m.job_title, m.email::text AS email FROM members m WHERE $cond ORDER BY (m.member_kind = 'agent'), lower(m.display_name), m.id LIMIT $size OFFSET " . (($page - 1) * $size));
+    $st->execute($args);
+    return ['rows' => $st->fetchAll(), 'total' => $total, 'page' => $page, 'page_size' => $size, 'pages' => $pages];
+}
+
 /** The live departments of the mirror. [{department_id, name}] */
 function find_live_departments(PDO $pdo): array
 {
