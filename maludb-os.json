@@ -94,6 +94,7 @@
       "name": "Records MCP",
       "kind": "mcp",
       "path": "/mcp/records",
+      "port_env": "MCP_RECORDS_PORT",
       "auth_kind": "bearer",
       "agent_reachable": true
     },
@@ -101,6 +102,7 @@
       "name": "Activity MCP",
       "kind": "mcp",
       "path": "/mcp/activity",
+      "port_env": "MCP_ACTIVITY_PORT",
       "auth_kind": "bearer",
       "agent_reachable": true
     }
